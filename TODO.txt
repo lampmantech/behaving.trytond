@@ -1,0 +1,32 @@
+
+
+1) Pull the existing doctests into the behave framework so that
+we can eliminate the duplication in the doctests.
+
+Currently (2.8.2), these are the existing doctests:
+
+
+trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
+trytond_account_asset-2.8.0/tests/scenario_account_asset.rst
+trytond_account_invoice-2.8.2/tests/scenario_invoice.rst
+trytond_account_invoice-2.8.2/tests/scenario_invoice_supplier.rst
+trytond_account_statement-2.8.0/tests/scenario_account_statement.rst
+trytond_account_stock_anglo_saxon-2.8.0/tests/scenario_account_stock_anglo_saxon.rst
+trytond_account_stock_continental-2.8.1/tests/scenario_account_stock_continental.rst
+trytond_carrier_percentage-2.8.0/tests/scenario_carrier_percentage_with_purchase_shipment_cost.rst
+trytond_carrier_weight-2.8.0/tests/scenario_carrier_weight.rst
+trytond_production-2.8.0/tests/scenario_production.rst
+trytond_project_invoice-2.8.2/tests/scenario_project_invoice_effort.rst
+trytond_project_invoice-2.8.2/tests/scenario_project_invoice_timesheet.rst
+trytond_purchase_shipment_cost-2.8.0/tests/scenario_purchase_shipment_cost.rst
+trytond_purchase_shipment_cost-2.8.0/tests/scenario_purchase_shipment_cost_with_account_stock.rst
+trytond_purchase_shipment_cost-2.8.0/tests/scenario_purchase_shipment_cost_with_account_stock_anglo_saxon.rst
+trytond_sale-2.8.1/tests/scenario_sale.rst
+trytond_sale_shipment_cost-2.8.0/tests/scenario_sale_shipment_cost.rst
+trytond_sale_supply-2.8.0/tests/scenario_sale_supply.rst
+trytond_sale_supply-2.8.1/tests/scenario_sale_supply.rst
+trytond_sale_supply_drop_shipment-2.8.0/tests/scenario_sale_supply_drop_shipment.rst
+trytond_sale_supply_drop_shipment-2.8.1/tests/scenario_sale_supply_drop_shipment.rst
+trytond_stock-2.8.2/tests/scenario_stock_average_cost_price.rst
+trytond_stock-2.8.2/tests/scenario_stock_shipment_out.rst
+trytond_stock_lot-2.8.0/tests/scenario_stock_lot_shipment_out.rst
