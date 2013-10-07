@@ -1,0 +1,19 @@
+commit 1f6ceb46a3ad124bae72df9ece1252b1894afb32
+Date:   Mon Oct 7 20:09:12 2013 +0300
+
+    Added environment and basic behave test.
+
+commit d76b7381e3ae8ad5033ac1b87a683801bf865367
+Date:   Mon Oct 7 18:52:21 2013 +0300
+
+    module boilerplate
+
+commit 887c043b545d1edba0b35e0478ece48a0e0ac51f
+Date:   Mon Oct 7 14:01:43 2013 +0000
+
+    Create TODO.txt
+
+commit dc1fa5091f946e95a30551ca92c75dac4a740951
+Date:   Mon Oct 7 06:43:36 2013 -0700
+
+    Initial commit

@@ -1,10 +1,10 @@
 
 
 1) Pull the existing doctests into the behave framework so that
-we can eliminate the duplication in the doctests.
+we can eliminate the duplication in the doctests, and build up
+coverage.
 
 Currently (2.8.2), these are the existing doctests:
-
 
 trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
 trytond_account_asset-2.8.0/tests/scenario_account_asset.rst
@@ -30,3 +30,47 @@ trytond_sale_supply_drop_shipment-2.8.1/tests/scenario_sale_supply_drop_shipment
 trytond_stock-2.8.2/tests/scenario_stock_average_cost_price.rst
 trytond_stock-2.8.2/tests/scenario_stock_shipment_out.rst
 trytond_stock_lot-2.8.0/tests/scenario_stock_lot_shipment_out.rst
+
+
+2) Pull the code from existing non-doctests into the behave framework 
+so that we can build up coverage.
+
+3) Identify the tests in the trytond modules that are really just
+boilerplate (well better than nothing :-) and create empty feature
+files to attract testing to them. They're easy to identify because
+they're about 4 lines long. Currently (2.8.2), these are:
+
+trytond_carrier-2.8.0/tests/test_carrier.py
+trytond_country-2.8.0/tests/test_country.py
+trytond_project-2.8.0/tests/test_project.py
+trytond_calendar-2.8.0/tests/test_calendar.py
+trytond_dashboard-2.8.0/tests/test_dashboard.py
+trytond_timesheet-2.8.0/tests/test_timesheet.py
+trytond_google_maps-2.8.0/tests/test_google_maps.py
+trytond_project_plan-2.8.2/tests/test_project_plan.py
+trytond_analytic_sale-2.8.0/tests/test_analytic_sale.py
+trytond_sale_price_list-2.8.0/tests/test_sale_price_list.py
+trytond_account_product-2.8.0/tests/test_account_product.py
+trytond_ldap_connection-2.8.0/tests/test_ldap_connection.py
+trytond_analytic_account-2.8.0/tests/test_analytic_account.py
+trytond_analytic_invoice-2.8.0/tests/test_analytic_invoice.py
+trytond_sale_opportunity-2.8.1/tests/test_sale_opportunity.py
+trytond_company_work_time-2.8.0/tests/test_company_work_time.py
+trytond_analytic_purchase-2.8.0/tests/test_analytic_purchase.py
+trytond_product_price_list-2.8.0/tests/test_product_price_list.py
+trytond_ldap_authentication-2.8.0/tests/test_ldap_authentication.py
+trytond_product_cost_history-2.8.0/tests/test_product_cost_history.py
+trytond_calendar_scheduling-2.8.0/tests/test_calendar_scheduling.py
+trytond_product_measurements-2.8.0/tests/test_measurements.py
+trytond_stock_product_location-2.8.0/tests/test_stock_product_location.py
+trytond_stock_location_sequence-2.8.0/tests/test_stock_location_sequence.py
+trytond_stock_inventory_location-2.8.0/tests/test_stock_inventory_location.py
+trytond_product_attribute-2.8.0/tests/test_product_attribute.py
+trytond_calendar_todo-2.8.0/tests/test_calendar_todo.py
+trytond_stock_supply_production-2.8.0/tests/test_stock_supply_production.py
+trytond_account_invoice_line_standalone-2.8.0/tests/test_account_invoice_line_standalone.py
+
+
+4) Go through OpenerpScenario for some of their more advanced tests
+that may be isomorphic with Tryton.
+
