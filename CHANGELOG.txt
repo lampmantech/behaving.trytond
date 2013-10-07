@@ -1,3 +1,8 @@
+commit ccf68a6551c76546473b78086896ea03419663d5
+Date:   Mon Oct 7 20:45:48 2013 +0300
+
+    Added basic tests of proteus and loading trytond modules.
+
 commit 1f6ceb46a3ad124bae72df9ece1252b1894afb32
 Date:   Mon Oct 7 20:09:12 2013 +0300
 

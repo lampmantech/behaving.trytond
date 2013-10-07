@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+-*- encoding: utf-8 -*-
 
 trytond_scenari
 ===============
@@ -15,9 +15,9 @@ for BDD testing of OpenERP v6.x and 7.0.
 trytond_scenari uses proteus.
 
 Tests are contained is textual feature files
-   features/*.feature
+   features/\*.feature
 that draw on the definitions of their steps in
-   features/steps/*.py
+   features/steps/\*.py
 For modularity, there is a local python module
 of undecorated python code
   features/steps/support/
@@ -37,13 +37,14 @@ The file features/environment.cfg contains the configuration
 information for the trytond server you are testing. Edit the
 settings to suit your setup; default values are:
 
+```
 [trytond]
 user = admin
 password = admin
 database_name = test28
 database_type = postgres
 config_file = /etc/trytond.conf
-
+```
 If the trytond database does not exist, it will be
 created.  As a rule, these tests to not tear down
 what they have done at the end, so that can be
@@ -55,11 +56,11 @@ files may be important, if one builds on a previous.
 Organization
 ------------
 
-By default, behave runs all *.feature files in
+By default, behave runs all \*.feature files in
 the directory features/ and its sub-directories.
 This allows us to organize the feature tests
 by the module layout in trytond. We will start
-by pulling in the doctest *.rst files, keeping
+by pulling in the doctest \*.rst files, keeping
 the same filename, to take advantage of behave's
 refactoring, and to get the steps to have good coverage.
 
