@@ -13,3 +13,4 @@ Feature: Run the Trytond scenario doctests
 	and Create company
 	and Reload the context
 	and Create fiscal year
+	and Create chart of accounts

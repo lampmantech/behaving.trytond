@@ -1,4 +1,8 @@
 
+0) Fix the FixMe : 
+  grep FixMe features/steps/*.py
+and fix the things we know are broken. 
+I don't know Tryton very well.
 
 1) Pull the existing doctests into the behave framework so that
 we can eliminate the duplication in the doctests, and build up
@@ -38,7 +42,7 @@ so that we can build up coverage.
 3) Identify the tests in the trytond modules that are really just
 boilerplate (well better than nothing :-) and create empty feature
 files to attract testing to them. They're easy to identify because
-they're about 4 lines long. Currently (2.8.2), these are:
+they're about 45 lines long. Currently (2.8.2), these are:
 
 trytond_carrier-2.8.0/tests/test_carrier.py
 trytond_country-2.8.0/tests/test_country.py
@@ -72,5 +76,5 @@ trytond_account_invoice_line_standalone-2.8.0/tests/test_account_invoice_line_st
 
 
 4) Go through OpenerpScenario for some of their more advanced tests
-that may be isomorphic with Tryton.
+that may be isomorphic with Tryton, and port them over.
 

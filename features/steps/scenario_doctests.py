@@ -18,7 +18,9 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from proteus import config, Model, Wizard
 
-COMPANY_NAME = 'B2CK'
+# Warning - these are hardwired from the Tryton code
+from .trytond_constants import *
+
 today = datetime.date.today()
 
 @step('Create database')
@@ -47,8 +49,7 @@ def step_impl(context):
     Company = Model.get('company.company')
     Party = Model.get('party.party')
 
-    companies = Company.find()
-    if not companies:
+    if not Company.find():
         company_config = Wizard('company.company.config')
         company_config.execute('company')
         company = company_config.form
@@ -69,7 +70,7 @@ def step_impl(context):
         company.currency = currency
         company_config.execute('add')
         
-    company, = Company.find()
+    assert Company.find()
 
 @step('Reload the context')
 def step_impl(context):
@@ -100,6 +101,9 @@ def step_impl(context):
         fiscalyear.save()
         FiscalYear.create_period([fiscalyear.id], config.context)
 
+        assert FiscalYear.find([('name', '=', str(today.year))])
+        assert len(fiscalyear.periods) == 12
+        
 @step('Create chart of accounts')
 def step_impl(context):
 
@@ -109,13 +113,13 @@ def step_impl(context):
     Journal = Model.get('account.journal')
     FiscalYear = Model.get('account.fiscalyear')
 
-    # check the success of the previous step
-    fiscalyear, = FiscalYear.find()
-    assert len(fiscalyear.periods) == 12
+    company, = Company.find()
+    fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
+    account_template, = AccountTemplate.find([('parent', '=', MINIMAL_ACCOUNT_PARENT)])
     
-    if not False:
-        company, = Company.find()
-        account_template, = AccountTemplate.find([('parent', '=', False)])
+    # FixMe: Is there a better test of telling if the
+    # 'Minimal A' chart of accounts has been created?
+    if not Account.find([('name', '=', MINIMAL_ACCOUNT_ROOT)]):
         
         create_chart = Wizard('account.create_chart')
         create_chart.execute('account')
@@ -148,4 +152,6 @@ def step_impl(context):
         create_chart.form.account_receivable = receivable
         create_chart.form.account_payable = payable
         create_chart.execute('create_properties')
+
+        assert Account.find([('name', '=', MINIMAL_ACCOUNT_ROOT)])
 

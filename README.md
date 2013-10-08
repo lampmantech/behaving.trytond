@@ -8,9 +8,9 @@ Scenario testing for trytond using behave BDD
 trytond database information and code using BDD.
 
 trytond_scenari is inspired by OpenERPScenario:
-  http:///launchpad.net/~camptocamp/oerpscenario/
+ <http:///launchpad.net/~camptocamp/oerpscenario/>
 with uses behave 
-  http://pythonhosted.org/behave
+ <http://pythonhosted.org/behave>
 for BDD testing of OpenERP v6.x and 7.0. 
 trytond_scenari uses proteus.
 
@@ -35,7 +35,7 @@ Configuration
 
 The file features/environment.cfg contains the configuration
 information for the trytond server you are testing. Edit the
-settings to suit your setup; default values are:
+settings to suit your setup; the default values are:
 
 ```
 [trytond]
@@ -49,15 +49,16 @@ If the trytond database does not exist, it will be
 created.  As a rule, these tests to not tear down
 what they have done at the end, so that can be
 adapted to load database information and code
-into production systems, as well as testing.
-This alsomeans that the order of execution of feature
-files may be important, if one builds on a previous.
+into production systems, as well as testing. This 
+also means that the order of execution of feature
+files may be important, if one step builds on a previous.
 
 Organization
 ------------
 
 By default, behave runs all \*.feature files in
-the directory features/ and its sub-directories.
+the directory features/ and its sub-directories
+(this can be controlled with the -i flag to behave).
 This allows us to organize the feature tests
 by the module layout in trytond. We will start
 by pulling in the doctest \*.rst files, keeping
@@ -65,6 +66,7 @@ the same filename, to take advantage of behave's
 refactoring, and to get the steps to have good coverage.
 
 Feature filenames are often ordered with a year-month
-numeric prefix to group together work of the same timeframe,
-or to influence the execution order by behave.
+numeric prefix to group together work of the same
+timeframe, or to influence the execution order by behave.
+
 

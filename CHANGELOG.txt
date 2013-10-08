@@ -1,3 +1,9 @@
+commit 5e6b244c942731a6599ba4a809b774dd88358ded
+Date:   Mon Oct 7 21:26:23 2013 +0300
+
+    Added the first basic steps from the doctests of creating a company
+    and a fiscal year. Still need to test the results.
+
 commit ccf68a6551c76546473b78086896ea03419663d5
 Date:   Mon Oct 7 20:45:48 2013 +0300
 
