@@ -1,5 +1,6 @@
+# -*- encoding: utf-8 -*-
 
-0) Fix the FixMe : 
+0) Fix all the occurences of "FixMe" : 
   grep FixMe features/steps/*.py
 and fix the things we know are broken. 
 I don't know Tryton very well.
@@ -73,7 +74,6 @@ trytond_product_attribute-2.8.0/tests/test_product_attribute.py
 trytond_calendar_todo-2.8.0/tests/test_calendar_todo.py
 trytond_stock_supply_production-2.8.0/tests/test_stock_supply_production.py
 trytond_account_invoice_line_standalone-2.8.0/tests/test_account_invoice_line_standalone.py
-
 
 4) Go through OpenerpScenario for some of their more advanced tests
 that may be isomorphic with Tryton, and port them over.

@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-import os
+import sys, os
 import ConfigParser
 
 from datetime import datetime
@@ -8,6 +8,8 @@ from optparse import OptionParser
 
 import proteus
 from proteus import Model, Wizard
+
+from .steps.support import tools
 
 ETC_TRYTOND_CONF='/etc/trytond.conf'
 
@@ -22,6 +24,7 @@ def vCreateConfigFile(oConfig, sFile):
 
     oConfig.add_section('scenari')
     oConfig.set('scenari', 'verbosity', '0')
+    oConfig.set('scenari', 'tracer', '')
 
     # Writing our configuration file to 'example.cfg'
     with open(sFile, 'wb') as oFd:
@@ -56,57 +59,117 @@ def before_all(context):
 
     context.oConfig = oConfig
     context.oProteusConfig = proteus.config.set_trytond(
+        database_name=sDatabaseName,
         user=sUser,
         database_type=sDatabaseType,
-        database_name=sDatabaseName,
-        config_file=sTrytonConfigFile,
-        password=sPassword)
+        password=sPassword,
+        language='en_US',
+        config_file=sTrytonConfigFile)
+
+    # one of ['pdb', 'pydbgr']
+    sTracer = oConfig.get('scenari', 'tracer')
+    if sTracer:
+        try:
+            import pydbgr
+            lTracers = ['pdb', 'pydbgr']
+        except:
+            lTracers = ['pdb']
+
+        assert sTracer in lTracers, "Unsupported tracer: %s" % (sTracer,)
+    # use this dictionary as a last resort to pass data around
+    if not hasattr(context, 'dData'):
+        context.dData = dict()
 
 def after_all(context):
     """These run before and after the whole shooting match.
     """
-    pass
+    # This is REQUIRED if we dont want to leave a hanging
+    # database connexion to postgres. It will show up
+    # with netstat evan after the behave process is done.
+    if context.oProteusConfig:
+        context.oProteusConfig.database_connexion.close()
+        context.oProteusConfig = None
+
+    # we still end up with a lingering closewait of the
+    # socket in the trytond server, but that, I think, is OK.
+    # tcp        1      0 127.0.0.1:37369         127.0.0.1:4070          CLOSE_WAIT  22425/python
+    # # ps ax | grep 22425
+    # 22425 pts/0    Sl     4:03 python /n/lib/python2.7/site-packages/tryton-2.8.2-py2.7.egg/EGG-INFO/scripts/tryton
 
 
 def before_step(context, step):
-    """These run before and after every step.
+    """These run before every step.
     """
-    pass
+    
+    ctx = context # From OpenERPScenario
+    ctx._messages = []
+    # Extra cleanup (should be fixed upstream?)
+    ctx.table = None
+    ctx.text = None
+    if not 'scenario' in context.dData or context.dData['scenario'] is None:
+        before_scenario(context, None)
+    if not 'feature'  in context.dData or context.dData['feature'] is None:
+        before_feature(context, None)
 
-def after_step(context, step):
-    """These run before and after every step.
+def after_step(context, laststep):
+    """These run after every step.
+    FixMe; I dont see this getting called after a failed step
+    but the code clearly calls behave-1.2.3 model.py line 1079:
+    runner.run_hook('after_step', runner.context, self)
     """
-    pass
+    sTracer = context.oConfig.get('scenari', 'tracer')
+    ctx = context # From OpenERPScenario
+    if len(ctx.config.outputs):
+        # FixMe: figure these out and formatters
+        # Its of len(1) and class StreamOpener with attribute getvalue()
+        output = ctx.config.outputs[0]
+    # Sleazy - but works for me
+    output = sys.__stdout__
+    if ctx._messages:
+        # Flush the messages collected with puts(...)
+        for item in ctx._messages:
+            for line in str(item).splitlines():
+                output.write(u'      %s\n' % (line,))
+        output.flush()
+        
+    if laststep.status == 'failed' and sTracer and ctx.config.stop:
+        if sTracer == 'pdb':
+            tools.set_trace_with_pdb()
+        elif sTracer == 'pydbgr':
+            tools.set_trace_with_pdb()
 
 def before_scenario(context, scenario):
-    """These run before and after each scenario is run.
+    """These run before each scenario is run.
     """
-    pass
+    # use this dictionary as a last resort to pass data around
+    if not 'scenario' in context.dData or context.dData['scenario'] is None:
+        context.dData['scenario'] = dict()
 
 def after_scenario(context, scenario):
-    """These run before and after each scenario is run.
+    """These run after each scenario is run.
     """
-    pass
+    context.dData['scenario'] = None
 
 def before_feature(context, feature):
-    """These run before and after each feature file is exercised.
+    """These run before each feature file is exercised.
     """
-    pass
+    if not 'feature' in context.dData or context.dData['feature'] is None:
+        context.dData['feature'] = dict()
 
 def after_feature(context, feature):
-    """These run before and after each feature file is exercised.
+    """These run after each feature file is exercised.
     """
-    pass
+    context.dData['feature'] = None
 
 def before_tag(context, tag):
-    """These run before and after a section tagged with the given name. They are
+    """These run before a section tagged with the given name. They are
     invoked for each tag encountered in the order they're found in the
     feature file.
     """
     pass
 
 def after_tag(context, tag):
-    """These run before and after a section tagged with the given name. They are
+    """These run after a section tagged with the given name. They are
     invoked for each tag encountered in the order they're found in the
     feature file.
     """

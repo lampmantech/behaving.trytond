@@ -12,3 +12,6 @@ As of trytond-2.8.2.
 COMPANY_NAME = 'B2CK'
 MINIMAL_ACCOUNT_ROOT = 'Minimal Account Chart'
 MINIMAL_ACCOUNT_PARENT = False
+
+ACCOUNTANT_USER = 'accountant'
+ACCOUNTANT_PASSWORD = 'accountant'

@@ -18,6 +18,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from proteus import config, Model, Wizard
+from .support.fields import string_to_python
 
 # Warning - these are hardwired from the Tryton code
 from .trytond_constants import *
@@ -41,7 +42,8 @@ def step_impl(context):
 
     assert User.find([('name', '=', 'Accountant')])
 
-# Category
+#unused Category
+# Create a saved instance of "product.category" named "Category"
 @step('Create a ProductCategory named "{sName}"')
 def step_impl(context, sName):
     # idempotent
@@ -49,21 +51,16 @@ def step_impl(context, sName):
     if not ProductCategory.find([('name', '=', sName)]):
         category = ProductCategory(name=sName)
         category.save()
-    assert ProductCategory.find([('name', '=', sName)])
+        assert ProductCategory.find([('name', '=', sName)])
 
 # product , 'fixed' or fifo
-@step('Create a ProductTemplate named "{sName}" with a cost_price_method of "{sCPM}"')
-def step_impl(context, sName, sCPM):
+@step('Create a ProductTemplate named "{sName}" having')
+def step_impl(context, sName):
     # idempotent
-    if sCPM == 'fifo':
-        # FixMe: assert product_cost_fifo is loaded
-        pass
 
     ProductTemplate = Model.get('product.template')
 
-    # Yet this works ('cost_price_method', '=', 'fixed'),
-    if not ProductTemplate.find([('name', '=', 'product'),
-                                 ('type', '=', 'goods')]):
+    if not ProductTemplate.find([('name', '=', sName)]):
         ProductCategory = Model.get('product.category')
         category, = ProductCategory.find([('name', '=', 'Category')])
 
@@ -87,9 +84,6 @@ def step_impl(context, sName, sCPM):
             ('kind', '=', 'expense'),
             ('company', '=', company.id),
             ])
-
-        # FixMe: this is defined in account.xml of the
-        # module but it is not picked up on our chart of accounts
         cogs, = Account.find([
                     ('kind', '=', 'other'),
                     ('company', '=', company.id),
@@ -104,16 +98,14 @@ def step_impl(context, sName, sCPM):
                     ('name', 'like', 'Stock%'),
                     ], order=[('name', 'ASC')])
         template = ProductTemplate()
-        template.name = 'product'
-        template.type = 'goods'
-        template.cost_price_method = sCPM
+        template.name = sName
+        # type, cost_price_method
+        for row in context.table:
+            setattr(template, row['name'],
+                    string_to_python(row['name'], row['value']))
+
         template.category = category
         template.default_uom = unit
-        template.purchasable = True
-        template.salable = True
-        template.list_price = Decimal('10')
-        template.cost_price = Decimal('5')
-        template.delivery_time = 0
         template.account_expense = expense
         template.account_revenue = revenue
         template.account_stock = stock
@@ -125,6 +117,11 @@ def step_impl(context, sName, sCPM):
         template.account_journal_stock_supplier = stock_journal
         template.account_journal_stock_customer = stock_journal
         template.account_journal_stock_lost_found = stock_journal
+
+        if template.cost_price_method == 'fifo':
+            # FixMe: assert product_cost_fifo is loaded
+            pass
+
         template.save()
 
 # average or fifo
@@ -167,7 +164,7 @@ def step_impl(context, sCPM):
         context.dData['feature']['product_average'] = product_average
 
 # Direct, 0
-@step('Create a payment term named "{sName}" with "{iNum}" days remainder')
+@step('Create a PaymentTerm named "{sName}" with "{iNum}" days remainder')
 def step_impl(context, sName, iNum):
     # idempotent
     PaymentTerm = Model.get('account.invoice.payment_term')
@@ -180,15 +177,15 @@ def step_impl(context, sName, iNum):
         payment_term.lines.append(payment_term_line)
         payment_term.save()
 
-@step('Purchase 12 products')
-def step_impl(context):
+@step('Purchase 12 products from Supplier "{sSupplier}"')
+def step_impl(context, sSupplier):
     # idempotent
     current_config = context.oProteusConfig
 
     Purchase = Model.get('purchase.purchase')
 
     Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', 'Supplier')])
+    supplier, = Party.find([('name', '=', sSupplier)])
 
     if not Purchase.find([('invoice_method', '=', 'shipment'),
                           ('party.id', '=', supplier.id)]):
@@ -225,16 +222,15 @@ def step_impl(context):
         Purchase.confirm([purchase.id], current_config.context)
         assert purchase.state == u'confirmed'
 
-@step('Receive 9 products')
-def step_impl(context):
+@step('Receive 9 products from Supplier "{sSupplier}"')
+def step_impl(context, sSupplier):
     # idempotent
     current_config = context.oProteusConfig
 
     ShipmentIn = Model.get('stock.shipment.in')
-    Move = Model.get('stock.move')
 
     Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', 'Supplier')])
+    supplier, = Party.find([('name', '=', sSupplier)])
 
     # FixMe: Hack alert - how do I find this Move again?
     if not ShipmentIn.find([('supplier.id', '=', supplier.id)]):
@@ -243,9 +239,12 @@ def step_impl(context):
         Purchase = Model.get('purchase.purchase')
         purchase, = Purchase.find([('invoice_method', '=', 'shipment'),
                                    ('party.id', '=', supplier.id)])
+
+        Move = Model.get('stock.move')
         move = Move(purchase.moves[0].id)
         shipment.incoming_moves.append(move)
         move.quantity = 4.0
+
         move = Move(purchase.moves[1].id)
         shipment.incoming_moves.append(move)
         move.quantity = 5.0
@@ -290,8 +289,8 @@ def step_impl(context):
             (Decimal('0.00'), Decimal('4.00')), \
             "Expected 0.00,4.00 but got %.2f,%.2f" % (expense.debit, expense.credit,)
 
-@step('Open supplier invoice')
-def step_impl(context):
+@step('Open purchase invoice to Supplier "{sSupplier}"')
+def step_impl(context, sSupplier):
 
     current_config = context.oProteusConfig
 
@@ -299,7 +298,7 @@ def step_impl(context):
     Account = Model.get('account.account')
 
     Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', 'Supplier')])
+    supplier, = Party.find([('name', '=', sSupplier)])
     Purchase = Model.get('purchase.purchase')
     purchase, = Purchase.find([('invoice_method', '=', 'shipment'),
                                ('party.id', '=', supplier.id)])
@@ -349,15 +348,15 @@ def step_impl(context):
         (Decimal('46.00'), Decimal('46.00')), \
         "Expected 46.00,46.00 but got %.2f,%.2f" % (stock_supplier.debit, stock_supplier.credit,)
 
-@step('Sale 5 products')
-def step_impl(context):
+@step('Sell 5 products to customer "{sCustomer}"')
+def step_impl(context, sCustomer):
     # idempotent
     current_config = context.oProteusConfig
 
     Sale = Model.get('sale.sale')
 
     Party = Model.get('party.party')
-    customer, = Party.find([('name', '=', 'Customer')])
+    customer, = Party.find([('name', '=', sCustomer)])
 
     if not Sale.find([('invoice_method', '=', 'shipment'),
                       ('party.id', '=', customer.id)]):
@@ -391,8 +390,8 @@ def step_impl(context):
 
         assert sale.state == u'processing'
 
-@step('Send 5 products')
-def step_impl(context):
+@step('Send 5 products to customer "{sCustomer}"')
+def step_impl(context, sCustomer):
     current_config = context.oProteusConfig
 
     ShipmentOut = Model.get('stock.shipment.out')
@@ -401,10 +400,10 @@ def step_impl(context):
     SaleLine = Model.get('sale.line')
 
     Party = Model.get('party.party')
-    customer, = Party.find([('name', '=', 'Customer')])
+    customer, = Party.find([('name', '=', sCustomer)])
 
     sale, = Sale.find([('invoice_method', '=', 'shipment'),
-                      ('party.id', '=', customer.id)])
+                       ('party.id', '=', customer.id)])
 
     # FixMe: not idempotent
     shipment, = sale.shipments

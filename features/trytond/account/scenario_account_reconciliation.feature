@@ -9,10 +9,10 @@ from trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
    Scenario: Run the scenario_account_reconciliation
 
       Given Create database
-        and we ensure that the "account" module is loaded
+        and Ensure that the "account" module is loaded
 	and the "account" module is in the list of loaded modules
-	and Create company
-	and Reload the context
+	and Create the Company with default COMPANY_NAME and Currency code "EUR"
+	and Reload the default User preferences into the context
 	and Create this fiscal year
 	and Create a chart of accounts from the MINIMAL_ACCOUNT_PARENT
         and Create a party named "Customer" with an account_payable attribute

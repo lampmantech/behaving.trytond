@@ -1,3 +1,41 @@
+commit 6b68feaca63be376f84827e4e7b48da8ec81b0fa
+Date:   Tue Oct 22 12:32:37 2013 +0300
+
+    Started parameterizing the tests in scenario_account_stock_anglo_saxon.feature
+    This makes them really reusable to create production systems from the
+    scenari.
+    
+    Also added support for pdb - works.
+    
+    Starting support for pydbgr - may work.
+
+commit 56c24a9565f94a06721e6806dd89db40ba18224c
+Date:   Tue Oct 22 01:18:14 2013 +0300
+
+    Fleshed out:
+      features/trytond/account_stock_anglo_saxon/scenario_account_stock_anglo_saxon.feature
+    which now runs and passes. It still needs parameterizing with tables.
+    
+    Added:
+      features/trytond/account/scenario_account_reconciliation.feature
+    which now runs and passes. It still needs parameterizing with tables.
+    
+    Added:
+      features/trytond/product_cost_fifo/scenario_product_cost_fifo_stock_anglo_saxon.feature
+    which FAILS as it should for now because it is a copy of
+      features/trytond/account_stock_anglo_saxon/scenario_account_stock_anglo_saxon.feature
+    changed to use FIFO, but the accounting results have not yet been updated.
+    
+    Added:
+       rst_to_feature.el
+    I'll deny all knowledge of it :-)
+
+commit bfe602dead1f4595d8b731382b23d877ec3d9eaa
+Date:   Tue Oct 8 13:09:33 2013 +0300
+
+    Added features/trytond/account/2013-10-scenario_account_reconciliation.feature
+    and fixed the creation of the Minimal A chart of accounts to be idempotent.
+
 commit 5e6b244c942731a6599ba4a809b774dd88358ded
 Date:   Mon Oct 7 21:26:23 2013 +0300
 
