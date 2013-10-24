@@ -12,7 +12,7 @@ trytond_scenari is inspired by OpenERPScenario:
  <http:///launchpad.net/~camptocamp/oerpscenario/>
 with uses behave
  <http://pythonhosted.org/behave>
-for BDD testing of OpenERP v6.x and 7.0.
+for BDD testing of OpenERP (v6.x and 7.0).
 trytond_scenari uses proteus.
 
 Tests are contained is textual feature files
@@ -70,9 +70,9 @@ interfere with each other, but dont be surprised
 if there in interference between directories.
 
 If you set tracer in the scenari section of the
-configuration file, it will drop you into
-the pdb debugger, and if you invoke behave with
-the --stop flag.
+configuration file to be pdb, it will drop you into
+the pdb debugger on an error, if you invoked behave 
+with the --stop flag (stop at the first error).
 
 Organization
 ------------
@@ -85,10 +85,6 @@ by the module layout in trytond. We will start
 by pulling in the doctest \*.rst files, keeping
 the same filename, to take advantage of behave's
 refactoring, and to get the steps to have good coverage.
-
-Feature filenames are often ordered with a year-month
-numeric prefix to group together work of the same
-timeframe, or to influence the execution order by behave.
 
 
 Issues

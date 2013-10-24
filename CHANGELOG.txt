@@ -1,3 +1,8 @@
+commit 3ffe9341f945b7452a69f769e190b8f78286e406
+Date:   Tue Oct 22 12:46:58 2013 +0300
+
+    Push up to github.com - see the CHANGELOG.txt for details.
+
 commit 6b68feaca63be376f84827e4e7b48da8ec81b0fa
 Date:   Tue Oct 22 12:32:37 2013 +0300
 

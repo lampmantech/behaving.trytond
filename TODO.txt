@@ -7,7 +7,9 @@ I don't know Tryton very well.
 
 1) Pull the existing doctests into the behave framework so that
 we can eliminate the duplication in the doctests, and build up
-coverage.
+coverage. The huge advantage to this is that when properly 
+parameterized, the test steps become the boilerplate for the
+Test Driven Development of production systems.
 
 Currently (2.8.2), these are the existing doctests:
 
@@ -38,9 +40,9 @@ trytond_stock_lot-2.8.0/tests/scenario_stock_lot_shipment_out.rst
 
 
 2) Pull the code from existing non-doctests into the behave framework 
-so that we can build up coverage.
+so that we can build up coverage, and start running coverage metrics.
 
-3) Identify the tests in the trytond modules that are really just
+3) Identify the trytond modules whose tests are really just proforma
 boilerplate (well better than nothing :-) and create empty feature
 files to attract testing to them. They're easy to identify because
 they're about 45 lines long. Currently (2.8.2), these are:
@@ -75,6 +77,11 @@ trytond_calendar_todo-2.8.0/tests/test_calendar_todo.py
 trytond_stock_supply_production-2.8.0/tests/test_stock_supply_production.py
 trytond_account_invoice_line_standalone-2.8.0/tests/test_account_invoice_line_standalone.py
 
-4) Go through OpenerpScenario for some of their more advanced tests
+5) Start porting over the magic from the OpenERPScenario file steps/dsl.py
+that does the type detection of Tryton fields, and the innstance detecion
+of its "by name:" and "by oid:". We'll need help from Tryton experts
+for this kind of deep internals work.
+
+4) Go through OpenERPScenario for some of their more advanced tests
 that may be isomorphic with Tryton, and port them over.
 
