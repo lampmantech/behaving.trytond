@@ -15,11 +15,11 @@ from trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
 	and Reload the default User preferences into the context
 	and Create this fiscal year
 	and Create a chart of accounts from the MINIMAL_ACCOUNT_PARENT
-        and Create a party named "Customer" with an account_payable attribute
-       	and Create Moves for direct reconciliation
-       	and Reconcile Lines without writeoff
-       	and Create Moves for writeoff reconciliation
-       	and Reconcile Lines with writeoff
+        and TS/SAR Create a party named "Customer" with an account_payable attribute
+       	and TS/SAR Create Moves for direct reconciliation
+       	and TS/SAR Reconcile Lines without writeoff
+       	and TS/SAR Create Moves for writeoff reconciliation
+       	and TS/SAR Reconcile Lines with writeoff
        Then there are some instances of "party.party"
 
       

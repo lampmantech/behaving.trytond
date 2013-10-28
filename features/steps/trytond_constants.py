@@ -13,5 +13,6 @@ COMPANY_NAME = 'B2CK'
 MINIMAL_ACCOUNT_ROOT = 'Minimal Account Chart'
 MINIMAL_ACCOUNT_PARENT = False
 
+ACCOUNTANT_NAME = 'Accountant'
 ACCOUNTANT_USER = 'accountant'
 ACCOUNTANT_PASSWORD = 'accountant'

@@ -1,3 +1,8 @@
+commit 5133559de602c26b6b313a7e1d73fa94804a484e
+Date:   Thu Oct 24 16:16:21 2013 +0300
+
+    Support dropping into pdb on an error.
+
 commit 3ffe9341f945b7452a69f769e190b8f78286e406
 Date:   Tue Oct 22 12:46:58 2013 +0300
 

@@ -25,7 +25,7 @@ from .trytond_constants import *
 today = datetime.date.today()
 
 # Customer
-@step('Create a party named "{sName}" with an account_payable attribute')
+@step('TS/SAR Create a party named "{sName}" with an account_payable attribute')
 def step_impl(context, sName):
 
     Party = Model.get('party.party')
@@ -47,7 +47,7 @@ def step_impl(context, sName):
 
     assert Party.find([('name', '=', sName)])
 
-@step('Create Moves for direct reconciliation')
+@step('TS/SAR Create Moves for direct reconciliation')
 def step_impl(context):
 
     Move = Model.get('account.move')
@@ -121,7 +121,7 @@ def step_impl(context):
     # FixMe: Hack alert - we want to avoid using context.dData
     context.dData['feature']['reconcile2'] = reconcile2
 
-@step('Reconcile Lines without writeoff')
+@step('TS/SAR Reconcile Lines without writeoff')
 def step_impl(context):
 
     reconcile1 = context.dData['feature']['reconcile1']
@@ -138,7 +138,7 @@ def step_impl(context):
     assert reconcile1.reconciliation == reconcile2.reconciliation != None
     assert len(reconcile1.reconciliation.lines) == 2
 
-@step('Create Moves for writeoff reconciliation')
+@step('TS/SAR Create Moves for writeoff reconciliation')
 def step_impl(context):
 
     Move = Model.get('account.move')
@@ -214,7 +214,7 @@ def step_impl(context):
     # FixMe: Hack alert - we want to avoid using context.dData
     context.dData['feature']['reconcile2'] = reconcile2
 
-@step('Reconcile Lines with writeoff')
+@step('TS/SAR Reconcile Lines with writeoff')
 def step_impl(context):
 
     reconcile1 = context.dData['feature']['reconcile1']

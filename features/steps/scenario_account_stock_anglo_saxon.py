@@ -25,18 +25,19 @@ from .trytond_constants import *
 
 today = datetime.date.today()
 
-@step('Create an accountant user')
-def step_impl(context):
+# Account
+@step('TS/SASAS Create an ACCOUNTANT_USER user with the "{sGroup}" group')
+def step_impl(context, sGroup):
     # idempotent
     User = Model.get('res.user')
     Group = Model.get('res.group')
 
-    if not User.find([('name', '=', 'Accountant')]):
+    if not User.find([('name', '=', ACCOUNTANT_NAME)]):
         accountant = User()
-        accountant.name = 'Accountant'
-        accountant.login = 'accountant'
-        accountant.password = 'accountant'
-        account_group, = Group.find([('name', '=', 'Account')])
+        accountant.name = ACCOUNTANT_NAME
+        accountant.login = ACCOUNTANT_USER
+        accountant.password = ACCOUNTANT_PASSWORD
+        account_group, = Group.find([('name', '=', sGroup)])
         accountant.groups.append(account_group)
         accountant.save()
 
@@ -44,7 +45,7 @@ def step_impl(context):
 
 #unused Category
 # Create a saved instance of "product.category" named "Category"
-@step('Create a ProductCategory named "{sName}"')
+@step('TS/SASAS Create a ProductCategory named "{sName}"')
 def step_impl(context, sName):
     # idempotent
     ProductCategory = Model.get('product.category')
@@ -54,7 +55,7 @@ def step_impl(context, sName):
         assert ProductCategory.find([('name', '=', sName)])
 
 # product , 'fixed' or fifo
-@step('Create a ProductTemplate named "{sName}" having')
+@step('TS/SASAS Create a ProductTemplate named "{sName}" having')
 def step_impl(context, sName):
     # idempotent
 
@@ -124,13 +125,11 @@ def step_impl(context, sName):
 
         template.save()
 
-# average or fifo
-@step('Create a product with a cost_price_method of "{sCPM}"')
-def step_impl(context, sCPM):
+# product, average or fifo
+@step('TS/SASAS Create a product from the ProductTemplate named "{sName}"')
+# FixMe: actually creates 2 different Product and ProductTemplates
+def step_impl(context, sName):
 
-    if sCPM == 'fifo':
-        # FixMe: assert product_cost_fifo is loaded
-        pass
     current_config = context.oProteusConfig
     Product = Model.get('product.product')
 
@@ -138,7 +137,7 @@ def step_impl(context, sCPM):
     # FixMe: ('cost_price_method', '=', 'fixed'), gives a SQL Error
     # ProgrammingError: can't adapt type 'product.template'
 
-    template = ProductTemplate.find([('name', '=', 'product'),
+    template = ProductTemplate.find([('name', '=', sName),
                                      ('type', '=', 'goods')])[0]
 
     # FixMe: Hack alert - how do I find this Product again?
@@ -150,12 +149,16 @@ def step_impl(context, sCPM):
 
         # FixMe: Hack alert - we want to avoid using context.dData
         context.dData['feature']['product'] = product
-
+        
+    # FixMe: Hack alert - how do I find this Product again?
+    if not 'product_average' in context.dData['feature']:
         template_average = ProductTemplate(
             ProductTemplate.copy([template.id],
                                  current_config.context)[0])
-        template_average.cost_price_method = sCPM
+        template_average.cost_price_method = 'average'
         template_average.save()
+        
+        product = context.dData['feature']['product']
         product_average = Product(
             Product.copy([product.id], {
                 'template': template_average.id,
@@ -164,7 +167,7 @@ def step_impl(context, sCPM):
         context.dData['feature']['product_average'] = product_average
 
 # Direct, 0
-@step('Create a PaymentTerm named "{sName}" with "{iNum}" days remainder')
+@step('TS/SASAS Create a PaymentTerm named "{sName}" with "{iNum}" days remainder')
 def step_impl(context, sName, iNum):
     # idempotent
     PaymentTerm = Model.get('account.invoice.payment_term')
@@ -177,7 +180,7 @@ def step_impl(context, sName, iNum):
         payment_term.lines.append(payment_term_line)
         payment_term.save()
 
-@step('Purchase 12 products from Supplier "{sSupplier}"')
+@step('TS/SASAS Purchase 12 products from Supplier "{sSupplier}"')
 def step_impl(context, sSupplier):
     # idempotent
     current_config = context.oProteusConfig
@@ -209,6 +212,7 @@ def step_impl(context, sSupplier):
         purchase_line.product = product
         purchase_line.quantity = 5.0
         purchase_line.unit_price = Decimal(4)
+        
         purchase_line = PurchaseLine()
         purchase.lines.append(purchase_line)
         purchase_line.product = product_average
@@ -222,7 +226,7 @@ def step_impl(context, sSupplier):
         Purchase.confirm([purchase.id], current_config.context)
         assert purchase.state == u'confirmed'
 
-@step('Receive 9 products from Supplier "{sSupplier}"')
+@step('TS/SASAS Receive 9 products from Supplier "{sSupplier}"')
 def step_impl(context, sSupplier):
     # idempotent
     current_config = context.oProteusConfig
@@ -275,11 +279,6 @@ def step_impl(context, sSupplier):
         assert (stock.debit, stock.credit) == \
             (Decimal('50.00'), Decimal('0.00')), \
             "Expected 50.00,0.00 but got %.2f,%.2f" % (stock.debit, stock.credit,)
-
-        Account = Model.get('account.account')
-        party, = Party.find([('name', '=', COMPANY_NAME)])
-        Company = Model.get('company.company')
-        company, = Company.find([('party.id', '=', party.id)])
         expense, = Account.find([
             ('kind', '=', 'expense'),
             ('company', '=', company.id),
@@ -289,7 +288,7 @@ def step_impl(context, sSupplier):
             (Decimal('0.00'), Decimal('4.00')), \
             "Expected 0.00,4.00 but got %.2f,%.2f" % (expense.debit, expense.credit,)
 
-@step('Open purchase invoice to Supplier "{sSupplier}"')
+@step('TS/SASAS Open purchase invoice to Supplier "{sSupplier}"')
 def step_impl(context, sSupplier):
 
     current_config = context.oProteusConfig
@@ -348,7 +347,7 @@ def step_impl(context, sSupplier):
         (Decimal('46.00'), Decimal('46.00')), \
         "Expected 46.00,46.00 but got %.2f,%.2f" % (stock_supplier.debit, stock_supplier.credit,)
 
-@step('Sell 5 products to customer "{sCustomer}"')
+@step('TS/SASAS Sell 5 products to customer "{sCustomer}"')
 def step_impl(context, sCustomer):
     # idempotent
     current_config = context.oProteusConfig
@@ -390,7 +389,7 @@ def step_impl(context, sCustomer):
 
         assert sale.state == u'processing'
 
-@step('Send 5 products to customer "{sCustomer}"')
+@step('TS/SASAS Send 5 products to customer "{sCustomer}"')
 def step_impl(context, sCustomer):
     current_config = context.oProteusConfig
 
@@ -438,7 +437,7 @@ def step_impl(context, sCustomer):
         (Decimal('50.00'), Decimal('28.00')), \
         "Expected 50.00,28.00 but got %.2f,%.2f" % (stock.debit, stock.credit,)
 
-@step('Open customer invoice')
+@step('TS/SASAS Open customer invoice')
 def step_impl(context):
 
     current_config = context.oProteusConfig
@@ -478,7 +477,7 @@ def step_impl(context):
     revenue.reload()
     assert (revenue.debit, revenue.credit) == \
         (Decimal('0.00'), Decimal('50.00')), \
-        "Expected 50.00,0.00 but got %.2f,%.2f" % (revenue.debit, revenue.credit,)
+        "Expected 0.00,50.00 but got %.2f,%.2f" % (revenue.debit, revenue.credit,)
 
     (stock, stock_customer, stock_lost_found, stock_production,
      stock_supplier) = Account.find([
@@ -501,7 +500,7 @@ def step_impl(context):
         (Decimal('28.00'), Decimal('0.00')), \
         "Expected 28.00,0.00 but got %.2f,%.2f" % (cogs.debit, cogs.credit,)
 
-@step('Now create a supplier invoice with an accountant')
+@step('TS/SASAS Now create a supplier invoice with an accountant')
 def step_impl(context):
 
     current_config = context.oProteusConfig

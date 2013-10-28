@@ -7,7 +7,7 @@ From OerpScenario support/tools.py
 import sys
 import traceback
 
-__all__ = ['puts', 'set_trace']    # + 20 'assert_*' helpers
+__all__ = ['puts', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr']    # + 20 'assert_*' 
 
 def print_exc():
     """Print exception, and its relevant stack trace."""
