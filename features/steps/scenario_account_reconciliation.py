@@ -24,30 +24,7 @@ from .trytond_constants import *
 
 today = datetime.date.today()
 
-# Customer
-@step('TS/SAR Create a party named "{sName}" with an account_payable attribute')
-def step_impl(context, sName):
-
-    Party = Model.get('party.party')
-    Company = Model.get('company.company')
-    Account = Model.get('account.account')
-
-    if not Party.find([('name', '=', sName)]):
-        party, = Party.find([('name', '=', COMPANY_NAME)])
-        company, = Company.find([('party.id', '=', party.id)])
-        payables = Account.find([
-                ('kind', '=', 'payable'),
-                ('company', '=', company.id),
-                ])
-        assert payables
-        payable = payables[0]
-        customer = Party(name=sName)
-        customer.account_payable = payable
-        customer.save()
-
-    assert Party.find([('name', '=', sName)])
-
-@step('TS/SAR Create Moves for direct reconciliation')
+@step('T/A/SAR Create Moves for direct reconciliation')
 def step_impl(context):
 
     Move = Model.get('account.move')
@@ -121,7 +98,7 @@ def step_impl(context):
     # FixMe: Hack alert - we want to avoid using context.dData
     context.dData['feature']['reconcile2'] = reconcile2
 
-@step('TS/SAR Reconcile Lines without writeoff')
+@step('T/A/SAR Reconcile Lines without writeoff')
 def step_impl(context):
 
     reconcile1 = context.dData['feature']['reconcile1']
@@ -138,7 +115,7 @@ def step_impl(context):
     assert reconcile1.reconciliation == reconcile2.reconciliation != None
     assert len(reconcile1.reconciliation.lines) == 2
 
-@step('TS/SAR Create Moves for writeoff reconciliation')
+@step('T/A/SAR Create Moves for writeoff reconciliation')
 def step_impl(context):
 
     Move = Model.get('account.move')
@@ -214,7 +191,7 @@ def step_impl(context):
     # FixMe: Hack alert - we want to avoid using context.dData
     context.dData['feature']['reconcile2'] = reconcile2
 
-@step('TS/SAR Reconcile Lines with writeoff')
+@step('T/A/SAR Reconcile Lines with writeoff')
 def step_impl(context):
 
     reconcile1 = context.dData['feature']['reconcile1']

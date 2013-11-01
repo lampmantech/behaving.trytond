@@ -9,6 +9,6 @@ Feature: showing off trytond dsl from OpenERPScenario
       Given Ensure that the "party" module is loaded
         and I need a "party.party" with name: MyParty
         and having
-	    | name	| value		| 
+	    | name	| value		|
 	    | full_name | My Party 	|
        then there are some instances of "party.party"

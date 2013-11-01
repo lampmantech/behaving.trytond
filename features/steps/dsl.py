@@ -7,6 +7,8 @@ This is from OpenERPScenario and may fail, as is not properly ported to Tryton y
 
 from ast import literal_eval
 import time
+import datetime
+from decimal import Decimal
 import pdb
 
 from behave import *
@@ -110,9 +112,17 @@ def parse_table_values(ctx, obj, table):
             value = int(value)
         elif field_type == 'float':
             value = float(value)
-        elif field_type == 'boolean':
-            value = True
-        elif field_type in ('date', 'datetime'):
+        elif field_type == 'float':
+            value = float(value)
+        elif field_type == 'numeric':
+            # guessing
+            value = Decimal(value)
+        elif field_type == 'date':
+            # maybe Tryton wants a datetime object?
+            value = time.strftime(value)
+            value = datetime.date(*map(int,value.split('-')))
+        elif field_type == 'datetime':
+            # maybe Tryton wants a datetime object?
             value = time.strftime(value)
         res[key] = value
     return res
@@ -122,7 +132,7 @@ def parse_table_values(ctx, obj, table):
 @step('having')
 def impl_having(ctx):
     config = ctx.oProteusConfig
-    
+
     assert ctx.table, "please supply a table of values"
     assert ctx.search_model_name, 'cannot use "having" step without a previous step setting a model'
     table_values = parse_table_values(ctx, ctx.search_model_name,
@@ -147,7 +157,7 @@ def impl_having(ctx):
 
 def create_new_obj(ctx, model_name, values):
     config = ctx.oProteusConfig
-    
+
     values = values.copy()
     xmlid = values.pop('xmlid', None)
 

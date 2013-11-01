@@ -19,7 +19,7 @@ def vCreateConfigFile(oConfig, sFile):
     oConfig.set('trytond', 'password', 'foobar')
     oConfig.set('trytond', 'user', 'admin')
     oConfig.set('trytond', 'database_name', 'test28')
-    oConfig.set('trytond', 'database_type', 'postgres')
+    oConfig.set('trytond', 'database_type', 'postgresql')
     oConfig.set('trytond', 'config_file', ETC_TRYTOND_CONF)
 
     oConfig.add_section('scenari')
@@ -53,7 +53,7 @@ def before_all(context):
     sPassword = oConfig.get('trytond', 'password')
     assert sPassword
     sDatabaseType=oConfig.get('trytond', 'database_type')
-    assert sDatabaseType in ['postgres'], "Unsupported database type: " + sDatabaseType
+#?    assert sDatabaseType in ['postgresql'], "Unsupported database type: " + sDatabaseType
     sTrytonConfigFile=oConfig.get('trytond', 'config_file')
     assert os.path.exists(sTrytonConfigFile), "Required file not found: " + sTrytonConfigFile
 
@@ -81,13 +81,26 @@ def before_all(context):
         context.dData = dict()
 
 def after_all(context):
-    """These run before and after the whole shooting match.
+    """These run after the whole shooting match.
     """
     # This is REQUIRED if we dont want to leave a hanging
     # database connexion to postgres. It will show up
     # with netstat evan after the behave process is done.
     if context.oProteusConfig:
-        context.oProteusConfig.database_connexion.close()
+        if hasattr(context.oProteusConfig, 'database_connexion'):
+            # a patch of ours to proteus 2.8 config.py to support this
+            context.oProteusConfig.database_connexion.close()
+        else:
+            try:
+                # works for Tryton 3.x
+                from trytond import backend
+                _connpool = backend.get('Database')._connpool
+                if _connpool: 
+                    _connpool.closeall()
+                    _connpool = None
+            except:
+                # This is not fatal
+                pass
         context.oProteusConfig = None
 
     # we still end up with a lingering closewait of the

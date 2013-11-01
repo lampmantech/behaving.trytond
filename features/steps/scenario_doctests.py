@@ -24,7 +24,10 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from proteus import config, Model, Wizard
+
+from .support.fields import string_to_python
 from .support import modules
+from .support import tools
 
 # Warning - these are hardwired from the Tryton code
 from .trytond_constants import *
@@ -38,17 +41,15 @@ def step_impl(context):
 @step('Create database with pool.test set to True')
 def step_impl(context):
     # This is cute
-    context.execute_steps(u'''
-    Given Create database
-    ''')
+    context.execute_steps(u'''Given Create database''')
     current_config = context.oProteusConfig
     current_config.pool.test = True
 
 # account_stock_anglo_saxon
-@step('Install the test module named "{sName}"')
-def step_impl(context, sName):
+@step('Install the test module named "{uName}"')
+def step_impl(context, uName):
     from trytond.tests.test_tryton import install_module
-    install_module(sName)
+    install_module(uName)
 
 #unused
 @step('Install account')
@@ -175,8 +176,9 @@ def step_impl(context):
 
     assert FiscalYear.find([('name', '=', str(today.year))])
 
-@step('Create a chart of accounts from the MINIMAL_ACCOUNT_PARENT')
-def step_impl(context):
+# 'Minimal Account Chart', 'Minimal Account Chart'
+@step('Create a chart of accounts from template "{sTem}" with root "{sRoot}"')
+def step_impl(context, sTem, sRoot):
 
     Company = Model.get('company.company')
     AccountTemplate = Model.get('account.account.template')
@@ -188,15 +190,17 @@ def step_impl(context):
     party, = Party.find([('name', '=', COMPANY_NAME)])
     company, = Company.find([('party.id', '=', party.id)])
     fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
-    account_template, = AccountTemplate.find([('parent', '=', MINIMAL_ACCOUNT_PARENT)])
 
     # FixMe: Is there a better test of telling if the
     # 'Minimal A' chart of accounts has been created?
-    if not Account.find([('name', '=', MINIMAL_ACCOUNT_ROOT)]):
+    # MINIMAL_ACCOUNT_ROOT
+    if not Account.find([('name', '=', sRoot)]):
 
         create_chart = Wizard('account.create_chart')
         create_chart.execute('account')
 
+        # MINIMAL_ACCOUNT_TEMPLATE
+        account_template, = AccountTemplate.find([('name', '=', sTem)])
         create_chart.form.account_template = account_template
         create_chart.form.company = company
         create_chart.execute('create_account')
@@ -234,23 +238,169 @@ def step_impl(context):
             ('company', '=', company.id),
             ('name', '=', 'COGS'),
             ])
+
 # party.party Supplier
-@step('Create a saved instance of "{sKlass}" named "{sName}"')
-def step_impl(context, sKlass, sName):
+@step('Create a saved instance of "{sKlass}" named "{uName}"')
+def step_impl(context, sKlass, uName):
 
     Party = Model.get(sKlass)
-    if not Party.find([('name', '=', sName)]):
-        supplier = Party(name=sName)
+    if not Party.find([('name', '=', uName)]):
+        supplier = Party(name=uName)
         supplier.save()
 
 @step('Create parties')
 def step_impl(context):
+    context.execute_steps(u'''Create a party named "Supplier"''')
+    context.execute_steps(u'''Create a party named "Customer"''')
+
+@step('Create a party named "{uName}"')
+def step_impl(context, uName):
 
     Party = Model.get('party.party')
-    if not Party.find([('name', '=', 'Supplier')]):
-        supplier = Party(name='Supplier')
+    if not Party.find([('name', '=', uName)]):
+        supplier = Party(name=uName)
         supplier.save()
-    if not Party.find([('name', '=', 'Customer')]):
-        customer = Party(name='Customer')
+    assert Party.find([('name', '=', uName)])
+
+# Customer
+@step('Create a party named "{uName}" with an account_payable attribute')
+def step_impl(context, uName):
+
+    Party = Model.get('party.party')
+    Company = Model.get('company.company')
+    Account = Model.get('account.account')
+
+    if not Party.find([('name', '=', uName)]):
+        party, = Party.find([('name', '=', COMPANY_NAME)])
+        company, = Company.find([('party.id', '=', party.id)])
+        payables = Account.find([
+                ('kind', '=', 'payable'),
+                ('company', '=', company.id),
+                ])
+        assert payables
+        payable = payables[0]
+        customer = Party(name=uName)
+        customer.account_payable = payable
         customer.save()
 
+    assert Party.find([('name', '=', uName)])
+
+# Accountant, Account
+@step('Create a user named "{uName}" with the fields')
+def step_impl(context, uName):
+    # idempotent
+    User = Model.get('res.user')
+
+    if not User.find([('name', '=', uName)]):
+        Group = Model.get('res.group')
+        
+        user = User()
+        user.name = uName
+        # login password
+        for row in context.table:
+            if row['name'] == u'group':
+                # multiple allowed?
+                group, = Group.find([('name', '=', row['value'])])
+                user.groups.append(group)
+                continue
+            setattr(user, row['name'],
+                    string_to_python(row['name'], row['value']))
+        user.save()
+
+        assert User.find([('name', '=', uName)])
+
+@step('Create a calendar named "{uCalName}" owned by the user "{uUserName}"')
+def step_impl(context, uCalName, uUserName):
+    # idempotent
+    current_config = context.oProteusConfig
+
+    Calendar = Model.get('calendar.calendar')
+
+    uUserName='Accountant'
+    uUserLogin='accountant'
+    uUserPassword='accountant'
+    User = Model.get('res.user')
+    oUser, = User.find([('name', '=', uUserName)])
+    oAdminUser, = User.find([('name', '=', 'Administrator')])
+    # calendar names must be unique
+    if not Calendar.find([('name', '=', uCalName)]):
+
+        current_config = config.set_trytond(user=uUserLogin,
+                                            password=uUserPassword,
+                                            config_file=current_config.config_file,
+                                            database_name=current_config.database_name)
+        calendar = Calendar(name=uCalName, owner=oUser)
+        WriteUser = Model.get('calendar.calendar-write-res.user')
+        # oAdminWriteUser = WriteUser(calendar=calendar, user=oAdminUser)
+        # calendar.write_users.append(oAdminUser)
+        calendar.save()
+
+@step('Add an annual event to a calendar named "{uCalName}" owned by the user "{uUserName}" with dates')
+def step_impl(context, uCalName, uUserName):
+    # idempotent
+    Calendar = Model.get('calendar.calendar')
+
+    uUserName='Accountant'
+    uUserLogin='accountant'
+    uUserPassword='accountant'
+    User = Model.get('res.user')
+    oUser, = User.find([('name', '=', uUserName)])
+
+    calendar, = Calendar.find([('name', '=', uCalName)])
+
+    Rdate = pool.get('calendar.event.rdate')
+    
+    # FixMe: unfinished
+    for row in context.table:
+        pass
+
+@step('Create holidays in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
+def step_impl(context, uCalName, uUserName):
+    # idempotent
+    current_config = context.oProteusConfig
+
+    Calendar = Model.get('calendar.calendar')
+    # I think Calendar names are unique across all users
+    calendar, = Calendar.find([('name', '=', uCalName)])
+    
+    uUserName='Accountant'
+    uUserLogin='accountant'
+    uUserPassword='accountant'
+    User = Model.get('res.user')
+    oUser, = User.find([('name', '=', uUserName)])
+    owner_email = oUser.email
+
+    current_config = config.set_trytond(user=uUserLogin,
+                                        password=uUserPassword,
+                                        config_file=current_config.config_file,
+                                        database_name=current_config.database_name)
+
+
+    Event = Model.get('calendar.event')
+    # name date
+    for row in context.table:
+        uName = row['name']
+        uDate = row['date']
+        summary = "%s Holiday" % (uName,)
+        oDate=datetime.datetime(*map(int,uDate.split('-')))
+        if not Event.find([
+            ('calendar.owner.email', '=', owner_email),
+            ('summary', '=', summary),
+            ]):
+            event = Event(calendar=calendar,
+                          summary=summary,
+                          all_day=True,
+                          classification='public',
+                          transp='transparent',
+                          dtstart=oDate)
+            # FixMe: UserError: ('UserError', (u'You try to bypass an access rule.\n(Document type: calendar.event)', ''))
+            event.save()
+        assert Event.find([
+            ('calendar.owner.email', '=', owner_email),
+            ('summary', '=', summary),
+            ])
+        
+# lampman_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'lampman', 'postgresql', config_file='/etc/trytond.conf'))(2)
+
+    Rdate = Model.get('calendar.event.rdate')
+    

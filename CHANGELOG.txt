@@ -1,3 +1,14 @@
+commit 50092ef7445e7e612efd7a1c35c045cad8b2073b
+Date:   Mon Oct 28 09:45:55 2013 +0200
+
+    Added support for Tryton 3.0
+    
+    Added the first version of OpenERPScenario's DSL.
+    
+    Added labels to steps.
+    
+    Refactored some steps to make them more parameterized.
+
 commit 5133559de602c26b6b313a7e1d73fa94804a484e
 Date:   Thu Oct 24 16:16:21 2013 +0300
 

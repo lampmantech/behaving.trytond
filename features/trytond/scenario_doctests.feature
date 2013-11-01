@@ -13,4 +13,4 @@ Feature: Run the Trytond scenario doctests (e.g. from
 	and Create the Company with default COMPANY_NAME and Currency code "EUR"
 	and Reload the default User preferences into the context
 	and Create this fiscal year
-	and Create a chart of accounts from the MINIMAL_ACCOUNT_PARENT
+	and Create a chart of accounts from template "Minimal Account Chart" with root "Minimal Account Chart"

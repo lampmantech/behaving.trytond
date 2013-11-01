@@ -14,13 +14,13 @@ from trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
 	and Create the Company with default COMPANY_NAME and Currency code "EUR"
 	and Reload the default User preferences into the context
 	and Create this fiscal year
-	and Create a chart of accounts from the MINIMAL_ACCOUNT_PARENT
-        and TS/SAR Create a party named "Customer" with an account_payable attribute
-       	and TS/SAR Create Moves for direct reconciliation
-       	and TS/SAR Reconcile Lines without writeoff
-       	and TS/SAR Create Moves for writeoff reconciliation
-       	and TS/SAR Reconcile Lines with writeoff
+	and Create a chart of accounts from template "Minimal Account Chart" with root "Minimal Account Chart"
+        and Create a party named "Customer" with an account_payable attribute
+       	and T/A/SAR Create Moves for direct reconciliation
+       	and T/A/SAR Reconcile Lines without writeoff
+       	and T/A/SAR Create Moves for writeoff reconciliation
+       	and T/A/SAR Reconcile Lines with writeoff
        Then there are some instances of "party.party"
 
-      
+
 

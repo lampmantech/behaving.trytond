@@ -86,6 +86,30 @@ by pulling in the doctest \*.rst files, keeping
 the same filename, to take advantage of behave's
 refactoring, and to get the steps to have good coverage.
 
+Steps are often preceded by a label such as TS/SAR
+as a way of keeping steps from different modules from
+interfering with each other. The label is arbitrary
+but should be short, like T/A/SAR for
+trytond/account/scenario_account_reconciliation
+Generic steps, that are likely to be used by all scenari,
+may have no label.
+
+Versions
+--------
+
+To see what this version is, look at the first date in 
+the file CHANGELOG.txt.
+
+Active development is on Tryton 3.0.
+
+This should work with Tryton 2.8, but you should make a
+simple change to the trytond_proteus source code.
+proteus-2.8.*/proteus/config.py in class TrytondConfig
+after the line:
+        database = Database().connect()
+add the line:
+        self.database = database
+
 
 Issues
 ------
