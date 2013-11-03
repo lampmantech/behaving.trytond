@@ -60,7 +60,8 @@ def step_impl(context, uName):
         company, = Company.find([('party.id', '=', party.id)])
 
         AccountJournal = Model.get('account.journal')
-        stock_journal, = AccountJournal.find([('code', '=', 'STO')])
+        stock_journal, = AccountJournal.find([('code', '=', 'STO'),
+                                              ('company', '=', company.id),])
 
         Account = Model.get('account.account')
         revenue, = Account.find([
@@ -72,33 +73,33 @@ def step_impl(context, uName):
             ('company', '=', company.id),
             ])
         cogs, = Account.find([
-                    ('kind', '=', 'other'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'COGS'),
-                    ])
+            ('kind', '=', 'other'),
+            ('company', '=', company.id),
+            ('name', '=', 'COGS'),
+            ])
 
         # These are in by trytond_account_stock_continental/account.xml
         # which is pulled in by trytond_account_stock_anglo_saxon
         stock, = Account.find([
-                    ('kind', '=', 'stock'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'Stock')])
+            ('kind', '=', 'stock'),
+            ('company', '=', company.id),
+            ('name', '=', 'Stock')])
         stock_customer, = Account.find([
-                    ('kind', '=', 'stock'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'Stock Customer')])
+            ('kind', '=', 'stock'),
+            ('company', '=', company.id),
+            ('name', '=', 'Stock Customer')])
         stock_lost_found, = Account.find([
-                    ('kind', '=', 'stock'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'Stock Lost and Found')])
+            ('kind', '=', 'stock'),
+            ('company', '=', company.id),
+            ('name', '=', 'Stock Lost and Found')])
         stock_production, = Account.find([
-                    ('kind', '=', 'stock'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'Stock Production')])
+            ('kind', '=', 'stock'),
+            ('company', '=', company.id),
+            ('name', '=', 'Stock Production')])
         stock_supplier, = Account.find([
-                    ('kind', '=', 'stock'),
-                    ('company', '=', company.id),
-                    ('name', '=', 'Stock Supplier')])
+            ('kind', '=', 'stock'),
+            ('company', '=', company.id),
+            ('name', '=', 'Stock Supplier')])
 
         template = ProductTemplate()
         template.name = uName
@@ -106,7 +107,7 @@ def step_impl(context, uName):
         # type, cost_price_method
         for row in context.table:
             setattr(template, row['name'],
-                    string_to_python(row['name'], row['value']))
+                    string_to_python(row['name'], row['value'], ProductTemplate))
 
         template.category = category
         template.default_uom = unit
@@ -208,7 +209,7 @@ def step_impl(context, uDescription, uSupplier):
         # 'payment_term', 'invoice_method', 'purchase_date', 'currency'
         for row in context.table:
             setattr(purchase, row['name'],
-                    string_to_python(row['name'], row['value']))
+                    string_to_python(row['name'], row['value'], Purchase))
 
         purchase.save()
         assert Purchase.find([('description', '=', uDescription),
@@ -425,7 +426,6 @@ def step_impl(context):
         "Expected 44.00,50.00 but got %.2f,%.2f" % (expense.debit, expense.credit,)
 
     stock_supplier, = Account.find([
-        ('kind', '=', 'stock'),
         ('company', '=', company.id),
         ('name', '=', 'Stock Supplier')])
     stock_supplier.reload()
@@ -457,7 +457,7 @@ def step_impl(context, uDescription, uCustomer):
         # 'payment_term', 'invoice_method'
         for row in context.table:
             setattr(sale, row['name'],
-                    string_to_python(row['name'], row['value']))
+                    string_to_python(row['name'], row['value'], Sale))
         sale.save()
 
 
@@ -650,13 +650,12 @@ def step_impl(context, uSupplier):
 
     Party = Model.get('party.party')
     supplier, = Party.find([('name', '=', uSupplier)])
-    PaymentTerm = Model.get('account.invoice.payment_term')
-    payment_term, = PaymentTerm.find([('name', '=', 'Direct')])
 
-    supplier, = Party.find([('name', '=', 'Supplier')])
     if not Purchase.find([('invoice_method', '=', 'order'),
                           ('party.id', '=', supplier.id)]):
 
+        PaymentTerm = Model.get('account.invoice.payment_term')
+        payment_term, = PaymentTerm.find([('name', '=', 'Direct')])
         purchase = Purchase()
         purchase.party = supplier
         purchase.payment_term = payment_term

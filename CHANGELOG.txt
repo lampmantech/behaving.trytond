@@ -1,3 +1,14 @@
+commit 69b19586cb0ca439419a8fe512d5c47f3d08cbf3
+Date:   Fri Nov 1 11:06:51 2013 +0200
+
+        Finished parameterizing features/steps/scenario_account_stock_anglo_saxon.py
+        You should be able to use this feature to build productions systems.
+    
+        Made a first attempt at porting DSL from OpenERPScenario.
+        Not documenented or tested yet.
+    
+        Now switching to Tryton 3.0 for development from now on.
+
 commit 50092ef7445e7e612efd7a1c35c045cad8b2073b
 Date:   Mon Oct 28 09:45:55 2013 +0200
 

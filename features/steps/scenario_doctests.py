@@ -27,16 +27,64 @@ from proteus import config, Model, Wizard
 
 from .support.fields import string_to_python
 from .support import modules
-from .support import tools
-
-# Warning - these are hardwired from the Tryton code
-from .trytond_constants import *
+from .support.tools import *
 
 today = datetime.date.today()
 
 @step('Create database')
 def step_impl(context):
     context.dData = dict()
+
+def sGetFeatureData(context, sKey):
+    return context.dData['feature'][sKey]
+
+def vSetFeatureData(context, sKey, sValue):
+    context.dData['feature'][sKey] = sValue
+
+# Warning - these are hardwired from the Tryton code
+from .trytond_constants import *
+@step('Set the default feature data')
+def step_impl(context):
+    
+    assert type(context.dData['feature']) == dict
+    uDefaults = u'''
+    Given Set the feature data with values
+     | name                                      | value                      |
+     | party,company_name                        | {company_name}             |
+     | account.account,minimal_account_root      | {minimal_account_root}     |
+     | account.template,minimal_account_template | {minimal_account_template} |
+     | user,accountant,name                      | {accountant_name}          |
+     | user,accountant,login                     | {accountant_login}         |
+     | user,accountant,password                  | {accountant_password}      |
+     | account.template,main_receivable          | {main_receivable}          |
+     | account.template,main_payable             | {main_payable}             |
+     | account.template,main_revenue             | {main_revenue}             |
+     | account.template,main_expense             | {main_expense}             |
+     | account.template,main_cash                | {main_cash}                |
+     | account.template,main_tax                 | {main_tax}                 |
+'''
+    uDefaults = uDefaults.format(
+        company_name=COMPANY_NAME, # "B2CK"
+        minimal_account_root=MINIMAL_ACCOUNT_ROOT,
+        minimal_account_template=MINIMAL_ACCOUNT_TEMPLATE,
+        accountant_name=ACCOUNTANT_NAME, # 'Accountant'
+        accountant_login=ACCOUNTANT_USER, # 'accountant'
+        accountant_password=ACCOUNTANT_PASSWORD, # 'accountant'
+        # from trytond_account-3.0.0/account.xml
+        main_receivable='Main Receivable',
+        main_payable='Main Payable',
+        main_revenue='Main Revenue',
+        main_expense='Main Expense',
+        main_cash='Main Cash',
+        main_tax='Main Tax',
+        )
+    context.execute_steps(uDefaults)
+
+@step('Set the feature data with values')
+def step_impl(context):
+    assert type(context.dData['feature']) == dict
+    for row in context.table:
+        vSetFeatureData(context, row['name'], row['value'])
 
 @step('Create database with pool.test set to True')
 def step_impl(context):
@@ -62,12 +110,13 @@ def step_impl(context, sCode):
     Company = Model.get('company.company')
     Party = Model.get('party.party')
 
-    if not Party.find([('name', '=', COMPANY_NAME)]):
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    if not Party.find([('name', '=', sCompanyName)]):
         company_config = Wizard('company.company.config')
         company_config.execute('company')
         company = company_config.form
 
-        party = Party(name=COMPANY_NAME)
+        party = Party(name=sCompanyName)
         party.save()
         company.party = party
 
@@ -109,24 +158,36 @@ def step_impl(context):
     config._context = User.get_preferences(True, config.context)
 
 @step('Create this fiscal year')
+@step('Create this fiscal year without Invoicing')
 def step_impl(context):
+    context.execute_steps(u'''
+    Given Create the fiscal year "TODAY" without Invoicing
+    ''')
+    
+@step('Create the fiscal year "{uYear}" without Invoicing')
+def step_impl(context, uYear):
     config = context.oProteusConfig
 
+    if uYear == u'TODAY': uYear = str(today.year)
+        
     Company = Model.get('company.company')
     FiscalYear = Model.get('account.fiscalyear')
-    SequenceStrict = Model.get('ir.sequence.strict')
     Party = Model.get('party.party')
 
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
-    if not FiscalYear.find([('name', '=', str(today.year))]):
-        fiscalyear = FiscalYear(name='%s' % today.year)
-        fiscalyear.start_date = today + relativedelta(month=1, day=1)
-        fiscalyear.end_date = today + relativedelta(month=12, day=31)
+    if not FiscalYear.find([('name', '=', uYear),
+                            ('company', '=', company.id),]):
+        oDate = datetime.date(int(uYear), 1, 1)
+        
+        fiscalyear = FiscalYear(name='%s' % (uYear,))
+        fiscalyear.start_date = oDate + relativedelta(month=1, day=1)
+        fiscalyear.end_date = oDate + relativedelta(month=12, day=31)
         fiscalyear.company = company
 
         Sequence = Model.get('ir.sequence')
-        post_move_sequence = Sequence(name='%s' % today.year,
+        post_move_sequence = Sequence(name='%s' % (uYear,),
             code='account.move', company=company)
         post_move_sequence.save()
         fiscalyear.post_move_sequence = post_move_sequence
@@ -135,33 +196,44 @@ def step_impl(context):
         FiscalYear.create_period([fiscalyear.id], config.context)
         assert len(fiscalyear.periods) == 12
 
-    assert FiscalYear.find([('name', '=', str(today.year))])
+    assert FiscalYear.find([('name', '=', str(uYear))])
 
 @step('Create this fiscal year with Invoicing')
 def step_impl(context):
+    context.execute_steps(u'''
+    Given Create the fiscal year "TODAY" with Invoicing
+    ''')
+    
+@step('Create the fiscal year "{uYear}" with Invoicing')
+def step_impl(context, uYear):
     config = context.oProteusConfig
 
-    Company = Model.get('company.company')
+    if uYear == u'TODAY': uYear = str(today.year)
+
     FiscalYear = Model.get('account.fiscalyear')
-    Sequence = Model.get('ir.sequence')
     Party = Model.get('party.party')
 
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    if not FiscalYear.find([('name', '=', str(today.year))]):
-        fiscalyear = FiscalYear(name='%s' % today.year)
-        fiscalyear.start_date = today + relativedelta(month=1, day=1)
-        fiscalyear.end_date = today + relativedelta(month=12, day=31)
+    if not FiscalYear.find([('name', '=', str(uYear)),
+                            ('company', '=', company.id),]):
+        oDate = datetime.date(int(uYear), 1, 1)
+
+        fiscalyear = FiscalYear(name='%s' % (uYear,))
+        fiscalyear.start_date = oDate + relativedelta(month=1, day=1)
+        fiscalyear.end_date = oDate + relativedelta(month=12, day=31)
         fiscalyear.company = company
 
         Sequence = Model.get('ir.sequence')
-        post_move_sequence = Sequence(name='%s' % today.year,
+        post_move_sequence = Sequence(name='%s' % uYear,
             code='account.move', company=company)
         post_move_sequence.save()
         fiscalyear.post_move_sequence = post_move_sequence
 
         SequenceStrict = Model.get('ir.sequence.strict')
-        invoice_sequence = SequenceStrict(name='%s' % today.year,
+        invoice_sequence = SequenceStrict(name='%s' % uYear,
                                           code='account.invoice',
                                           company=company)
         invoice_sequence.save()
@@ -174,63 +246,66 @@ def step_impl(context):
         FiscalYear.create_period([fiscalyear.id], config.context)
         assert len(fiscalyear.periods) == 12
 
-    assert FiscalYear.find([('name', '=', str(today.year))])
+    assert FiscalYear.find([('name', '=', str(uYear))])
 
 # 'Minimal Account Chart', 'Minimal Account Chart'
-@step('Create a chart of accounts from template "{sTem}" with root "{sRoot}"')
-def step_impl(context, sTem, sRoot):
+@step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
+def step_impl(context, uTem, uRoot):
 
-    Company = Model.get('company.company')
-    AccountTemplate = Model.get('account.account.template')
     Account = Model.get('account.account')
-    Journal = Model.get('account.journal')
-    FiscalYear = Model.get('account.fiscalyear')
-    Party = Model.get('party.party')
 
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    Party = Model.get('party.party')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
 
     # FixMe: Is there a better test of telling if the
     # 'Minimal A' chart of accounts has been created?
     # MINIMAL_ACCOUNT_ROOT
-    if not Account.find([('name', '=', sRoot)]):
+    if not Account.find([('name', '=', uRoot),
+                         ('company', '=', company.id),]):
 
         create_chart = Wizard('account.create_chart')
         create_chart.execute('account')
 
         # MINIMAL_ACCOUNT_TEMPLATE
-        account_template, = AccountTemplate.find([('name', '=', sTem)])
+        AccountTemplate = Model.get('account.account.template')
+        account_template, = AccountTemplate.find([('name', '=', uTem)])
         create_chart.form.account_template = account_template
         create_chart.form.company = company
         create_chart.execute('create_account')
 
         receivable = Account.find([
                 ('kind', '=', 'receivable'),
+                ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
                 ('company', '=', company.id),
                 ])[0]
         payable, = Account.find([
                 ('kind', '=', 'payable'),
+                ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
                 ('company', '=', company.id),
                 ])
         revenue, = Account.find([
                 ('kind', '=', 'revenue'),
+                ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
                 ('company', '=', company.id),
                 ])
         expense, = Account.find([
                 ('kind', '=', 'expense'),
+                ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
                 ('company', '=', company.id),
                 ])
         cash, = Account.find([
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),
-                ('name', '=', 'Main Cash'),
+                ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
                 ])
         create_chart.form.account_receivable = receivable
         create_chart.form.account_payable = payable
         create_chart.execute('create_properties')
 
-    assert Account.find([('name', '=', MINIMAL_ACCOUNT_ROOT)])
+    assert Account.find([('name', '=', uRoot)])
     if 'account_stock_anglo_saxon' in modules.lInstalledModules():
         # in account_stock_anglo_saxon/account.xml
         assert Account.find([
@@ -240,13 +315,32 @@ def step_impl(context, sTem, sRoot):
             ])
 
 # party.party Supplier
-@step('Create a saved instance of "{sKlass}" named "{uName}"')
-def step_impl(context, sKlass, uName):
+@step('Create a saved instance of "{uKlass}" named "{uName}"')
+def step_impl(context, uKlass, uName):
+    # idempotent
 
-    Party = Model.get(sKlass)
+    Party = Model.get(uKlass)
     if not Party.find([('name', '=', uName)]):
-        supplier = Party(name=uName)
-        supplier.save()
+        instance = Party(name=uName)
+        instance.save()
+
+@step('Create an instance of "{uKlass}" named "{uName}" with fields')
+def step_impl(context, uKlass, uName):
+    # idempotent
+
+    assert context.table, "please supply a table of field name and values"
+    if hasattr(context.table, 'headings'):
+        # if we have a real table, ensure it has 2 columns
+        # otherwise, we will just fail during iteration
+        assert_equal(len(context.table.headings), 2)
+
+    Party = Model.get(uKlass)
+    if not Party.find([('name', '=', uName)]):
+        oInstance = Party(name=uName)
+        for row in context.table:
+            setattr(oInstance, row['name'],
+                    string_to_python(row['name'], row['value'], Party))
+        oInstance.save()
 
 @step('Create parties')
 def step_impl(context):
@@ -271,10 +365,12 @@ def step_impl(context, uName):
     Account = Model.get('account.account')
 
     if not Party.find([('name', '=', uName)]):
-        party, = Party.find([('name', '=', COMPANY_NAME)])
+        sCompanyName = sGetFeatureData(context, 'party,company_name')
+        party, = Party.find([('name', '=', sCompanyName)])
         company, = Company.find([('party.id', '=', party.id)])
         payables = Account.find([
                 ('kind', '=', 'payable'),
+                ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
                 ('company', '=', company.id),
                 ])
         assert payables
@@ -304,7 +400,7 @@ def step_impl(context, uName):
                 user.groups.append(group)
                 continue
             setattr(user, row['name'],
-                    string_to_python(row['name'], row['value']))
+                    string_to_python(row['name'], row['value'], User))
         user.save()
 
         assert User.find([('name', '=', uName)])
@@ -400,7 +496,6 @@ def step_impl(context, uCalName, uUserName):
             ('summary', '=', summary),
             ])
         
-# lampman_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'lampman', 'postgresql', config_file='/etc/trytond.conf'))(2)
+# accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
 
     Rdate = Model.get('calendar.event.rdate')
-    

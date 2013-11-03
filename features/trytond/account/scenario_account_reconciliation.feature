@@ -11,6 +11,7 @@ from trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
       Given Create database
         and Ensure that the "account" module is loaded
 	and the "account" module is in the list of loaded modules
+	and Set the default feature data
 	and Create the Company with default COMPANY_NAME and Currency code "EUR"
 	and Reload the default User preferences into the context
 	and Create this fiscal year
@@ -19,8 +20,7 @@ from trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
        	and T/A/SAR Create Moves for direct reconciliation
        	and T/A/SAR Reconcile Lines without writeoff
        	and T/A/SAR Create Moves for writeoff reconciliation
-       	and T/A/SAR Reconcile Lines with writeoff
-       Then there are some instances of "party.party"
+       Then T/A/SAR Reconcile Lines with writeoff
 
 
 

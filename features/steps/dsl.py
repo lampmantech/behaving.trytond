@@ -112,13 +112,10 @@ def parse_table_values(ctx, obj, table):
             value = int(value)
         elif field_type == 'float':
             value = float(value)
-        elif field_type == 'float':
-            value = float(value)
         elif field_type == 'numeric':
             # guessing
             value = Decimal(value)
         elif field_type == 'date':
-            # maybe Tryton wants a datetime object?
             value = time.strftime(value)
             value = datetime.date(*map(int,value.split('-')))
         elif field_type == 'datetime':
@@ -187,14 +184,14 @@ def impl(ctx, model_name, domain):
     domain = build_search_domain(ctx, model_name, values)
     if domain is not None:
         # was search in oerp
-        ids = ModelKlass.find(domain)
+        instances = ModelKlass.find(domain)
     else:
-        ids = []
-    if len(ids) == 1:
-        ctx.found_item = ModelKlass.browse(ids[0])
+        instances = []
+    if len(instances) == 1:
+        ctx.found_item = instances[0]
     else:
         ctx.found_item = None
-    ctx.found_items = ModelKlass.browse(ids)
+    ctx.found_items = instances
 
 
 @step(u'I need a "{model_name}" with {domain}')

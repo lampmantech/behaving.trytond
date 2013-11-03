@@ -29,22 +29,20 @@ def step_impl(context):
 
     Move = Model.get('account.move')
 
+    Party = Model.get('party.party')
+    party, = Party.find([('name', '=', COMPANY_NAME)])
+    Company = Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
     Journal = Model.get('account.journal')
-    journal_revenue, = Journal.find([
-                ('code', '=', 'REV'),
-                ])
-    journal_cash, = Journal.find([
-                ('code', '=', 'CASH'),
-                ])
+    journal_revenue, = Journal.find([('code', '=', 'REV'),
+                                     ('company', '=', company.id),])
+    journal_cash, = Journal.find([('code', '=', 'CASH'),
+                                  ('company', '=', company.id),])
 
     FiscalYear = Model.get('account.fiscalyear')
     fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
     period = fiscalyear.periods[0]
 
-    Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
-    Company = Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
     Account = Model.get('account.account')
     receivable, = Account.find([
         ('kind', '=', 'receivable'),

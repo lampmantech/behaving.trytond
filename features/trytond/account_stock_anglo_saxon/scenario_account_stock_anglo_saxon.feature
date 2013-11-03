@@ -10,6 +10,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
         and Ensure that the "account_stock_anglo_saxon" module is loaded
         and Ensure that the "sale" module is loaded
         and Ensure that the "purchase" module is loaded
+	and Set the default feature data
        then the "account_stock_anglo_saxon" module is in the list of loaded modules
 
     Scenario: Create the company to test the module named "account_stock_anglo_saxon"
