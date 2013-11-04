@@ -11,6 +11,16 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
         and Ensure that the "sale" module is loaded
         and Ensure that the "purchase" module is loaded
 	and Set the default feature data
+# These are in by trytond_account_stock_continental/account.xml
+# which is pulled in by trytond_account_stock_anglo_saxon
+	and Set the feature data with values
+	     | name                                  | value                |
+	     | account.template,COGS                 | COGS                 |
+	     | account.template,stock                | Stock                |
+	     | account.template,stock_customer       | Stock Customer       |
+	     | account.template,stock_lost_found     | Stock Lost and Found |
+	     | account.template,stock_production     | Stock Production     |
+	     | account.template,stock_supplier       | Stock Supplier       |
        then the "account_stock_anglo_saxon" module is in the list of loaded modules
 
     Scenario: Create the company to test the module named "account_stock_anglo_saxon"
@@ -25,6 +35,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 
 
     Scenario: Buy the products from the supplier, testing the module named "account_stock_anglo_saxon"
+
       Given Create a user named "Accountant" with the fields
 	  | name	| value		  |
 	  | login	| accountant	  |
@@ -67,7 +78,8 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	and T/ASAS/SASAS After paying for what we received assert the account credits and debits
 
     Scenario: Sell the products to the customer, testing the module named "account_stock_anglo_saxon"
-	and T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
+
+      Given T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct   |

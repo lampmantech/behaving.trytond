@@ -10,6 +10,7 @@ Feature: Run the Trytond scenario doctests (e.g. from
 
       Given Create database
         and Ensure that the "account" module is loaded
+	and Set the default feature data
 	and Create the Company with default COMPANY_NAME and Currency code "EUR"
 	and Reload the default User preferences into the context
 	and Create this fiscal year

@@ -9,6 +9,14 @@ import time
 from decimal import Decimal
 from proteus import config, Model, Wizard
 
+def sGetFeatureData(context, sKey):
+    assert sKey in context.dData['feature'], \
+           "Use 'Set the feature data with values' to set the value of "+sKey
+    return context.dData['feature'][sKey]
+
+def vSetFeatureData(context, sKey, sValue):
+    context.dData['feature'][sKey] = sValue
+
 def string_to_python (sField, sValue, Party=None):
     #? should replace this with DSL
     
@@ -16,24 +24,28 @@ def string_to_python (sField, sValue, Party=None):
         sType = ''
     else:
         dFields = Party._fields
-        assert dFields
         assert sField in dFields.keys(), \
-               "Unknown field %s; not in %r" % (sField, dFields.keys(),)
+               "ERROR: Unknown field %s; not in %r" % (sField, dFields.keys(),)
         dField = dFields[sField]
-        assert 'type' in dField.keys()
+        assert 'type' in dField.keys(), \
+               "PANIC: key %s; not in %r" % ('type', dFields.keys(),)
         sType = dField['type']
 
-    if sType == 'boolean' or sField in ['active']:
+    if sType == 'boolean':
         if sValue.lower() in ('false', 'nil'): return False
         if sValue.lower() in ('true'): return True
     if sType == 'numeric' or sField.endswith('_price'):
         return Decimal(sValue)
-    if sType in ('char', 'text',) or sField in ['name']:
+    if sType in ('char', 'text', 'sha',) or sField in ['name',]:
         return sValue
     if sType == 'integer':
         return int(sValue)
     if sType == 'float':
         return int(sValue)
+    if sType == 'selection':
+        # FixMe: are selections always strings or can they be otherwise?
+        # sSelection = dField['selection']
+        return sValue
     if sType == 'date' or sField.endswith('_date'):
         # tryton wants a datetime.date object?
         if sValue == 'TODAY': return datetime.date.today()
@@ -46,11 +58,14 @@ def string_to_python (sField, sValue, Party=None):
 
     # give up or error?
     if sType == '': return sValue
+
+    #? This is not always true
+    #assert 'searchable' in dField.keys(), \
+    #       "Sorry, dont know how to look in slots of %s " % (sField,)
+    #assert dField['searchable']
     
-    assert 'searchable' in dField.keys(), \
-           "Sorry, dont know how to look in slots of %s " % (sField,)
-    assert dField['searchable']
-    assert 'relation' in dField.keys()
+    assert 'relation' in dField.keys(), \
+               "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)
     sRelation = dField['relation']
     #? FixMe: if sType == 'many2one':
         
@@ -59,7 +74,7 @@ def string_to_python (sField, sValue, Party=None):
     #? name or code
     lElts = Klass.find([('name', '=', sValue)])
     assert len(lElts) != 0, \
-           "No instance of %s found named '%s'" % (sRelation, sValue,)
+           "ERROR: No instance of %s found named '%s'" % (sRelation, sValue,)
     assert len(lElts) == 1, \
-           "Too many instances of %s found named '%s'" % (sRelation, sValue,)
+           "ERROR: Too many instances of %s found named '%s'" % (sRelation, sValue,)
     return lElts[0]

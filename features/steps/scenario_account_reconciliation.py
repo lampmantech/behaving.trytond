@@ -19,8 +19,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from proteus import config, Model, Wizard
 
-# Warning - these are hardwired from the Tryton code
-from .trytond_constants import *
+from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 
 today = datetime.date.today()
 
@@ -30,14 +29,13 @@ def step_impl(context):
     Move = Model.get('account.move')
 
     Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     Journal = Model.get('account.journal')
-    journal_revenue, = Journal.find([('code', '=', 'REV'),
-                                     ('company', '=', company.id),])
-    journal_cash, = Journal.find([('code', '=', 'CASH'),
-                                  ('company', '=', company.id),])
+    journal_revenue, = Journal.find([('code', '=', 'REV'),])
+    journal_cash, = Journal.find([('code', '=', 'CASH'),])
 
     FiscalYear = Model.get('account.fiscalyear')
     fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
@@ -46,16 +44,18 @@ def step_impl(context):
     Account = Model.get('account.account')
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
         ('company', '=', company.id),
         ])
     revenue, = Account.find([
         ('kind', '=', 'revenue'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
         ('company', '=', company.id),
         ])
     cash, = Account.find([
         ('kind', '=', 'other'),
         ('company', '=', company.id),
-        ('name', '=', 'Main Cash'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
         ])
     customer, = Party.find([('name', '=', 'Customer')])
 
@@ -138,22 +138,26 @@ def step_impl(context):
     Party = Model.get('party.party')
     customer, = Party.find([('name', '=', 'Customer')])
 
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
+    
     Account = Model.get('account.account')
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
         ('company', '=', company.id),
         ])
     revenue, = Account.find([
         ('kind', '=', 'revenue'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
         ('company', '=', company.id),
         ])
     cash, = Account.find([
         ('kind', '=', 'other'),
         ('company', '=', company.id),
-        ('name', '=', 'Main Cash'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
         ])
 
     line = move.lines.new()
@@ -196,13 +200,15 @@ def step_impl(context):
     reconcile2 = context.dData['feature']['reconcile2']
 
     Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
     Account = Model.get('account.account')
     expense, = Account.find([
         ('kind', '=', 'expense'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
         ('company', '=', company.id),
         ])
 
@@ -213,6 +219,7 @@ def step_impl(context):
     reconcile_lines = Wizard('account.move.reconcile_lines',
             [reconcile1, reconcile2])
     assert reconcile_lines.form_state == 'writeoff'
+    
     reconcile_lines.form.journal = journal_expense
     reconcile_lines.form.account = expense
     reconcile_lines.execute('reconcile')
@@ -226,5 +233,6 @@ def step_impl(context):
             if l.credit == Decimal(3)]
     writeoff_line2, = [l for l in writeoff_line1.move.lines
             if l != writeoff_line1]
+    
     assert writeoff_line2.account == expense
     assert writeoff_line2.debit == Decimal(3)

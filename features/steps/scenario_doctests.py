@@ -5,12 +5,12 @@ This is a straight cut-and-paste from
 trytond_*-2.8.*/tests/scenario_*.rst
 to refactor the doctests to eliminate duplication.
 All the steps in this file are used by all of
-the feature files that implment the doctest scenarios.
+the feature files that implment the doctest scenari.
 
 The aim is to make each step idempotent, so that if
 you run a step again from another feature file,
 the work is not repeated, and will not error.
-That's easy in th early steps, but harder farther on,
+That's easy in the early steps, but harder farther on,
 so some feature files will need to be run on their own.
 Most steps are commented as either idempotent or FixMe.
 
@@ -25,7 +25,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from proteus import config, Model, Wizard
 
-from .support.fields import string_to_python
+from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
 
@@ -33,13 +33,7 @@ today = datetime.date.today()
 
 @step('Create database')
 def step_impl(context):
-    context.dData = dict()
-
-def sGetFeatureData(context, sKey):
-    return context.dData['feature'][sKey]
-
-def vSetFeatureData(context, sKey, sValue):
-    context.dData['feature'][sKey] = sValue
+    pass
 
 # Warning - these are hardwired from the Tryton code
 from .trytond_constants import *
@@ -306,13 +300,6 @@ def step_impl(context, uTem, uRoot):
         create_chart.execute('create_properties')
 
     assert Account.find([('name', '=', uRoot)])
-    if 'account_stock_anglo_saxon' in modules.lInstalledModules():
-        # in account_stock_anglo_saxon/account.xml
-        assert Account.find([
-            ('kind', '=', 'other'),
-            ('company', '=', company.id),
-            ('name', '=', 'COGS'),
-            ])
 
 # party.party Supplier
 @step('Create a saved instance of "{uKlass}" named "{uName}"')

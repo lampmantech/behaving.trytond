@@ -1,3 +1,25 @@
+commit 17d849f397b4f156be8c4960fff147604f9d20f0
+Date:   Sun Nov 3 16:19:14 2013 +0200
+
+    Added features/steps/oerpscenario.py
+    which are the elementary tests from OpenERPScenario.
+    The aim here is to make the same feature tests in OpenERPScenario
+    run in trytond_scenari on Tryton. YMMV!
+    
+    Refactored the scenarios to use a Set of default feature data.
+    This will allow us to un-hardwire the account names, and run the
+    same testing scenarios on Chart of Accounts other than the
+    default "Minimal Chart of Accounts" in the account module.
+    
+    Made features/steps/support/fields.py use tryton to get field
+    data types. Anything that is not a basic data type is assumed
+    to be the "name" field of a relation, and the OerpScenario
+    syntax of 'by name: Name' is dropped to just 'Name'.
+    
+    I'm not sure if we want to support the OerpScenario syntaxes of
+    'by oid:' or 'by code:' - if so, fix features/steps/dsl.py
+    which is currently broken, and keep the syntax local to those steps.
+
 commit 69b19586cb0ca439419a8fe512d5c47f3d08cbf3
 Date:   Fri Nov 1 11:06:51 2013 +0200
 

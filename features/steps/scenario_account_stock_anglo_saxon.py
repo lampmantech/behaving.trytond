@@ -19,7 +19,7 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 from proteus import config, Model, Wizard
 
-from .support.fields import string_to_python
+from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support import tools
 
@@ -54,28 +54,30 @@ def step_impl(context, uName):
         ProductUom = Model.get('product.uom')
         unit, = ProductUom.find([('name', '=', 'Unit')])
 
+        sCompanyName = sGetFeatureData(context, 'party,company_name')
         Party = Model.get('party.party')
-        party, = Party.find([('name', '=', COMPANY_NAME)])
+        party, = Party.find([('name', '=', sCompanyName)])
         Company = Model.get('company.company')
         company, = Company.find([('party.id', '=', party.id)])
 
         AccountJournal = Model.get('account.journal')
-        stock_journal, = AccountJournal.find([('code', '=', 'STO'),
-                                              ('company', '=', company.id),])
+        stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
 
         Account = Model.get('account.account')
         revenue, = Account.find([
             ('kind', '=', 'revenue'),
+            ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
             ('company', '=', company.id),
             ])
         expense, = Account.find([
             ('kind', '=', 'expense'),
+            ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
             ('company', '=', company.id),
             ])
         cogs, = Account.find([
             ('kind', '=', 'other'),
+            ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
             ('company', '=', company.id),
-            ('name', '=', 'COGS'),
             ])
 
         # These are in by trytond_account_stock_continental/account.xml
@@ -83,23 +85,28 @@ def step_impl(context, uName):
         stock, = Account.find([
             ('kind', '=', 'stock'),
             ('company', '=', company.id),
-            ('name', '=', 'Stock')])
+            ('name', '=', sGetFeatureData(context, 'account.template,stock')),
+            ])
         stock_customer, = Account.find([
             ('kind', '=', 'stock'),
             ('company', '=', company.id),
-            ('name', '=', 'Stock Customer')])
+            ('name', '=', sGetFeatureData(context, 'account.template,stock_customer')),
+            ])
         stock_lost_found, = Account.find([
             ('kind', '=', 'stock'),
             ('company', '=', company.id),
-            ('name', '=', 'Stock Lost and Found')])
+            ('name', '=', sGetFeatureData(context, 'account.template,stock_lost_found')),
+            ])
         stock_production, = Account.find([
             ('kind', '=', 'stock'),
             ('company', '=', company.id),
-            ('name', '=', 'Stock Production')])
+            ('name', '=', sGetFeatureData(context, 'account.template,stock_production')),
+            ])
         stock_supplier, = Account.find([
             ('kind', '=', 'stock'),
+            ('name', '=', sGetFeatureData(context, 'account.template,stock_supplier')),
             ('company', '=', company.id),
-            ('name', '=', 'Stock Supplier')])
+            ])
 
         template = ProductTemplate()
         template.name = uName
@@ -317,19 +324,23 @@ def step_impl(context):
     current_config = context.oProteusConfig
 
     Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     Account = Model.get('account.account')
 
     stock, = Account.find([
-                ('kind', '=', 'stock'),
-                ('company', '=', company.id),
-                ('name', '=', 'Stock')])
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock')),
+        ])
     stock_supplier, = Account.find([
-                ('kind', '=', 'stock'),
-                ('company', '=', company.id),
-                ('name', '=', 'Stock Supplier')])
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_supplier')),
+        ])
     stock_supplier.reload()
 
     stock.reload()
@@ -343,6 +354,7 @@ def step_impl(context):
         "Expected 50.00,0.00 but got %.2f,%.2f" % (stock.debit, stock.credit,)
     expense, = Account.find([
         ('kind', '=', 'expense'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
         ('company', '=', company.id),
         ])
     expense.reload()
@@ -360,7 +372,8 @@ def step_impl(context, uDescription, uSupplier):
 
     Party = Model.get('party.party')
     supplier, = Party.find([('name', '=', uSupplier)])
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     purchase, = Purchase.find([('description', '=', uDescription),
@@ -402,13 +415,15 @@ def step_impl(context):
     current_config = context.oProteusConfig
 
     Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
     Account = Model.get('account.account')
     payable, = Account.find([
         ('kind', '=', 'payable'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
         ('company', '=', company.id),
         ])
     payable.reload()
@@ -418,6 +433,7 @@ def step_impl(context):
 
     expense, = Account.find([
         ('kind', '=', 'expense'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
         ('company', '=', company.id),
         ])
     expense.reload()
@@ -427,7 +443,8 @@ def step_impl(context):
 
     stock_supplier, = Account.find([
         ('company', '=', company.id),
-        ('name', '=', 'Stock Supplier')])
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_supplier')),
+        ])
     stock_supplier.reload()
     assert (stock_supplier.debit, stock_supplier.credit) == \
         (Decimal('46.00'), Decimal('46.00')), \
@@ -443,7 +460,8 @@ def step_impl(context, uDescription, uCustomer):
 
     Party = Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
@@ -470,7 +488,8 @@ def step_impl(context, uDescription, uCustomer):
 
     Party = Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
@@ -515,7 +534,8 @@ def step_impl(context, uDescription, uCustomer):
 
     Party = Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
@@ -543,18 +563,21 @@ def step_impl(context):
     Account = Model.get('account.account')
     
     Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
     stock, = Account.find([
-                ('kind', '=', 'stock'),
-                ('company', '=', company.id),
-                ('name', '=', 'Stock')])
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock')),
+        ])
     stock_customer, = Account.find([
-                ('kind', '=', 'stock'),
-                ('company', '=', company.id),
-                ('name', '=', 'Stock Customer')])
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_customer')),
+        ])
     stock_customer.reload()
     assert (stock_customer.debit, stock_customer.credit) == \
         (Decimal('28.00'), Decimal('0.00')), \
@@ -575,7 +598,8 @@ def step_impl(context, uDescription, uCustomer):
 
     Party = Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
@@ -599,12 +623,14 @@ def step_impl(context):
     Account = Model.get('account.account')
     
     Party = Model.get('party.party')
-    party, = Party.find([('name', '=', COMPANY_NAME)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
         ('company', '=', company.id),
         ])
     receivable.reload()
@@ -614,6 +640,7 @@ def step_impl(context):
 
     revenue, = Account.find([
         ('kind', '=', 'revenue'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
         ('company', '=', company.id),
         ])
     revenue.reload()
@@ -622,9 +649,10 @@ def step_impl(context):
         "Expected 0.00,50.00 but got %.2f,%.2f" % (revenue.debit, revenue.credit,)
 
     stock_customer, = Account.find([
-                ('kind', '=', 'stock'),
-                ('company', '=', company.id),
-                ('name', '=', 'Stock Customer')])
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_customer')),
+        ])
     stock_customer.reload()
     assert (stock_customer.debit, stock_customer.credit) == \
         (Decimal('28.00'), Decimal('28.00')), \
@@ -633,7 +661,7 @@ def step_impl(context):
     cogs, = Account.find([
         ('kind', '=', 'other'),
         ('company', '=', company.id),
-        ('name', '=', 'COGS'),
+        ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
         ])
     cogs.reload()
     assert (cogs.debit, cogs.credit) == \
@@ -689,7 +717,8 @@ def step_impl(context, uSupplier):
             password=ACCOUNTANT_PASSWORD,
             database_name=current_config.database_name)
         for invoice in purchase.invoices:
-                invoice.invoice_date = today
-                invoice.save()
+            invoice.invoice_date = today
+            invoice.save()
+            
         Invoice = Model.get('account.invoice')
         Invoice.validate_invoice([i.id for i in purchase.invoices], new_config.context)
