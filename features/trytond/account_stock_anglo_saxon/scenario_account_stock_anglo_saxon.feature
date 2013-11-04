@@ -41,8 +41,8 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | login	| accountant	  |
 	  | password	| accountant	  |
 	  | group	| Account	  |
-	and T/ASAS/SASAS Create a PaymentTerm named "Direct" with "0" days remainder
-	and T/ASAS/SASAS Create a ProductTemplate named "product" having:
+	and Create a PaymentTerm named "Direct" with "0" days remainder
+	and T/ASAS/SASAS Create a ProductTemplate named "product" with fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fixed |
@@ -51,6 +51,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | list_price 	      | 10    |
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
+	  | default_uom	      | Unit  |
 	and T/ASAS/SASAS Create two products of type "goods" from the ProductTemplate named "product" with fields
 	  | name                | cost_price_method |
 	  | product_fixed	| fixed   	    |
@@ -91,6 +92,6 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	and T/ASAS/SASAS After shipping to customer assert the account credits and debits
 	and T/ASAS/SASAS Open customer invoice for the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits
-	and T/ASAS/SASAS Now create an invoice to supplier "Supplier" by an accountant with quantities
+	and T/ASAS/SASAS Create an invoice to supplier "Supplier" by an accountant with quantities
 	  | description     | quantity	| unit_price |
 	  | product_fixed   | 5.0      	| 4.00	     |

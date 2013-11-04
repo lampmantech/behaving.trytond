@@ -331,8 +331,8 @@ def step_impl(context, uKlass, uName):
 
 @step('Create parties')
 def step_impl(context):
-    context.execute_steps(u'''Create a party named "Supplier"''')
-    context.execute_steps(u'''Create a party named "Customer"''')
+    context.execute_steps(u'''Given Create a party named "Supplier"''')
+    context.execute_steps(u'''Given Create a party named "Customer"''')
 
 @step('Create a party named "{uName}"')
 def step_impl(context, uName):
@@ -367,6 +367,20 @@ def step_impl(context, uName):
         customer.save()
 
     assert Party.find([('name', '=', uName)])
+
+# Direct, 0
+@step('Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder')
+def step_impl(context, uTermName, uNum):
+    # idempotent
+    PaymentTerm = Model.get('account.invoice.payment_term')
+    iNum=int(uNum)
+    assert iNum >= 0
+    if not PaymentTerm.find([('name', '=', uTermName)]):
+        PaymentTermLine = Model.get('account.invoice.payment_term.line')
+        payment_term = PaymentTerm(name=uTermName)
+        payment_term_line = PaymentTermLine(type='remainder', days=iNum)
+        payment_term.lines.append(payment_term_line)
+        payment_term.save()
 
 # Accountant, Account
 @step('Create a user named "{uName}" with the fields')

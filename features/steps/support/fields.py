@@ -67,9 +67,8 @@ def string_to_python (sField, sValue, Party=None):
     assert 'relation' in dField.keys(), \
                "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)
     sRelation = dField['relation']
-    #? FixMe: if sType == 'many2one':
         
-    # FixMe: assume name for now
+    #? FixMe: assume name for now
     Klass = Model.get(sRelation)
     #? name or code
     lElts = Klass.find([('name', '=', sValue)])
@@ -77,4 +76,6 @@ def string_to_python (sField, sValue, Party=None):
            "ERROR: No instance of %s found named '%s'" % (sRelation, sValue,)
     assert len(lElts) == 1, \
            "ERROR: Too many instances of %s found named '%s'" % (sRelation, sValue,)
+    #? FixMe: if sType == 'many2one':
+    #? FixMe: if sType == 'many2many':
     return lElts[0]

@@ -1,3 +1,11 @@
+commit 49725377de4f1d9a65c60154b4c391caef20f9ee
+Date:   Mon Nov 4 13:24:00 2013 +0200
+
+    The chart of accounts specific data can now be set, so that
+    features/trytond/account_stock_anglo_saxon/scenario_account_stock_anglo_saxon.feature
+    should work now with other chart of accounts, and other
+    company names.
+
 commit 17d849f397b4f156be8c4960fff147604f9d20f0
 Date:   Sun Nov 3 16:19:14 2013 +0200
 

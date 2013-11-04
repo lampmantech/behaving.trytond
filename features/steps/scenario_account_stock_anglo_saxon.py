@@ -40,7 +40,7 @@ def step_impl(context, uName):
         assert ProductCategory.find([('name', '=', uName)])
 
 # product , 'fixed' or fifo
-@step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" having')
+@step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields')
 def step_impl(context, uName):
     # idempotent
 
@@ -52,7 +52,6 @@ def step_impl(context, uName):
         category, = ProductCategory.find([('name', '=', 'Category')])
 
         ProductUom = Model.get('product.uom')
-        unit, = ProductUom.find([('name', '=', 'Unit')])
 
         sCompanyName = sGetFeatureData(context, 'party,company_name')
         Party = Model.get('party.party')
@@ -111,13 +110,12 @@ def step_impl(context, uName):
         template = ProductTemplate()
         template.name = uName
         # template_average.cost_price_method = 'fixed'
-        # type, cost_price_method
+        # type, cost_price_method, default_uom
         for row in context.table:
             setattr(template, row['name'],
                     string_to_python(row['name'], row['value'], ProductTemplate))
 
         template.category = category
-        template.default_uom = unit
         template.account_expense = expense
         template.account_revenue = revenue
         template.account_stock = stock
@@ -180,20 +178,6 @@ def step_impl(context, sType, uName):
                         }, current_config.context)[0])
                 product_average.description = uRowName
                 product_average.save()
-
-# Direct, 0
-@step('T/ASAS/SASAS Create a PaymentTerm named "{uName}" with "{uNum}" days remainder')
-def step_impl(context, uName, uNum):
-    # idempotent
-    PaymentTerm = Model.get('account.invoice.payment_term')
-    iNum=int(uNum)
-    assert iNum >= 0
-    if not PaymentTerm.find([('name', '=', uName)]):
-        PaymentTermLine = Model.get('account.invoice.payment_term.line')
-        payment_term = PaymentTerm(name=uName)
-        payment_term_line = PaymentTermLine(type='remainder', days=iNum)
-        payment_term.lines.append(payment_term_line)
-        payment_term.save()
 
 # 12 products, Supplier
 @step('T/ASAS/SASAS Create a Purchase Order with description "{uDescription}" from Supplier "{uSupplier}" with fields')
@@ -669,7 +653,7 @@ def step_impl(context):
         "Expected 28.00,0.00 but got %.2f,%.2f" % (cogs.debit, cogs.credit,)
 
 # Supplier
-@step('T/ASAS/SASAS Now create an invoice to supplier "{uSupplier}" by an accountant with quantities')
+@step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" by an accountant with quantities')
 def step_impl(context, uSupplier):
 
     current_config = context.oProteusConfig
