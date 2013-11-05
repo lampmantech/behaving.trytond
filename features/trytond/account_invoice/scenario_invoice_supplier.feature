@@ -35,7 +35,10 @@ Feature: Run the Trytond scenario_invoice_supplier doctests
 	  | default_uom	      | Unit    |
 #	  | cost_price_method | fixed   |
 	and TS/AIS Create a product with description "Services Bought" from template "Service Product"
-# Note: Product description "Services Bought" is derived from the
-# invoice description "Buy the Services Bought"
 	and TS/AIS Create an invoice with description "Buy the Services Bought" to supplier "Supplier" with fields
-       Then  TS/AIS Post the invoice with description "Buy the Services Bought" and assert the taxes named "10% Sales Tax" with fields
+# Note that this uses the heading description rather than name
+	  | description       | quantity   | unit_price |
+	  | Services Bought   | 5	   | 		|
+	  | Test     	      | 1	   | 10.00	|
+       Then TS/AIS Post the invoice with description "Buy the Services Bought" and assert the taxes named "10% Sales Tax" with fields
+        and TS/AIS Create a credit note for the invoice with description "Buy the Services Bought" and assert the amounts

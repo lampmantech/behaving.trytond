@@ -1,3 +1,10 @@
+commit 462200823adddf4c77775ecc430c2d719c1e55d0
+Date:   Mon Nov 4 23:07:35 2013 +0200
+
+    Added features/steps/scenario_invoice_supplier.py and
+    features/trytond/account_invoice/scenario_invoice_supplier.feature
+    which means invoices with taxes can be handled now.
+
 commit 49725377de4f1d9a65c60154b4c391caef20f9ee
 Date:   Mon Nov 4 13:24:00 2013 +0200
 

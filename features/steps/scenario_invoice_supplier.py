@@ -29,7 +29,7 @@ from .trytond_constants import *
 
 today = datetime.date.today()
 
-# 10% Sales Tax,
+# 10% Sales Tax
 @step('TS/AIS Create a tax named "{uTaxName}" with fields')
 def step_impl(context, uTaxName):
 
@@ -61,7 +61,6 @@ def step_impl(context, uTaxName):
                    row['name'] == 'credit_note_base_code' or \
                    row['name'] == 'credit_note_tax_code':
                 # create these if they dont exist
-                attr = row['name']
                 l = TaxCode.find([('name', '=', row['value'])])
                 if l:
                     tax_code = l[0]
@@ -132,7 +131,7 @@ def step_impl(context, uDescription, uTemplateName):
         product.save()
 
 
-# , Supplier
+# Buy the Services Bought, Supplier
 @step('TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields')
 def step_impl(context, uDescription, uSupplier):
     current_config = context.oProteusConfig
@@ -157,17 +156,6 @@ def step_impl(context, uDescription, uSupplier):
         invoice.party = party
         invoice.payment_term = payment_term
 
-        Product = Model.get('product.product')
-        # Groddy: Product description "Services Bought" is derived from the
-        # invoice description "Buy the Services Bought"
-        product, = Product.find([('description', '=', uDescription[8:])])
-
-        InvoiceLine = Model.get('account.invoice.line')
-        line = InvoiceLine()
-        invoice.lines.append(line)
-        line.product = product
-        line.quantity = 5
-
         Account = Model.get('account.account')    
         expense, = Account.find([
             ('kind', '=', 'expense'),
@@ -175,15 +163,26 @@ def step_impl(context, uDescription, uSupplier):
             ('company', '=', company.id),
             ])
 
-        line = InvoiceLine()
-        invoice.lines.append(line)
-        line.account = expense
-        line.description = 'Test'
-        line.quantity = 1
-        line.unit_price = Decimal(10)
+        InvoiceLine = Model.get('account.invoice.line')
+        Product = Model.get('product.product')
+        for row in context.table:
+            line = InvoiceLine()
+            invoice.lines.append(line)
+            # Note that this uses the heading 'description' rather than 'name'
+            lProducts = Product.find([('description', '=', row['description'])])
+            if lProducts:
+                line.product = lProducts[0]
+                # 'unit_price' is derived from the Product
+            else:
+                line.account = expense
+                line.description = row['description']
+                line.unit_price = Decimal(row['unit_price'])
+            line.quantity = \
+                    string_to_python('quantity', row['quantity'], InvoiceLine)
+
         invoice.save()
 
-# 
+# Buy the Services Bought, 10% Sales Tax
 @step('TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields')
 def step_impl(context, uDescription, uTaxName):
     current_config = context.oProteusConfig
@@ -254,12 +253,18 @@ def step_impl(context, uDescription, uTaxName):
     credit_note_tax_code.reload()
     assert credit_note_tax_code.sum == Decimal(0)
 
-#@step('TS/AIS Credit invoice')
-#def step_impl(context):
+# Buy the Services Bought
+@step('TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts')
+def step_impl(context, uDescription):
+    current_config = context.oProteusConfig
+
+    Invoice = Model.get('account.invoice')
+    invoice, = Invoice.find(['description', '=', uDescription])
 
     credit = Wizard('account.invoice.credit', [invoice])
     credit.form.with_refund = False
     credit.execute('credit')
+    
     credit_note, = Invoice.find([('type', '=', 'in_credit_note')])
     assert credit_note.state == u'draft'
     assert credit_note.untaxed_amount == invoice.untaxed_amount

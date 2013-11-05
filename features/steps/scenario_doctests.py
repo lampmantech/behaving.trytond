@@ -254,8 +254,6 @@ def step_impl(context, uTem, uRoot):
     Company = Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
-    # FixMe: Is there a better test of telling if the
-    # 'Minimal A' chart of accounts has been created?
     # MINIMAL_ACCOUNT_ROOT
     if not Account.find([('name', '=', uRoot),
                          ('company', '=', company.id),]):
@@ -311,37 +309,34 @@ def step_impl(context, uKlass, uName):
         instance = Party(name=uName)
         instance.save()
 
+@step('Create a party named "{uName}"')
+def step_impl(context, uName):
+    context.execute_steps(u'''
+    Given Create a saved instance of "party.party" named "%s"
+    ''' % (uName,))
+
 @step('Create an instance of "{uKlass}" named "{uName}" with fields')
 def step_impl(context, uKlass, uName):
     # idempotent
 
-    assert context.table, "please supply a table of field name and values"
+    assert context.table, "Please supply a table of field name and values"
     if hasattr(context.table, 'headings'):
         # if we have a real table, ensure it has 2 columns
         # otherwise, we will just fail during iteration
         assert_equal(len(context.table.headings), 2)
 
-    Party = Model.get(uKlass)
-    if not Party.find([('name', '=', uName)]):
-        oInstance = Party(name=uName)
+    Klass = Model.get(uKlass)
+    if not Klass.find([('name', '=', uName)]):
+        oInstance = Klass(name=uName)
         for row in context.table:
             setattr(oInstance, row['name'],
-                    string_to_python(row['name'], row['value'], Party))
+                    string_to_python(row['name'], row['value'], Klass))
         oInstance.save()
 
 @step('Create parties')
 def step_impl(context):
     context.execute_steps(u'''Given Create a party named "Supplier"''')
     context.execute_steps(u'''Given Create a party named "Customer"''')
-
-@step('Create a party named "{uName}"')
-def step_impl(context, uName):
-
-    Party = Model.get('party.party')
-    if not Party.find([('name', '=', uName)]):
-        supplier = Party(name=uName)
-        supplier.save()
-    assert Party.find([('name', '=', uName)])
 
 # Customer
 @step('Create a party named "{uName}" with an account_payable attribute')
@@ -451,6 +446,7 @@ def step_impl(context, uCalName, uUserName):
     for row in context.table:
         pass
 
+# unfinished
 @step('Create holidays in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
 def step_impl(context, uCalName, uUserName):
     # idempotent
