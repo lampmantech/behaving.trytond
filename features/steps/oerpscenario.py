@@ -15,16 +15,27 @@ from behave import *
 # FixMe: UNFINISHED
 @step('I do not want all demo data to be loaded on install')
 def impl(ctx):
+    """
+    WIP
+    """
     pass
 
 # FixMe: UNFINISHED
 @step('I update the module list')
 def impl(ctx):
+    """
+    WIP
+    """
     pass
 
 from support import modules
-@step('I install the required modules with dependencies:')
+@step('I install the required modules with dependencies')
 def impl(ctx):
+    """
+    Install the required modules.
+    It expects a |name| table.
+    Idempotent.
+    """
     # module_config.py
     to_install = []
     for row in ctx.table:
@@ -34,6 +45,9 @@ def impl(ctx):
 
 @step('my modules should have been installed and models reloaded')
 def impl(ctx):
+    """
+    Null.
+    """
     # module_config.py
     pass
 

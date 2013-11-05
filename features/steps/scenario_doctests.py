@@ -39,7 +39,13 @@ def step_impl(context):
 from .trytond_constants import *
 @step('Set the default feature data')
 def step_impl(context):
-    
+    """
+    You can use this step to define a set of default feature data
+    that will be available using the vSetFeatureData and vSetFeatureData
+    functions to pass data between steps. The default data is pulled
+    from the Tryton code, but you can override this for your own
+    production Chart of Accounts, users...
+    """
     assert type(context.dData['feature']) == dict
     uDefaults = u'''
     Given Set the feature data with values
@@ -76,20 +82,33 @@ def step_impl(context):
 
 @step('Set the feature data with values')
 def step_impl(context):
+    """
+    You can use this step to define a set of default feature data
+    that will be available using the vSetFeatureData and vSetFeatureData
+    functions to pass data between steps. It expects a |name|value| table.
+    """
     assert type(context.dData['feature']) == dict
     for row in context.table:
         vSetFeatureData(context, row['name'], row['value'])
 
 @step('Create database with pool.test set to True')
 def step_impl(context):
+    # FixMe: what does this do?
+    """
+    Sets pool.test set to True
+    """
     # This is cute
-    context.execute_steps(u'''Given Create database''')
     current_config = context.oProteusConfig
     current_config.pool.test = True
 
 # account_stock_anglo_saxon
 @step('Install the test module named "{uName}"')
 def step_impl(context, uName):
+    # FixMe: what does this do?
+    """
+    Installs a module using trytond.tests.test_tryton.install_module
+    in case thats different to installing a module.
+    """
     from trytond.tests.test_tryton import install_module
     install_module(uName)
 
@@ -146,6 +165,10 @@ def step_impl(context, sCode):
 
 @step('Reload the default User preferences into the context')
 def step_impl(context):
+    # FixMe: what does this do?
+    """
+    Reload the default User get_preferences
+    """
     config = context.oProteusConfig
 
     User = Model.get('res.user')
@@ -160,6 +183,11 @@ def step_impl(context):
     
 @step('Create the fiscal year "{uYear}" without Invoicing')
 def step_impl(context, uYear):
+    """
+    Creates a fiscal year 'uYear' with a non-Strict  move_sequence.
+    Create the company first.
+    """
+    
     config = context.oProteusConfig
 
     if uYear == u'TODAY': uYear = str(today.year)
@@ -200,6 +228,11 @@ def step_impl(context):
     
 @step('Create the fiscal year "{uYear}" with Invoicing')
 def step_impl(context, uYear):
+    """
+    Creates a fiscal year 'uYear' with a non-Strict move_sequence
+    and a Strict invoice_sequence for Invoices.
+    Create the company first.
+    """
     config = context.oProteusConfig
 
     if uYear == u'TODAY': uYear = str(today.year)
@@ -302,8 +335,11 @@ def step_impl(context, uTem, uRoot):
 # party.party Supplier
 @step('Create a saved instance of "{uKlass}" named "{uName}"')
 def step_impl(context, uKlass, uName):
-    # idempotent
-
+    """
+    Create an instance of a Model, like Model.get('party.party')
+    with the name attribute of 'uName'.
+    Idempotent.
+    """
     Party = Model.get(uKlass)
     if not Party.find([('name', '=', uName)]):
         instance = Party(name=uName)
@@ -317,7 +353,11 @@ def step_impl(context, uName):
 
 @step('Create an instance of "{uKlass}" named "{uName}" with fields')
 def step_impl(context, uKlass, uName):
-    # idempotent
+    """
+    Create an instance of a Model, like Model.get('party.party')
+    with the name attribute of 'uName'. It expects a |name|value| table.
+    Idempotent.
+    """
 
     assert context.table, "Please supply a table of field name and values"
     if hasattr(context.table, 'headings'):
@@ -341,7 +381,13 @@ def step_impl(context):
 # Customer
 @step('Create a party named "{uName}" with an account_payable attribute')
 def step_impl(context, uName):
-
+    """
+    Create a party named 'uName' with an account_payable attribute.
+    The account_payable Account is taken from the
+    'account.template,main_payable' entry of the feature data
+    (use 'Set the feature data with values' to override)
+    Idempotent.
+    """
     Party = Model.get('party.party')
     Company = Model.get('company.company')
     Account = Model.get('account.account')
@@ -366,7 +412,12 @@ def step_impl(context, uName):
 # Direct, 0
 @step('Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder')
 def step_impl(context, uTermName, uNum):
-    # idempotent
+    """
+    Create a account.invoice.payment_term with name 'uTermName'
+    with a account.invoice.payment_term.line of type 'remainder',
+    and days=uNum.
+    Idempotent.
+    """
     PaymentTerm = Model.get('account.invoice.payment_term')
     iNum=int(uNum)
     assert iNum >= 0
@@ -380,7 +431,12 @@ def step_impl(context, uTermName, uNum):
 # Accountant, Account
 @step('Create a user named "{uName}" with the fields')
 def step_impl(context, uName):
-    # idempotent
+    """
+    Create a res.user named 'uName'.
+    If one of the field names is 'group', it will add the User to that group.
+    It expects a |name|value| table.
+    Idempotent.
+    """
     User = Model.get('res.user')
 
     if not User.find([('name', '=', uName)]):
@@ -403,14 +459,17 @@ def step_impl(context, uName):
 
 @step('Create a calendar named "{uCalName}" owned by the user "{uUserName}"')
 def step_impl(context, uCalName, uUserName):
-    # idempotent
+    """
+    WIP.
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     Calendar = Model.get('calendar.calendar')
 
-    uUserName='Accountant'
-    uUserLogin='accountant'
-    uUserPassword='accountant'
+    uUserName=sGetFeatureData(context, 'user,accountant,name')
+    uUserLogin=sGetFeatureData(context, 'user,accountant,login')
+    uUserPassword=sGetFeatureData(context, 'user,accountant,password')
     User = Model.get('res.user')
     oUser, = User.find([('name', '=', uUserName)])
     oAdminUser, = User.find([('name', '=', 'Administrator')])
@@ -429,12 +488,16 @@ def step_impl(context, uCalName, uUserName):
 
 @step('Add an annual event to a calendar named "{uCalName}" owned by the user "{uUserName}" with dates')
 def step_impl(context, uCalName, uUserName):
-    # idempotent
+    """
+    WIP.
+    It expects a |name|value| table.
+    Idempotent.
+    """
     Calendar = Model.get('calendar.calendar')
 
-    uUserName='Accountant'
-    uUserLogin='accountant'
-    uUserPassword='accountant'
+    uUserName=sGetFeatureData(context, 'user,accountant,name')
+    uUserLogin=sGetFeatureData(context, 'user,accountant,login')
+    uUserPassword=sGetFeatureData(context, 'user,accountant,password')
     User = Model.get('res.user')
     oUser, = User.find([('name', '=', uUserName)])
 
@@ -449,7 +512,11 @@ def step_impl(context, uCalName, uUserName):
 # unfinished
 @step('Create holidays in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
 def step_impl(context, uCalName, uUserName):
-    # idempotent
+    """
+    WIP.
+    It expects a |name|value| table.
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     Calendar = Model.get('calendar.calendar')

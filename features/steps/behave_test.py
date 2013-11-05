@@ -11,13 +11,22 @@ from behave import *
 
 @given('we have behave installed')
 def step_impl(context):
+    """
+    If behave is not installed we couldnt get here!
+    """
     pass
 
 @when('we implement a test')
 def step_impl(context):
+    """
+    A trivial assertion.
+    """
     assert True is not False
 
 @then('behave will test it for us!')
 def step_impl(context):
+    """
+    The trivial assertion did not fail.
+    """
     assert context.failed is False
 

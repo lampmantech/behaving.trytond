@@ -1,3 +1,9 @@
+commit eeed82f054b7b12faaf9a5777641881f847eeed1
+Date:   Tue Nov 5 10:48:21 2013 +0200
+
+    Tablized some more of features/steps/scenario_invoice_supplier.py
+    so that the invoice code is easier to reuse.
+
 commit 462200823adddf4c77775ecc430c2d719c1e55d0
 Date:   Mon Nov 4 23:07:35 2013 +0200
 

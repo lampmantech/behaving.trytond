@@ -16,6 +16,10 @@ def step_impl(context):
 
 @step('Ensure that the "{mod}" module is loaded')
 def step_impl(context, mod):
+    """
+    Load the "{mod}" module if it is not already loaded.
+    Idempotent.
+    """
     lRetval = modules.lInstallModules([mod], context.oProteusConfig)
 
 @step('the "{mod}" module is in the list of loaded modules')
@@ -30,6 +34,11 @@ def step_impl(context):
 # party.party
 @step('we have the following table of "{mod}" instances')
 def step_impl(context, mod):
+    """
+    Creates the instances of the Model 'uMod' with the names from the table.
+    It expects a |name| table.
+    Idempotent.
+    """
     Module = Model.get(mod)
     parties = [x.name for x in Module.find()]
     for row in context.table:
@@ -41,8 +50,12 @@ def step_impl(context, mod):
         assert party.id > 0
 
 
-@then('there are some instances of "{mod}"')
+@then('there are some instances of "{uMod}"')
 def step_impl(context, mod):
-    Module = Model.get(mod)
+    """
+    Asserts that there are some instances of the Model 'uMod'.
+    Idempotent.
+    """    
+    Module = Model.get(uMod)
     parties = [x.name for x in Module.find([])]
     assert parties
