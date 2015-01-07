@@ -56,7 +56,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | name                | cost_price_method |
 	  | product_fixed	| fixed   	    |
 	  | product_average	| average 	    |
-	and T/ASAS/SASAS Create a Purchase Order with description "12 products" from Supplier "Supplier" with fields
+	and Create a Purchase Order with description "12 products" from supplier "Supplier" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct 	 |

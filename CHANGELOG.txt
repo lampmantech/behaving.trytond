@@ -1,3 +1,10 @@
+commit f52f3197ad15c6e83c7bbba6a0c5b51baf5d71db
+Date:   Tue Nov 5 12:42:42 2013 +0200
+
+    Added docstrings to the steps. I'll write a step modification
+    that can harvest these for the documentation so that the
+    documentation can be automatically generated from the steps.
+
 commit eeed82f054b7b12faaf9a5777641881f847eeed1
 Date:   Tue Nov 5 10:48:21 2013 +0200
 

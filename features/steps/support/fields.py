@@ -17,7 +17,7 @@ def sGetFeatureData(context, sKey):
 def vSetFeatureData(context, sKey, sValue):
     context.dData['feature'][sKey] = sValue
 
-def string_to_python (sField, sValue, Party=None):
+def string_to_python (sField, uValue, Party=None):
     #? should replace this with DSL
     
     if Party is None: 
@@ -32,50 +32,60 @@ def string_to_python (sField, sValue, Party=None):
         sType = dField['type']
 
     if sType == 'boolean':
-        if sValue.lower() in ('false', 'nil'): return False
-        if sValue.lower() in ('true'): return True
+        if uValue.lower() in ('false', 'nil'): return False
+        if uValue.lower() in ('true'): return True
     if sType == 'numeric' or sField.endswith('_price'):
-        return Decimal(sValue)
-    if sType in ('char', 'text', 'sha',) or sField in ['name',]:
-        return sValue
+        return Decimal(uValue)
+    if sType in ['char', 'text', 'sha']:
+        return uValue
     if sType == 'integer':
-        return int(sValue)
+        return int(uValue)
     if sType == 'float':
-        return int(sValue)
+        return int(uValue)
     if sType == 'selection':
         # FixMe: are selections always strings or can they be otherwise?
         # sSelection = dField['selection']
-        return sValue
+        return uValue
     if sType == 'date' or sField.endswith('_date'):
-        # tryton wants a datetime.date object?
-        if sValue == 'TODAY': return datetime.date.today()
-        return datetime.date(*map(int,sValue.split('-')))
+        # FixMe: whats a date format look like on input? Assuming YYYY-MM-DD
+        if uValue == 'TODAY': return datetime.date.today()
+        return datetime.date(*map(int,uValue.split('-')))
 
-    if sType == 'time':
-        # FixMe: wants a datetime.datetime object?
-        if sValue == 'TODAY': return datetime.datetime.today()
-        return datetime.datetime(*map(int,sValue.split('-')))
+    if sType == 'datetime':
+        # FixMe: whats a time format look like on input? Assuming YYYY-MM-DD
+        if uValue == 'TODAY': return datetime.datetime.now()
+        return datetime.datetime(*map(int,uValue.split('-')))
 
+    if sField in ['name',]:
+        return uValue
+        
     # give up or error?
-    if sType == '': return sValue
+    if sType == '': return uValue
 
     #? This is not always true
     #assert 'searchable' in dField.keys(), \
     #       "Sorry, dont know how to look in slots of %s " % (sField,)
     #assert dField['searchable']
+
     
+    # sType == 'many2one' or sType == 'many2many' uses relation
     assert 'relation' in dField.keys(), \
                "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)
     sRelation = dField['relation']
-        
-    #? FixMe: assume name for now
+
     Klass = Model.get(sRelation)
-    #? name or code
-    lElts = Klass.find([('name', '=', sValue)])
+    #? FixMe: assume name for now
+    lElts = Klass.find([('name', '=', uValue)])
+
+    if len(lElts) == 0 and sField in ['country',]:
+        # Im having trouble with country.country as of 3.2
+        # .find([('name','=',gValue)]) returns []
+        # .find([('rec_name','=',gValue)]) returns []
+        # FixMe: Just junk the field value for now.
+        return None        
+
     assert len(lElts) != 0, \
-           "ERROR: No instance of %s found named '%s'" % (sRelation, sValue,)
+           "ERROR: No instance of %s found named '%s'" % (sRelation, uValue,)
     assert len(lElts) == 1, \
-           "ERROR: Too many instances of %s found named '%s'" % (sRelation, sValue,)
-    #? FixMe: if sType == 'many2one':
-    #? FixMe: if sType == 'many2many':
+           "ERROR: Too many instances of %s found named '%s'" % (sRelation, uValue,)
     return lElts[0]

@@ -16,9 +16,10 @@ for BDD testing of OpenERP (v6.x and 7.0).
 trytond_scenari uses proteus.
 
 Tests are contained is textual feature files
-   features/\*.feature
+wriiten in a Gherkin syntax
+   features/*.feature
 that draw on the definitions of their steps in
-   features/steps/\*.py
+   features/steps/*.py
 For modularity, there is a local python module
 of undecorated python code
   features/steps/support/
@@ -47,7 +48,7 @@ the default values are:
 [trytond]
 user = admin
 password = admin
-database_name = test28
+database_name = test30
 database_type = postgres
 config_file = /etc/trytond.conf
 
@@ -86,13 +87,27 @@ by pulling in the doctest \*.rst files, keeping
 the same filename, to take advantage of behave's
 refactoring, and to get the steps to have good coverage.
 
-Steps are often preceded by a label such as TS/SAR
+Steps are often preceded by a label such as T/A/SAR
 as a way of keeping steps from different modules from
 interfering with each other. The label is arbitrary
 but should be short, like T/A/SAR for
-trytond/account/scenario_account_reconciliation
+trytond/account/scenario_account_reconciliation etc.
 Generic steps, that are likely to be used by all scenari,
-may have no label.
+may have no label, and are usually defined in the generic
+scenario_doctests.py. As specific steps get generalized
+and serve for many different scenari, they will get pulled
+into the generic file. If you are contributing on githib,
+it's best to write your steps with a label and add FixMe:
+comment to signal that you think the step is generic.
+
+Documentation
+-------------
+
+For the moment, the documentation is in the docstrings to the steps. 
+I'll write a step modification that can harvest these for the
+documentation so that the documentation can be automatically generated
+from the steps.
+
 
 Versions
 --------
@@ -100,7 +115,12 @@ Versions
 To see what this version is, look at the first date in 
 the file CHANGELOG.txt.
 
-Active development is on Tryton 3.0.
+Active development is on Tryton 3.2. There is a bug under
+3.2 that hits the country field in party.address; look for
+the comment "Just junk the field value for now" in
+features/steps/support/fields.py
+
+This should work with Tryton 3.0 with no problems.
 
 This should work with Tryton 2.8, but you should make a
 simple change to the trytond_proteus source code.
@@ -109,7 +129,6 @@ after the line:
         database = Database().connect()
 add the line:
         self.database = database
-
 
 Issues
 ------

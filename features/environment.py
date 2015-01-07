@@ -126,9 +126,7 @@ def before_step(context, step):
 
 def after_step(context, laststep):
     """These run after every step.
-    FixMe; I dont see this getting called after a failed step
-    but the code clearly calls behave-1.2.3 model.py line 1079:
-    runner.run_hook('after_step', runner.context, self)
+    N.B.: only called after a failed step if behave --stop
     """
     sTracer = context.oConfig.get('scenari', 'tracer')
     ctx = context # From OpenERPScenario
@@ -144,7 +142,7 @@ def after_step(context, laststep):
             for line in str(item).splitlines():
                 output.write(u'      %s\n' % (line,))
         output.flush()
-        
+
     if laststep.status == 'failed' and sTracer and ctx.config.stop:
         if sTracer == 'pdb':
             tools.set_trace_with_pdb()

@@ -12,12 +12,11 @@ It should be improved to be more like a Behave BDD.
 """
 
 from behave import *
-from proteus import Model, Wizard
+import proteus
 
 import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-from proteus import config, Model, Wizard
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 
@@ -26,22 +25,22 @@ today = datetime.date.today()
 @step('T/A/SAR Create Moves for direct reconciliation')
 def step_impl(context):
 
-    Move = Model.get('account.move')
+    Move = proteus.Model.get('account.move')
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    Journal = Model.get('account.journal')
+    Journal = proteus.Model.get('account.journal')
     journal_revenue, = Journal.find([('code', '=', 'REV'),])
     journal_cash, = Journal.find([('code', '=', 'CASH'),])
 
-    FiscalYear = Model.get('account.fiscalyear')
+    FiscalYear = proteus.Model.get('account.fiscalyear')
     fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
     period = fiscalyear.periods[0]
 
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
         ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
@@ -102,7 +101,7 @@ def step_impl(context):
     reconcile1 = context.dData['feature']['reconcile1']
     reconcile2 = context.dData['feature']['reconcile2']
 
-    reconcile_lines = Wizard('account.move.reconcile_lines',
+    reconcile_lines = proteus.Wizard('account.move.reconcile_lines',
             [reconcile1, reconcile2])
     assert reconcile_lines.state == 'end'
 
@@ -116,9 +115,9 @@ def step_impl(context):
 @step('T/A/SAR Create Moves for writeoff reconciliation')
 def step_impl(context):
 
-    Move = Model.get('account.move')
+    Move = proteus.Model.get('account.move')
 
-    Journal = Model.get('account.journal')
+    Journal = proteus.Model.get('account.journal')
     journal_revenue, = Journal.find([
                 ('code', '=', 'REV'),
                 ])
@@ -126,7 +125,7 @@ def step_impl(context):
                 ('code', '=', 'CASH'),
                 ])
 
-    FiscalYear = Model.get('account.fiscalyear')
+    FiscalYear = proteus.Model.get('account.fiscalyear')
     fiscalyear, = FiscalYear.find([('name', '=', str(today.year))])
     period = fiscalyear.periods[0]
 
@@ -135,15 +134,15 @@ def step_impl(context):
     move.journal = journal_revenue
     move.date = period.start_date
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     customer, = Party.find([('name', '=', 'Customer')])
 
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
         ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
@@ -197,31 +196,55 @@ def step_impl(context):
 def step_impl(context):
 
     reconcile1 = context.dData['feature']['reconcile1']
+    assert reconcile1
     reconcile2 = context.dData['feature']['reconcile2']
+    assert reconcile2
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
     expense, = Account.find([
         ('kind', '=', 'expense'),
         ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
         ('company', '=', company.id),
         ])
+    revenue, = Account.find([
+        ('kind', '=', 'revenue'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
+        ('company', '=', company.id),
+        ])
 
-    Journal = Model.get('account.journal')
-    journal_expense, = Journal.find([
-                ('code', '=', 'EXP'),
-                ])
-    reconcile_lines = Wizard('account.move.reconcile_lines',
+    reconcile_lines = proteus.Wizard('account.move.reconcile_lines',
             [reconcile1, reconcile2])
     assert reconcile_lines.form_state == 'writeoff'
     
-    reconcile_lines.form.journal = journal_expense
-    reconcile_lines.form.account = expense
+    Journal = proteus.Model.get('account.journal')
+    # Fixme: how do we know the tryton version we are talking to?
+    # I'll assume it's the same as the proteus for now
+    sMaj, sMin, sMic = proteus.__version__.split('.')
+    if int(sMaj) < 3 or ( int(sMaj) == 3 and int(sMin) < 2):
+        # This errors on 3.2 but not <= 3.0
+        journal_expense, = Journal.find([
+                ('code', '=', 'EXP'),
+                ])
+        reconcile_lines.form.journal = journal_expense
+        reconcile_lines.form.account = expense
+    else:
+        Sequence = proteus.Model.get('ir.sequence')
+#        SequenceStrict = proteus.Model.get('ir.sequence.strict')
+        sequence_journal, = Sequence.find([('code', '=', 'account.journal')])
+        journal_writeoff = Journal(name='Write-Off', type='write-off',
+                                   sequence=sequence_journal,
+                                   credit_account=revenue,
+                                   debit_account=expense)
+        journal_writeoff.save()
+
+        reconcile_lines.form.journal = journal_writeoff
+
     reconcile_lines.execute('reconcile')
 
     reconcile1.reload()

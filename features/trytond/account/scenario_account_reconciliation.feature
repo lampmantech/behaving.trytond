@@ -5,6 +5,7 @@
 
 Feature: Run the Trytond scenario_account_reconciliation doctests
 from trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
+Updated for 3.0 and 3.2.
 
    Scenario: Run the scenario_account_reconciliation
 

@@ -347,9 +347,14 @@ def step_impl(context, uKlass, uName):
 
 @step('Create a party named "{uName}"')
 def step_impl(context, uName):
-    context.execute_steps(u'''
-    Given Create a saved instance of "party.party" named "%s"
-    ''' % (uName,))
+# boken in 3.2
+#    context.execute_steps(u'''
+#    Given Create a saved instance of "party.party" named "%s"
+#    ''' % (uName,))
+    Party = Model.get('party.party')
+    if not Party.find([('name', '=', uName)]):
+        instance = Party(name=uName)
+        instance.save()
 
 @step('Create an instance of "{uKlass}" named "{uName}" with fields')
 def step_impl(context, uKlass, uName):
@@ -369,9 +374,31 @@ def step_impl(context, uKlass, uName):
     if not Klass.find([('name', '=', uName)]):
         oInstance = Klass(name=uName)
         for row in context.table:
-            setattr(oInstance, row['name'],
-                    string_to_python(row['name'], row['value'], Klass))
+            gValue = string_to_python(row['name'], row['value'], Klass)
+            setattr(oInstance, row['name'], gValue )
         oInstance.save()
+
+@step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
+def step_impl(context, uName, uKlass):
+    """
+    Guven an instance of a Model, like Model.get('party.party')
+    with the name attribute of 'uName', set the attributes to the values.
+    It expects a |name|value| table.
+    Idempotent.
+    """
+
+    assert context.table, "Please supply a table of field name and values"
+    if hasattr(context.table, 'headings'):
+        # if we have a real table, ensure it has 2 columns
+        # otherwise, we will just fail during iteration
+        assert_equal(len(context.table.headings), 2)
+
+    Klass = Model.get(uKlass)
+    oInstance, = Klass.find([('name', '=', uName)])
+    for row in context.table:
+        setattr(oInstance, row['name'],
+                string_to_python(row['name'], row['value'], Klass))
+    oInstance.save()
 
 @step('Create parties')
 def step_impl(context):
@@ -456,6 +483,38 @@ def step_impl(context, uName):
         user.save()
 
         assert User.find([('name', '=', uName)])
+
+# 12 products, Supplier
+@step('Create a Purchase Order with description "{uDescription}" from supplier "{uSupplier}" with fields')
+def step_impl(context, uDescription, uSupplier):
+    """
+    Create a Purchase Order from a supplier with a description.
+    It expects a |name|value| table; the fields typically include:
+    'payment_term', 'invoice_method', 'purchase_date', 'currency'
+    Idempotent.
+    """
+    current_config = context.oProteusConfig
+
+    Purchase = Model.get('purchase.purchase')
+
+    Party = Model.get('party.party')
+    supplier, = Party.find([('name', '=', uSupplier)])
+
+    if not Purchase.find([('description', '=', uDescription),
+                          ('party.id', '=', supplier.id)]):
+        purchase = Purchase()
+        purchase.party = supplier
+        purchase.description = uDescription
+        purchase.purchase_date = today
+        
+        for row in context.table:
+            setattr(purchase, row['name'],
+                    string_to_python(row['name'], row['value'], Purchase))
+
+        purchase.save()
+        assert Purchase.find([('description', '=', uDescription),
+                              ('party.id', '=', supplier.id)])
+
 
 @step('Create a calendar named "{uCalName}" owned by the user "{uUserName}"')
 def step_impl(context, uCalName, uUserName):

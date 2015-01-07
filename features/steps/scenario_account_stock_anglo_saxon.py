@@ -32,17 +32,19 @@ today = datetime.date.today()
 # Create a saved instance of "product.category" named "Category"
 @step('T/ASAS/SASAS Create a ProductCategory named "{uName}"')
 def step_impl(context, uName):
-    # idempotent
-    ProductCategory = Model.get('product.category')
-    if not ProductCategory.find([('name', '=', uName)]):
-        category = ProductCategory(name=uName)
-        category.save()
-        assert ProductCategory.find([('name', '=', uName)])
+    """
+    Idempotent.
+    """
+    context.execute_steps(u'''
+    Given Create a saved instance of "product.category" named "%s"
+    ''' % (uName,))
 
 # product , 'fixed' or fifo
 @step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields')
 def step_impl(context, uName):
-    # idempotent
+    """
+    Idempotent.
+    """
 
     current_config = context.oProteusConfig
     ProductTemplate = Model.get('product.template')
@@ -137,7 +139,9 @@ def step_impl(context, uName):
 @step('T/ASAS/SASAS Create two products of type "{sType}" from the ProductTemplate named "{uName}" with fields')
 # FixMe: actually creates 2 different Product and ProductTemplates
 def step_impl(context, sType, uName):
-    # idempotent
+    """
+    Idempotent.
+    """
     
     current_config = context.oProteusConfig
     Product = Model.get('product.product')
@@ -180,36 +184,11 @@ def step_impl(context, sType, uName):
                 product_average.save()
 
 # 12 products, Supplier
-@step('T/ASAS/SASAS Create a Purchase Order with description "{uDescription}" from Supplier "{uSupplier}" with fields')
-def step_impl(context, uDescription, uSupplier):
-    # idempotent
-    current_config = context.oProteusConfig
-
-    Purchase = Model.get('purchase.purchase')
-
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
-
-    if not Purchase.find([('description', '=', uDescription),
-                          ('party.id', '=', supplier.id)]):
-        purchase = Purchase()
-        purchase.party = supplier
-        purchase.description = uDescription
-        purchase.purchase_date = today
-        
-        # 'payment_term', 'invoice_method', 'purchase_date', 'currency'
-        for row in context.table:
-            setattr(purchase, row['name'],
-                    string_to_python(row['name'], row['value'], Purchase))
-
-        purchase.save()
-        assert Purchase.find([('description', '=', uDescription),
-                              ('party.id', '=', supplier.id)])
-
-# 12 products, Supplier
 @step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
-    # idempotent
+    """
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     Purchase = Model.get('purchase.purchase')
@@ -244,7 +223,9 @@ def step_impl(context, uDescription, uSupplier):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
-    # idempotent
+    """
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     Party = Model.get('party.party')
@@ -263,7 +244,9 @@ def step_impl(context, uDescription, uSupplier):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
-    # idempotent
+    """
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     ShipmentIn = Model.get('stock.shipment.in')
@@ -437,7 +420,9 @@ def step_impl(context):
 # Customer, Sell 5 products
 @step('T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields')
 def step_impl(context, uDescription, uCustomer):
-    # idempotent
+    """
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     Sale = Model.get('sale.sale')
@@ -465,7 +450,9 @@ def step_impl(context, uDescription, uCustomer):
 
 @step('T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities')
 def step_impl(context, uDescription, uCustomer):
-    # idempotent
+    """
+    Idempotent.
+    """
     current_config = context.oProteusConfig
 
     Sale = Model.get('sale.sale')

@@ -51,11 +51,11 @@ def step_impl(context, mod):
 
 
 @then('there are some instances of "{uMod}"')
-def step_impl(context, mod):
+def step_impl(context, uMod):
     """
     Asserts that there are some instances of the Model 'uMod'.
     Idempotent.
     """    
     Module = Model.get(uMod)
-    parties = [x.name for x in Module.find([])]
-    assert parties
+    lParties = [x.name for x in Module.find([])]
+    assert lParties

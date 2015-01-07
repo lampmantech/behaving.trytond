@@ -15,7 +15,7 @@ Feature: Run the Trytond scenario_invoice_supplier doctests
 	and Reload the default User preferences into the context
 	and Create this fiscal year with Invoicing
 	and Create a chart of accounts from template "Minimal Account Chart" with root "Minimal Account Chart"
-	and Create a party named "Supplier"
+	and Create a saved instance of "party.party" named "Supplier"
 	and Create a PaymentTerm named "Term" with "0" days remainder
 	and TS/AIS Create a tax named "10% Sales Tax" with fields
 	    | name                  | value            |
