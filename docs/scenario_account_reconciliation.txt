@@ -1,0 +1,34 @@
+From: ../features/steps/scenario_account_reconciliation.py
+
+
+From: ../features/steps/scenario_account_reconciliation.py
+
+
+
+**T/A/SAR Create Moves for direct reconciliation**
+
+**T/A/SAR Reconcile Lines without writeoff**
+
+**T/A/SAR Create Moves for writeoff reconciliation**
+
+**T/A/SAR Reconcile Lines with writeoff**
+
+**T/A/SAR Create Moves for direct reconciliation**
+
+**T/A/SAR Reconcile Lines without writeoff**
+
+**T/A/SAR Create Moves for writeoff reconciliation**
+
+**T/A/SAR Reconcile Lines with writeoff**
+
+**T/A/SAR Create Moves for direct reconciliation**
+   Tryton is the only Python project that puts NO documentation in its doctests!
+
+**T/A/SAR Reconcile Lines without writeoff**
+   Tryton is the only Python project that puts NO documentation in its doctests!
+
+**T/A/SAR Create Moves for writeoff reconciliation**
+   Tryton is the only Python project that puts NO documentation in its doctests!
+
+**T/A/SAR Reconcile Lines with writeoff**
+   Tryton is the only Python project that puts NO documentation in its doctests!

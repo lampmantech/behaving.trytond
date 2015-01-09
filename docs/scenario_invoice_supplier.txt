@@ -1,0 +1,42 @@
+From: ../features/steps/scenario_invoice_supplier.py
+
+
+From: ../features/steps/scenario_invoice_supplier.py
+
+
+
+**TS/AIS Create a tax named "{uTaxName}" with fields**
+
+**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
+
+**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
+
+**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
+
+**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
+
+**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
+
+**TS/AIS Create a tax named "{uTaxName}" with fields**
+
+**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
+
+**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
+
+**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
+
+**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
+
+**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
+
+**TS/AIS Create a tax named "{uTaxName}" with fields**
+
+**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
+
+**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
+
+**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
+
+**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
+
+**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**

@@ -1,3 +1,10 @@
+commit 57ec84a05b4a09cc4ce2a3c9646f20aabbd223a1
+Date:   Wed Jan 7 08:33:04 2015 +0200
+
+    Updated for Tryton 3.2.
+    Still have a problem in looking up country fields;
+    as a workaroun, they are set to nothing (e.g. party.address->country).
+
 commit f52f3197ad15c6e83c7bbba6a0c5b51baf5d71db
 Date:   Tue Nov 5 12:42:42 2013 +0200
 

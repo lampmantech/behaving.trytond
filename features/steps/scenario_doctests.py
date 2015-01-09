@@ -5,7 +5,7 @@ This is a straight cut-and-paste from
 trytond_*-2.8.*/tests/scenario_*.rst
 to refactor the doctests to eliminate duplication.
 All the steps in this file are used by all of
-the feature files that implment the doctest scenari.
+the feature files that impelment the doctest scenari.
 
 The aim is to make each step idempotent, so that if
 you run a step again from another feature file,
@@ -117,8 +117,8 @@ def step_impl(context, uName):
 def step_impl(context):
     context.execute_steps(u'''Given Ensure that the "account" module is loaded''')
 
-@step('Create the Company with default COMPANY_NAME and Currency code "{sCode}"')
-def step_impl(context, sCode):
+@step('Create the Company with default COMPANY_NAME and Currency code "{uCode}"')
+def step_impl(context, uCode):
 
     Company = Model.get('company.company')
     Party = Model.get('party.party')
@@ -134,28 +134,42 @@ def step_impl(context, sCode):
         company.party = party
 
         Currency = Model.get('currency.currency')
-        currencies = Currency.find([('code', '=', sCode)])
+        currencies = Currency.find([('code', '=', uCode)])
         if not currencies:
-            if sCode == 'EUR':
+            if uCode == 'EUR':
                 currency = Currency(name='EUR', symbol=u'€', code='EUR',
-                    rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-                    mon_decimal_point=',')
-            elif sCode == 'GBP':
+                                    digits=2,
+                                    rounding=Decimal('0.01'),
+                                    mon_grouping='[3, 3, 0]',
+                                    mon_decimal_point='.')
+            elif uCode == 'GBP':
                 currency = Currency(name='GBP', symbol=u'£', code='GBP',
-                    rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-                    mon_decimal_point='.')
-            elif sCode == 'USD':
+                                    digits=2,
+                                    rounding=Decimal('0.01'),
+                                    mon_grouping='[3, 3, 0]',
+                                    mon_decimal_point='.')
+            elif uCode == 'USD':
                 currency = Currency(name='USD', symbol=u'$', code='USD',
-                    rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-                    mon_decimal_point='.')
+                                    digits=2,
+                                    rounding=Decimal('0.01'),
+                                    mon_grouping='[3, 3, 0]',
+                                    mon_decimal_point='.')
+            elif uCode == 'CAD':
+                currency = Currency(name='CAD', symbol=u'$', code='CAD',
+                                    digits=2,
+                                    rounding=Decimal('0.01'),
+                                    mon_grouping='[3, 3, 0]',
+                                    mon_decimal_point='.')
             else:
-                assert code in ['EUR', 'GBP', 'USD'], \
-                       "Unsupported currency code: %s" % (sCode,)
+                assert code in ['EUR', 'GBP', 'USD', 'CAD'], \
+                       "Unsupported currency code: %s" % (uCode,)
             currency.save()
 
             CurrencyRate = Model.get('currency.currency.rate')
-            CurrencyRate(date=today + relativedelta(month=1, day=1),
-                rate=Decimal('1.0'), currency=currency).save()
+            # the beginning of computer time
+            CurrencyRate(date=datetime.date(year=1970, month=1, day=1),
+                         rate=Decimal('1.0'),
+                         currency=currency).save()
         else:
             currency, = currencies
         company.currency = currency
@@ -163,11 +177,52 @@ def step_impl(context, sCode):
 
     assert Company.find()
 
+@step('Create the currency with Currency code "{uCode}"')
+def step_impl(context, uCode):
+    """
+    Create the currency with the given Currency code.
+    You'll need to do this before you use any other currencies
+    than the company's base currency.
+    """
+    Company = Model.get('company.company')
+    Party = Model.get('party.party')
+
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    Currency = Model.get('currency.currency')
+    currencies = Currency.find([('code', '=', uCode)])
+    if not currencies:
+        if uCode == 'EUR':
+            currency = Currency(name='EUR', symbol=u'€', code='EUR',
+                rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
+                mon_decimal_point=',')
+        elif uCode == 'GBP':
+            currency = Currency(name='GBP', symbol=u'£', code='GBP',
+                rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
+                mon_decimal_point='.')
+        elif uCode == 'USD':
+            currency = Currency(name='USD', symbol=u'$', code='USD',
+                rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
+                mon_decimal_point='.')
+        elif uCode == 'CAD':
+            currency = Currency(name='CAD', symbol=u'$', code='CAD',
+                rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
+                mon_decimal_point='.')
+        else:
+            assert code in ['EUR', 'GBP', 'USD', 'CAD'], \
+                   "Unsupported currency code: %s" % (uCode,)
+        currency.save()
+
+
+    assert Currency.find([('code', '=', uCode)])
+
 @step('Reload the default User preferences into the context')
 def step_impl(context):
     # FixMe: what does this do?
     """
-    Reload the default User get_preferences
+    Reload the default User get_preferences.
     """
     config = context.oProteusConfig
 
@@ -184,8 +239,8 @@ def step_impl(context):
 @step('Create the fiscal year "{uYear}" without Invoicing')
 def step_impl(context, uYear):
     """
-    Creates a fiscal year 'uYear' with a non-Strict  move_sequence.
-    Create the company first.
+    Creates a fiscal year 'uYear' with a non-Strict move_sequence.
+    Create the company first before creating fiscal years.
     """
     
     config = context.oProteusConfig
@@ -278,7 +333,17 @@ def step_impl(context, uYear):
 # 'Minimal Account Chart', 'Minimal Account Chart'
 @step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
 def step_impl(context, uTem, uRoot):
-
+    """
+    Create a chart of accounts from template "{uTem}" 
+    with root account "{uRoot}".
+    Before you do this, set the feature data for:
+    * account.template,main_receivable
+    * account.template,main_payable
+    * account.template,main_revenue
+    * account.template,main_expense
+    * account.template,main_cash
+    """
+    
     Account = Model.get('account.account')
 
     sCompanyName = sGetFeatureData(context, 'party,company_name')
@@ -459,9 +524,9 @@ def step_impl(context, uTermName, uNum):
 @step('Create a user named "{uName}" with the fields')
 def step_impl(context, uName):
     """
-    Create a res.user named 'uName'.
-    If one of the field names is 'group', it will add the User to that group.
+    Create a res.user named 'uName' and the given field values.
     It expects a |name|value| table.
+    If one of the field names is 'group', it will add the User to that group.
     Idempotent.
     """
     User = Model.get('res.user')

@@ -24,7 +24,9 @@ today = datetime.date.today()
 
 @step('T/A/SAR Create Moves for direct reconciliation')
 def step_impl(context):
-
+    """
+    Tryton is the only Python project that puts NO documentation in its doctests!
+    """
     Move = proteus.Model.get('account.move')
 
     Party = proteus.Model.get('party.party')
@@ -97,6 +99,9 @@ def step_impl(context):
 
 @step('T/A/SAR Reconcile Lines without writeoff')
 def step_impl(context):
+    """
+    Tryton is the only Python project that puts NO documentation in its doctests!
+    """
 
     reconcile1 = context.dData['feature']['reconcile1']
     reconcile2 = context.dData['feature']['reconcile2']
@@ -114,6 +119,9 @@ def step_impl(context):
 
 @step('T/A/SAR Create Moves for writeoff reconciliation')
 def step_impl(context):
+    """
+    Tryton is the only Python project that puts NO documentation in its doctests!
+    """
 
     Move = proteus.Model.get('account.move')
 
@@ -194,6 +202,9 @@ def step_impl(context):
 
 @step('T/A/SAR Reconcile Lines with writeoff')
 def step_impl(context):
+    """
+    Tryton is the only Python project that puts NO documentation in its doctests!
+    """
 
     reconcile1 = context.dData['feature']['reconcile1']
     assert reconcile1

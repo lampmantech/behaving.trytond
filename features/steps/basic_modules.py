@@ -29,6 +29,9 @@ def step_impl(context, mod):
 
 @step('we print the list of loaded modules')
 def step_impl(context):
+    """
+    Print the list of loaded modules on behave's stdout.
+    """
     tools.puts(repr(modules.lInstalledModules()))
 
 # party.party
