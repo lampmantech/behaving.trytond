@@ -42,7 +42,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | password	| accountant	  |
 	  | group	| Account	  |
 	and Create a PaymentTerm named "Direct" with "0" days remainder
-	and T/ASAS/SASAS Create a ProductTemplate named "product" with fields
+	and T/ASAS/SASAS Create a ProductTemplate named "product" having:
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fixed |
@@ -51,17 +51,17 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | list_price 	      | 10    |
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
-	  | default_uom	      | Unit  |
+#?	  | default_uom	      | Unit  |
 	and T/ASAS/SASAS Create two products of type "goods" from the ProductTemplate named "product" with fields
 	  | name                | cost_price_method |
 	  | product_fixed	| fixed   	    |
 	  | product_average	| average 	    |
-	and Create a Purchase Order with description "12 products" from supplier "Supplier" with fields
+	and T/ASAS/SASAS Create a Purchase Order with description "12 products" from Supplier "Supplier" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct 	 |
 	  | purchase_date     | TODAY	 |
-	  | currency          | EUR	 |
+#?	  | currency          | EUR	 |
 	and T/ASAS/SASAS Purchase products on the P. O. with description "12 products" from supplier "Supplier" with quantities
 	  | description  	| quantity | unit_price |
 	  | product_fixed	| 5.0	   | 4		|

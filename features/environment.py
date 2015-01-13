@@ -11,7 +11,7 @@ from proteus import Model, Wizard
 
 from .steps.support import tools
 
-ETC_TRYTOND_CONF='/etc/trytond.conf'
+ETC_TRYTOND_CONF='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'
 
 def vCreateConfigFile(oConfig, sFile):
 
@@ -55,7 +55,8 @@ def before_all(context):
     sDatabaseType=oConfig.get('trytond', 'database_type')
 #?    assert sDatabaseType in ['postgresql'], "Unsupported database type: " + sDatabaseType
     sTrytonConfigFile=oConfig.get('trytond', 'config_file')
-    assert os.path.exists(sTrytonConfigFile), "Required file not found: " + sTrytonConfigFile
+    assert os.path.exists(sTrytonConfigFile), \
+        "Required file not found: " + sTrytonConfigFile
 
     context.oConfig = oConfig
     context.oProteusConfig = proteus.config.set_trytond(
@@ -79,6 +80,11 @@ def before_all(context):
     # use this dictionary as a last resort to pass data around
     if not hasattr(context, 'dData'):
         context.dData = dict()
+    context.dData['trytond,user'] = sUser
+    context.dData['trytond,password'] = sPassword
+    context.dData['trytond,database_name'] = sDatabaseName
+    context.dData['trytond,database_type'] = sDatabaseType
+    context.dData['trytond,config_file'] = sTrytonConfigFile
 
 def after_all(context):
     """These run after the whole shooting match.

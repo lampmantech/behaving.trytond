@@ -1,3 +1,10 @@
+commit e267921a4ec6f97e4b8d96391c9f63b5c0e0d2cf
+Date:   Fri Jan 9 03:20:48 2015 +0200
+
+    Added a quick and dirty bash script to pull the steps
+    and their docstrings into the docs diectory. It gives a starting point
+    for the documentation, and encourages the use of docstrings,
+
 commit 57ec84a05b4a09cc4ce2a3c9646f20aabbd223a1
 Date:   Wed Jan 7 08:33:04 2015 +0200
 

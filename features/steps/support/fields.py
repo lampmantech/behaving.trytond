@@ -11,7 +11,7 @@ from proteus import config, Model, Wizard
 
 def sGetFeatureData(context, sKey):
     assert sKey in context.dData['feature'], \
-           "Use 'Set the feature data with values' to set the value of "+sKey
+           "ERROR: Use 'Set the feature data with values' to set the value of "+sKey
     return context.dData['feature'][sKey]
 
 def vSetFeatureData(context, sKey, sValue):

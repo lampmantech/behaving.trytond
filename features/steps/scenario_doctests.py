@@ -18,12 +18,11 @@ It should be improved to be more like a Behave BDD.
 """
 
 from behave import *
-from proteus import Model, Wizard
+import proteus
 
 import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-from proteus import config, Model, Wizard
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
@@ -56,6 +55,7 @@ def step_impl(context):
      | user,accountant,name                      | {accountant_name}          |
      | user,accountant,login                     | {accountant_login}         |
      | user,accountant,password                  | {accountant_password}      |
+     | user,accountant,email                     | {accountant_email}         |
      | account.template,main_receivable          | {main_receivable}          |
      | account.template,main_payable             | {main_payable}             |
      | account.template,main_revenue             | {main_revenue}             |
@@ -70,6 +70,8 @@ def step_impl(context):
         accountant_name=ACCOUNTANT_NAME, # 'Accountant'
         accountant_login=ACCOUNTANT_USER, # 'accountant'
         accountant_password=ACCOUNTANT_PASSWORD, # 'accountant'
+        # our addition
+        accountant_email=ACCOUNTANT_EMAIL, # 'accountant@example.com'
         # from trytond_account-3.0.0/account.xml
         main_receivable='Main Receivable',
         main_payable='Main Payable',
@@ -112,28 +114,40 @@ def step_impl(context, uName):
     from trytond.tests.test_tryton import install_module
     install_module(uName)
 
-#unused
-@step('Install account')
-def step_impl(context):
-    context.execute_steps(u'''Given Ensure that the "account" module is loaded''')
-
-@step('Create the Company with default COMPANY_NAME and Currency code "{uCode}"')
+@step('Create the company with default COMPANY_NAME and Currency code "{uCode}"')
 def step_impl(context, uCode):
+    uPartyName = sGetFeatureData(context, 'party,company_name')
+    context.execute_steps(u'''
+Given Create the Company associated with the party named "%s" and using the currency "%s"
+''' % (uPartyName, uCode,)
+                          )
 
-    Company = Model.get('company.company')
-    Party = Model.get('party.party')
 
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    if not Party.find([('name', '=', sCompanyName)]):
-        company_config = Wizard('company.company.config')
-        company_config.execute('company')
-        company = company_config.form
+@step('Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"')
+def step_impl(context, uParty, uCode):
 
-        party = Party(name=sCompanyName)
-        party.save()
-        company.party = party
+    Company = proteus.Model.get('company.company')
+    Party = proteus.Model.get('party.party')
 
-        Currency = Model.get('currency.currency')
+    if uParty:
+        uPartyName = uParty
+    else:
+        uPartyName = sGetFeatureData(context, 'party,company_name')
+    l = Party.find([('name', '=', uPartyName)])
+    if not l:
+        oParty = Party(name=uPartyName)
+        oParty.save()
+    else:
+        oParty = l[0]
+    
+    if not Company.find([('party.id', '=', oParty.id)]):
+        oCompanyConfig = proteus.Wizard('company.company.config')
+        oCompanyConfig.execute('company')
+        oCompanyConfigForm = oCompanyConfig.form
+
+        oCompanyConfigForm.party = oParty
+
+        Currency = proteus.Model.get('currency.currency')
         currencies = Currency.find([('code', '=', uCode)])
         if not currencies:
             if uCode == 'EUR':
@@ -165,17 +179,17 @@ def step_impl(context, uCode):
                        "Unsupported currency code: %s" % (uCode,)
             currency.save()
 
-            CurrencyRate = Model.get('currency.currency.rate')
+            CurrencyRate = proteus.Model.get('currency.currency.rate')
             # the beginning of computer time
             CurrencyRate(date=datetime.date(year=1970, month=1, day=1),
                          rate=Decimal('1.0'),
                          currency=currency).save()
         else:
             currency, = currencies
-        company.currency = currency
-        company_config.execute('add')
+        oCompanyConfigForm.currency = currency
+        oCompanyConfig.execute('add')
 
-    assert Company.find()
+    assert Company.find([('party.id', '=', oParty.id)])
 
 @step('Create the currency with Currency code "{uCode}"')
 def step_impl(context, uCode):
@@ -184,14 +198,8 @@ def step_impl(context, uCode):
     You'll need to do this before you use any other currencies
     than the company's base currency.
     """
-    Company = Model.get('company.company')
-    Party = Model.get('party.party')
-
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    company, = Company.find([('party.id', '=', party.id)])
     
-    Currency = Model.get('currency.currency')
+    Currency = proteus.Model.get('currency.currency')
     currencies = Currency.find([('code', '=', uCode)])
     if not currencies:
         if uCode == 'EUR':
@@ -226,176 +234,8 @@ def step_impl(context):
     """
     config = context.oProteusConfig
 
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     config._context = User.get_preferences(True, config.context)
-
-@step('Create this fiscal year')
-@step('Create this fiscal year without Invoicing')
-def step_impl(context):
-    context.execute_steps(u'''
-    Given Create the fiscal year "TODAY" without Invoicing
-    ''')
-    
-@step('Create the fiscal year "{uYear}" without Invoicing')
-def step_impl(context, uYear):
-    """
-    Creates a fiscal year 'uYear' with a non-Strict move_sequence.
-    Create the company first before creating fiscal years.
-    """
-    
-    config = context.oProteusConfig
-
-    if uYear == u'TODAY': uYear = str(today.year)
-        
-    Company = Model.get('company.company')
-    FiscalYear = Model.get('account.fiscalyear')
-    Party = Model.get('party.party')
-
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    company, = Company.find([('party.id', '=', party.id)])
-    if not FiscalYear.find([('name', '=', uYear),
-                            ('company', '=', company.id),]):
-        oDate = datetime.date(int(uYear), 1, 1)
-        
-        fiscalyear = FiscalYear(name='%s' % (uYear,))
-        fiscalyear.start_date = oDate + relativedelta(month=1, day=1)
-        fiscalyear.end_date = oDate + relativedelta(month=12, day=31)
-        fiscalyear.company = company
-
-        Sequence = Model.get('ir.sequence')
-        post_move_sequence = Sequence(name='%s' % (uYear,),
-            code='account.move', company=company)
-        post_move_sequence.save()
-        fiscalyear.post_move_sequence = post_move_sequence
-        fiscalyear.save()
-
-        FiscalYear.create_period([fiscalyear.id], config.context)
-        assert len(fiscalyear.periods) == 12
-
-    assert FiscalYear.find([('name', '=', str(uYear))])
-
-@step('Create this fiscal year with Invoicing')
-def step_impl(context):
-    context.execute_steps(u'''
-    Given Create the fiscal year "TODAY" with Invoicing
-    ''')
-    
-@step('Create the fiscal year "{uYear}" with Invoicing')
-def step_impl(context, uYear):
-    """
-    Creates a fiscal year 'uYear' with a non-Strict move_sequence
-    and a Strict invoice_sequence for Invoices.
-    Create the company first.
-    """
-    config = context.oProteusConfig
-
-    if uYear == u'TODAY': uYear = str(today.year)
-
-    FiscalYear = Model.get('account.fiscalyear')
-    Party = Model.get('party.party')
-
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-    if not FiscalYear.find([('name', '=', str(uYear)),
-                            ('company', '=', company.id),]):
-        oDate = datetime.date(int(uYear), 1, 1)
-
-        fiscalyear = FiscalYear(name='%s' % (uYear,))
-        fiscalyear.start_date = oDate + relativedelta(month=1, day=1)
-        fiscalyear.end_date = oDate + relativedelta(month=12, day=31)
-        fiscalyear.company = company
-
-        Sequence = Model.get('ir.sequence')
-        post_move_sequence = Sequence(name='%s' % uYear,
-            code='account.move', company=company)
-        post_move_sequence.save()
-        fiscalyear.post_move_sequence = post_move_sequence
-
-        SequenceStrict = Model.get('ir.sequence.strict')
-        invoice_sequence = SequenceStrict(name='%s' % uYear,
-                                          code='account.invoice',
-                                          company=company)
-        invoice_sequence.save()
-        fiscalyear.out_invoice_sequence = invoice_sequence
-        fiscalyear.in_invoice_sequence = invoice_sequence
-        fiscalyear.out_credit_note_sequence = invoice_sequence
-        fiscalyear.in_credit_note_sequence = invoice_sequence
-        fiscalyear.save()
-
-        FiscalYear.create_period([fiscalyear.id], config.context)
-        assert len(fiscalyear.periods) == 12
-
-    assert FiscalYear.find([('name', '=', str(uYear))])
-
-# 'Minimal Account Chart', 'Minimal Account Chart'
-@step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
-def step_impl(context, uTem, uRoot):
-    """
-    Create a chart of accounts from template "{uTem}" 
-    with root account "{uRoot}".
-    Before you do this, set the feature data for:
-    * account.template,main_receivable
-    * account.template,main_payable
-    * account.template,main_revenue
-    * account.template,main_expense
-    * account.template,main_cash
-    """
-    
-    Account = Model.get('account.account')
-
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    Party = Model.get('party.party')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    # MINIMAL_ACCOUNT_ROOT
-    if not Account.find([('name', '=', uRoot),
-                         ('company', '=', company.id),]):
-
-        create_chart = Wizard('account.create_chart')
-        create_chart.execute('account')
-
-        # MINIMAL_ACCOUNT_TEMPLATE
-        AccountTemplate = Model.get('account.account.template')
-        account_template, = AccountTemplate.find([('name', '=', uTem)])
-        create_chart.form.account_template = account_template
-        create_chart.form.company = company
-        create_chart.execute('create_account')
-
-        receivable = Account.find([
-                ('kind', '=', 'receivable'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
-                ('company', '=', company.id),
-                ])[0]
-        payable, = Account.find([
-                ('kind', '=', 'payable'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
-                ('company', '=', company.id),
-                ])
-        revenue, = Account.find([
-                ('kind', '=', 'revenue'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
-                ('company', '=', company.id),
-                ])
-        expense, = Account.find([
-                ('kind', '=', 'expense'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-                ('company', '=', company.id),
-                ])
-        cash, = Account.find([
-                ('kind', '=', 'other'),
-                ('company', '=', company.id),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
-                ])
-        create_chart.form.account_receivable = receivable
-        create_chart.form.account_payable = payable
-        create_chart.execute('create_properties')
-
-    assert Account.find([('name', '=', uRoot)])
 
 # party.party Supplier
 @step('Create a saved instance of "{uKlass}" named "{uName}"')
@@ -405,18 +245,18 @@ def step_impl(context, uKlass, uName):
     with the name attribute of 'uName'.
     Idempotent.
     """
-    Party = Model.get(uKlass)
+    Party = proteus.Model.get(uKlass)
     if not Party.find([('name', '=', uName)]):
         instance = Party(name=uName)
         instance.save()
 
 @step('Create a party named "{uName}"')
 def step_impl(context, uName):
-# boken in 3.2
+# broken in 3.2
 #    context.execute_steps(u'''
 #    Given Create a saved instance of "party.party" named "%s"
 #    ''' % (uName,))
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     if not Party.find([('name', '=', uName)]):
         instance = Party(name=uName)
         instance.save()
@@ -425,7 +265,8 @@ def step_impl(context, uName):
 def step_impl(context, uKlass, uName):
     """
     Create an instance of a Model, like Model.get('party.party')
-    with the name attribute of 'uName'. It expects a |name|value| table.
+    with the name attribute of 'uName' and the fields from the table.
+    It expects a |name|value| table.
     Idempotent.
     """
 
@@ -435,7 +276,7 @@ def step_impl(context, uKlass, uName):
         # otherwise, we will just fail during iteration
         assert_equal(len(context.table.headings), 2)
 
-    Klass = Model.get(uKlass)
+    Klass = proteus.Model.get(uKlass)
     if not Klass.find([('name', '=', uName)]):
         oInstance = Klass(name=uName)
         for row in context.table:
@@ -458,7 +299,7 @@ def step_impl(context, uName, uKlass):
         # otherwise, we will just fail during iteration
         assert_equal(len(context.table.headings), 2)
 
-    Klass = Model.get(uKlass)
+    Klass = proteus.Model.get(uKlass)
     oInstance, = Klass.find([('name', '=', uName)])
     for row in context.table:
         setattr(oInstance, row['name'],
@@ -480,9 +321,9 @@ def step_impl(context, uName):
     (use 'Set the feature data with values' to override)
     Idempotent.
     """
-    Party = Model.get('party.party')
-    Company = Model.get('company.company')
-    Account = Model.get('account.account')
+    Party = proteus.Model.get('party.party')
+    Company = proteus.Model.get('company.company')
+    Account = proteus.Model.get('account.account')
 
     if not Party.find([('name', '=', uName)]):
         sCompanyName = sGetFeatureData(context, 'party,company_name')
@@ -501,25 +342,6 @@ def step_impl(context, uName):
 
     assert Party.find([('name', '=', uName)])
 
-# Direct, 0
-@step('Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder')
-def step_impl(context, uTermName, uNum):
-    """
-    Create a account.invoice.payment_term with name 'uTermName'
-    with a account.invoice.payment_term.line of type 'remainder',
-    and days=uNum.
-    Idempotent.
-    """
-    PaymentTerm = Model.get('account.invoice.payment_term')
-    iNum=int(uNum)
-    assert iNum >= 0
-    if not PaymentTerm.find([('name', '=', uTermName)]):
-        PaymentTermLine = Model.get('account.invoice.payment_term.line')
-        payment_term = PaymentTerm(name=uTermName)
-        payment_term_line = PaymentTermLine(type='remainder', days=iNum)
-        payment_term.lines.append(payment_term_line)
-        payment_term.save()
-
 # Accountant, Account
 @step('Create a user named "{uName}" with the fields')
 def step_impl(context, uName):
@@ -529,10 +351,10 @@ def step_impl(context, uName):
     If one of the field names is 'group', it will add the User to that group.
     Idempotent.
     """
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
 
     if not User.find([('name', '=', uName)]):
-        Group = Model.get('res.group')
+        Group = proteus.Model.get('res.group')
         
         user = User()
         user.name = uName
@@ -545,145 +367,9 @@ def step_impl(context, uName):
                 continue
             setattr(user, row['name'],
                     string_to_python(row['name'], row['value'], User))
+            sKey='user,'+uName+","+row['name']
+            context.dData['feature'][sKey]=row['value']
         user.save()
 
         assert User.find([('name', '=', uName)])
 
-# 12 products, Supplier
-@step('Create a Purchase Order with description "{uDescription}" from supplier "{uSupplier}" with fields')
-def step_impl(context, uDescription, uSupplier):
-    """
-    Create a Purchase Order from a supplier with a description.
-    It expects a |name|value| table; the fields typically include:
-    'payment_term', 'invoice_method', 'purchase_date', 'currency'
-    Idempotent.
-    """
-    current_config = context.oProteusConfig
-
-    Purchase = Model.get('purchase.purchase')
-
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
-
-    if not Purchase.find([('description', '=', uDescription),
-                          ('party.id', '=', supplier.id)]):
-        purchase = Purchase()
-        purchase.party = supplier
-        purchase.description = uDescription
-        purchase.purchase_date = today
-        
-        for row in context.table:
-            setattr(purchase, row['name'],
-                    string_to_python(row['name'], row['value'], Purchase))
-
-        purchase.save()
-        assert Purchase.find([('description', '=', uDescription),
-                              ('party.id', '=', supplier.id)])
-
-
-@step('Create a calendar named "{uCalName}" owned by the user "{uUserName}"')
-def step_impl(context, uCalName, uUserName):
-    """
-    WIP.
-    Idempotent.
-    """
-    current_config = context.oProteusConfig
-
-    Calendar = Model.get('calendar.calendar')
-
-    uUserName=sGetFeatureData(context, 'user,accountant,name')
-    uUserLogin=sGetFeatureData(context, 'user,accountant,login')
-    uUserPassword=sGetFeatureData(context, 'user,accountant,password')
-    User = Model.get('res.user')
-    oUser, = User.find([('name', '=', uUserName)])
-    oAdminUser, = User.find([('name', '=', 'Administrator')])
-    # calendar names must be unique
-    if not Calendar.find([('name', '=', uCalName)]):
-
-        current_config = config.set_trytond(user=uUserLogin,
-                                            password=uUserPassword,
-                                            config_file=current_config.config_file,
-                                            database_name=current_config.database_name)
-        calendar = Calendar(name=uCalName, owner=oUser)
-        WriteUser = Model.get('calendar.calendar-write-res.user')
-        # oAdminWriteUser = WriteUser(calendar=calendar, user=oAdminUser)
-        # calendar.write_users.append(oAdminUser)
-        calendar.save()
-
-@step('Add an annual event to a calendar named "{uCalName}" owned by the user "{uUserName}" with dates')
-def step_impl(context, uCalName, uUserName):
-    """
-    WIP.
-    It expects a |name|value| table.
-    Idempotent.
-    """
-    Calendar = Model.get('calendar.calendar')
-
-    uUserName=sGetFeatureData(context, 'user,accountant,name')
-    uUserLogin=sGetFeatureData(context, 'user,accountant,login')
-    uUserPassword=sGetFeatureData(context, 'user,accountant,password')
-    User = Model.get('res.user')
-    oUser, = User.find([('name', '=', uUserName)])
-
-    calendar, = Calendar.find([('name', '=', uCalName)])
-
-    Rdate = pool.get('calendar.event.rdate')
-    
-    # FixMe: unfinished
-    for row in context.table:
-        pass
-
-# unfinished
-@step('Create holidays in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
-def step_impl(context, uCalName, uUserName):
-    """
-    WIP.
-    It expects a |name|value| table.
-    Idempotent.
-    """
-    current_config = context.oProteusConfig
-
-    Calendar = Model.get('calendar.calendar')
-    # I think Calendar names are unique across all users
-    calendar, = Calendar.find([('name', '=', uCalName)])
-    
-    uUserName='Accountant'
-    uUserLogin='accountant'
-    uUserPassword='accountant'
-    User = Model.get('res.user')
-    oUser, = User.find([('name', '=', uUserName)])
-    owner_email = oUser.email
-
-    current_config = config.set_trytond(user=uUserLogin,
-                                        password=uUserPassword,
-                                        config_file=current_config.config_file,
-                                        database_name=current_config.database_name)
-
-
-    Event = Model.get('calendar.event')
-    # name date
-    for row in context.table:
-        uName = row['name']
-        uDate = row['date']
-        summary = "%s Holiday" % (uName,)
-        oDate=datetime.datetime(*map(int,uDate.split('-')))
-        if not Event.find([
-            ('calendar.owner.email', '=', owner_email),
-            ('summary', '=', summary),
-            ]):
-            event = Event(calendar=calendar,
-                          summary=summary,
-                          all_day=True,
-                          classification='public',
-                          transp='transparent',
-                          dtstart=oDate)
-            # FixMe: UserError: ('UserError', (u'You try to bypass an access rule.\n(Document type: calendar.event)', ''))
-            event.save()
-        assert Event.find([
-            ('calendar.owner.email', '=', owner_email),
-            ('summary', '=', summary),
-            ])
-        
-# accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
-
-    Rdate = Model.get('calendar.event.rdate')

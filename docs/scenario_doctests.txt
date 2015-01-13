@@ -4,6 +4,15 @@ From: ../features/steps/scenario_doctests.py
 From: ../features/steps/scenario_doctests.py
 
 
+From: ../features/steps/scenario_doctests.py
+
+
+From: ../features/steps/scenario_doctests.py
+
+
+From: ../features/steps/scenario_doctests.py
+
+
 
 **Create database**
 
@@ -354,4 +363,279 @@ From: ../features/steps/scenario_doctests.py
 **Create holidays in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
    WIP.
    It expects a |name|value| table.
+   Idempotent.
+   This is a straight cut-and-paste from
+   trytond_*-2.8.*/tests/scenario_*.rst
+   to refactor the doctests to eliminate duplication.
+   All the steps in this file are used by all of
+   the feature files that impelment the doctest scenari.
+   The aim is to make each step idempotent, so that if
+   you run a step again from another feature file,
+   the work is not repeated, and will not error.
+   That's easy in the early steps, but harder farther on,
+   so some feature files will need to be run on their own.
+   Most steps are commented as either idempotent or FixMe.
+   It should be improved to be more like a Behave BDD.
+
+**Create database**
+
+**Set the default feature data**
+   You can use this step to define a set of default feature data
+   that will be available using the vSetFeatureData and vSetFeatureData
+   functions to pass data between steps. The default data is pulled
+   from the Tryton code, but you can override this for your own
+   production Chart of Accounts, users...
+
+**Set the feature data with values**
+   You can use this step to define a set of default feature data
+   that will be available using the vSetFeatureData and vSetFeatureData
+   functions to pass data between steps. It expects a |name|value| table.
+
+**Create database with pool.test set to True**
+   Sets pool.test set to True
+
+**Install the test module named "{uName}"**
+   Installs a module using trytond.tests.test_tryton.install_module
+   in case thats different to installing a module.
+
+**Install account**
+
+**Create the Company with default COMPANY_NAME and Currency code "{uCode}"**
+
+**Create the currency with Currency code "{uCode}"**
+   Create the currency with the given Currency code.
+   You'll need to do this before you use any other currencies
+   than the company's base currency.
+
+**Reload the default User preferences into the context**
+   Reload the default User get_preferences.
+
+**Create this fiscal year**
+
+**Create this fiscal year without Invoicing**
+
+**Create the fiscal year "{uYear}" without Invoicing**
+   Creates a fiscal year 'uYear' with a non-Strict move_sequence.
+   Create the company first before creating fiscal years.
+
+**Create this fiscal year with Invoicing**
+
+**Create the fiscal year "{uYear}" with Invoicing**
+   Creates a fiscal year 'uYear' with a non-Strict move_sequence
+   and a Strict invoice_sequence for Invoices.
+   Create the company first.
+
+**Create a chart of accounts from template "{uTem}" with root "{uRoot}"**
+   Create a chart of accounts from template "{uTem}"
+   with root account "{uRoot}".
+   Before you do this, set the feature data for:
+   * account.template,main_receivable
+   * account.template,main_payable
+   * account.template,main_revenue
+   * account.template,main_expense
+   * account.template,main_cash
+
+**Create a saved instance of "{uKlass}" named "{uName}"**
+   Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName'.
+   Idempotent.
+
+**Create a party named "{uName}"**
+
+**Create an instance of "{uKlass}" named "{uName}" with fields**
+   Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName'. It expects a |name|value| table.
+   Idempotent.
+
+**Set the slots of the instance named "{uName}" of model "{uKlass}" to the values**
+   Guven an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName', set the attributes to the values.
+   It expects a |name|value| table.
+   Idempotent.
+
+**Create parties**
+
+**Create a party named "{uName}" with an account_payable attribute**
+   Create a party named 'uName' with an account_payable attribute.
+   The account_payable Account is taken from the
+   'account.template,main_payable' entry of the feature data
+   (use 'Set the feature data with values' to override)
+   Idempotent.
+
+**Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder**
+   Create a account.invoice.payment_term with name 'uTermName'
+   with a account.invoice.payment_term.line of type 'remainder',
+   and days=uNum.
+   Idempotent.
+
+**Create a user named "{uName}" with the fields:**
+
+**Create a user named "{uName}" with the fields**
+   Create a res.user named 'uName' and the given field values.
+   It expects a |name|value| table.
+   If one of the field names is 'group', it will add the User to that group.
+   Idempotent.
+
+**Create a Purchase Order with description "{uDescription}" from supplier "{uSupplier}" with fields**
+   Create a Purchase Order from a supplier with a description.
+   It expects a |name|value| table; the fields typically include:
+   'payment_term', 'invoice_method', 'purchase_date', 'currency'
+   Idempotent.
+   This is a straight cut-and-paste from
+   trytond_*-2.8.*/tests/scenario_*.rst
+   to refactor the doctests to eliminate duplication.
+   All the steps in this file are used by all of
+   the feature files that impelment the doctest scenari.
+   The aim is to make each step idempotent, so that if
+   you run a step again from another feature file,
+   the work is not repeated, and will not error.
+   That's easy in the early steps, but harder farther on,
+   so some feature files will need to be run on their own.
+   Most steps are commented as either idempotent or FixMe.
+   It should be improved to be more like a Behave BDD.
+
+**Create database**
+
+**Set the default feature data**
+   You can use this step to define a set of default feature data
+   that will be available using the vSetFeatureData and vSetFeatureData
+   functions to pass data between steps. The default data is pulled
+   from the Tryton code, but you can override this for your own
+   production Chart of Accounts, users...
+
+**Set the feature data with values**
+   You can use this step to define a set of default feature data
+   that will be available using the vSetFeatureData and vSetFeatureData
+   functions to pass data between steps. It expects a |name|value| table.
+
+**Create database with pool.test set to True**
+   Sets pool.test set to True
+
+**Install the test module named "{uName}"**
+   Installs a module using trytond.tests.test_tryton.install_module
+   in case thats different to installing a module.
+
+**Create the company with default COMPANY_NAME and Currency code "{uCode}"**
+
+**Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"**
+
+**Create the currency with Currency code "{uCode}"**
+   Create the currency with the given Currency code.
+   You'll need to do this before you use any other currencies
+   than the company's base currency.
+
+**Reload the default User preferences into the context**
+   Reload the default User get_preferences.
+
+**Create a saved instance of "{uKlass}" named "{uName}"**
+   Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName'.
+   Idempotent.
+
+**Create a party named "{uName}"**
+
+**Create an instance of "{uKlass}" named "{uName}" with fields**
+   Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName' and the fields from the table.
+   It expects a |name|value| table.
+   Idempotent.
+
+**Set the slots of the instance named "{uName}" of model "{uKlass}" to the values**
+   Guven an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName', set the attributes to the values.
+   It expects a |name|value| table.
+   Idempotent.
+
+**Create parties**
+
+**Create a party named "{uName}" with an account_payable attribute**
+   Create a party named 'uName' with an account_payable attribute.
+   The account_payable Account is taken from the
+   'account.template,main_payable' entry of the feature data
+   (use 'Set the feature data with values' to override)
+   Idempotent.
+
+**Create a user named "{uName}" with the fields**
+   Create a res.user named 'uName' and the given field values.
+   It expects a |name|value| table.
+   If one of the field names is 'group', it will add the User to that group.
+   Idempotent.
+   This is a straight cut-and-paste from
+   trytond_*-2.8.*/tests/scenario_*.rst
+   to refactor the doctests to eliminate duplication.
+   All the steps in this file are used by all of
+   the feature files that impelment the doctest scenari.
+   The aim is to make each step idempotent, so that if
+   you run a step again from another feature file,
+   the work is not repeated, and will not error.
+   That's easy in the early steps, but harder farther on,
+   so some feature files will need to be run on their own.
+   Most steps are commented as either idempotent or FixMe.
+   It should be improved to be more like a Behave BDD.
+
+**Create database**
+
+**Set the default feature data**
+   You can use this step to define a set of default feature data
+   that will be available using the vSetFeatureData and vSetFeatureData
+   functions to pass data between steps. The default data is pulled
+   from the Tryton code, but you can override this for your own
+   production Chart of Accounts, users...
+
+**Set the feature data with values**
+   You can use this step to define a set of default feature data
+   that will be available using the vSetFeatureData and vSetFeatureData
+   functions to pass data between steps. It expects a |name|value| table.
+
+**Create database with pool.test set to True**
+   Sets pool.test set to True
+
+**Install the test module named "{uName}"**
+   Installs a module using trytond.tests.test_tryton.install_module
+   in case thats different to installing a module.
+
+**Create the company with default COMPANY_NAME and Currency code "{uCode}"**
+
+**Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"**
+
+**Create the currency with Currency code "{uCode}"**
+   Create the currency with the given Currency code.
+   You'll need to do this before you use any other currencies
+   than the company's base currency.
+
+**Reload the default User preferences into the context**
+   Reload the default User get_preferences.
+
+**Create a saved instance of "{uKlass}" named "{uName}"**
+   Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName'.
+   Idempotent.
+
+**Create a party named "{uName}"**
+
+**Create an instance of "{uKlass}" named "{uName}" with fields**
+   Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName' and the fields from the table.
+   It expects a |name|value| table.
+   Idempotent.
+
+**Set the slots of the instance named "{uName}" of model "{uKlass}" to the values**
+   Guven an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName', set the attributes to the values.
+   It expects a |name|value| table.
+   Idempotent.
+
+**Create parties**
+
+**Create a party named "{uName}" with an account_payable attribute**
+   Create a party named 'uName' with an account_payable attribute.
+   The account_payable Account is taken from the
+   'account.template,main_payable' entry of the feature data
+   (use 'Set the feature data with values' to override)
+   Idempotent.
+
+**Create a user named "{uName}" with the fields**
+   Create a res.user named 'uName' and the given field values.
+   It expects a |name|value| table.
+   If one of the field names is 'group', it will add the User to that group.
    Idempotent.

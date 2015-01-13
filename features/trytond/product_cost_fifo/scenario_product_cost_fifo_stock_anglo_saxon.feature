@@ -17,6 +17,17 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
         and Ensure that the "product_cost_fifo" module is loaded
         and Ensure that the "sale" module is loaded
         and Ensure that the "purchase" module is loaded
+	and Set the default feature data
+# These are in by trytond_account_stock_continental/account.xml
+# which is pulled in by trytond_account_stock_anglo_saxon
+	and Set the feature data with values
+	     | name                                  | value                |
+	     | account.template,COGS                 | COGS                 |
+	     | account.template,stock                | Stock                |
+	     | account.template,stock_customer       | Stock Customer       |
+	     | account.template,stock_lost_found     | Stock Lost and Found |
+	     | account.template,stock_production     | Stock Production     |
+	     | account.template,stock_supplier       | Stock Supplier       |
        then the "account_stock_anglo_saxon" module is in the list of loaded modules
 
     Scenario: Create the company to test the module named "product_cost_fifo"
@@ -31,9 +42,13 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 
 
     Scenario: Buy the products from the supplier, testing the module named "product_cost_fifo"
-	and T/ASAS/SASAS Create an ACCOUNTANT_USER user with the "Account" group
-	and T/ASAS/SASAS Create a PaymentTerm named "Direct" with "0" days remainder
-	and T/ASAS/SASAS Create a ProductTemplate named "product" having:
+      Given Create a user named "Accountant" with the fields
+	  | name	| value		  |
+	  | login	| accountant	  |
+	  | password	| accountant	  |
+	  | group	| Account	  |
+	and Create a PaymentTerm named "Direct" with "0" days remainder
+	and T/ASAS/SASAS Create a ProductTemplate named "product" with fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fifo  |
@@ -46,7 +61,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	  | name                | cost_price_method |
 	  | product_fixed	| fifo   	    |
 	  | product_average	| fifo		    |
-	and T/ASAS/SASAS Create a Purchase Order with description "12 products" from Supplier "Supplier" with fields
+	and Create a Purchase Order with description "12 products" from Supplier "Supplier" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct 	 |
@@ -65,7 +80,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	and T/ASAS/SASAS After paying for what we received assert the account credits and debits
 
     Scenario: Sell the products to the customer, testing the module named "product_cost_fifo"
-	and T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
+       Given T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct   |

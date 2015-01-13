@@ -1,0 +1,18 @@
+From: ../features/steps/trytond_purchase.py
+
+
+From: ../features/steps/trytond_purchase.py
+
+
+
+**Create a Purchase Order with description "{uDescription}" from supplier "{uSupplier}" with fields**
+   Create a Purchase Order from a supplier with a description.
+   It expects a |name|value| table; the fields typically include:
+   'payment_term', 'invoice_method', 'purchase_date', 'currency'
+   Idempotent.
+
+**Create a Purchase Order with description "{uDescription}" from supplier "{uSupplier}" with fields**
+   Create a Purchase Order from a supplier with a description.
+   It expects a |name|value| table; the fields typically include:
+   'payment_term', 'invoice_method', 'purchase_date', 'currency'
+   Idempotent.

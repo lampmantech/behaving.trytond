@@ -4,6 +4,15 @@ From: ../features/steps/behave_test.py
 From: ../features/steps/behave_test.py
 
 
+From: ../features/steps/behave_test.py
+
+
+From: ../features/steps/behave_test.py
+
+
+From: ../features/steps/behave_test.py
+
+
 
 **we have behave installed**
    If behave is not installed we couldnt get here!
@@ -22,6 +31,45 @@ From: ../features/steps/behave_test.py
 
 **behave will test it for us!**
    The trivial assertion did not fail.
+
+**we have behave installed**
+   If behave is not installed we couldnt get here!
+
+**we implement a test**
+   A trivial assertion.
+
+**behave will test it for us!**
+   The trivial assertion did not fail.
+   This is the elementary behave test from its tutorial;
+   see http://pythonhosted.org/behave/ or the docs/
+   directory in the behave source distribion.
+   If this test fails, behave is not properly installed.
+
+**we have behave installed**
+   If behave is not installed we couldnt get here!
+
+**we implement a test**
+   A trivial assertion.
+
+**behave will test it for us!**
+   The trivial assertion did not fail.
+   This is the elementary behave test from its tutorial;
+   see http://pythonhosted.org/behave/ or the docs/
+   directory in the behave source distribion.
+   If this test fails, behave is not properly installed.
+
+**we have behave installed**
+   If behave is not installed we couldnt get here!
+
+**we implement a test**
+   A trivial assertion.
+
+**behave will test it for us!**
+   The trivial assertion did not fail.
+   This is the elementary behave test from its tutorial;
+   see http://pythonhosted.org/behave/ or the docs/
+   directory in the behave source distribion.
+   If this test fails, behave is not properly installed.
 
 **we have behave installed**
    If behave is not installed we couldnt get here!

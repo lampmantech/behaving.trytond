@@ -1,0 +1,70 @@
+From: ../features/steps/trytond_account.py
+
+
+From: ../features/steps/trytond_account.py
+
+
+
+**Create this fiscal year**
+
+**Create this fiscal year without Invoicing**
+
+**Create the fiscal year "{uYear}" without Invoicing**
+   Creates a fiscal year 'uYear' with a non-Strict move_sequence.
+   Create the company first before creating fiscal years.
+
+**Create this fiscal year with Invoicing**
+
+**Create the fiscal year "{uYear}" with Invoicing**
+   Creates a fiscal year 'uYear' with a non-Strict move_sequence
+   and a Strict invoice_sequence for Invoices.
+   Create the company first.
+
+**Create a chart of accounts from template "{uTem}" with root "{uRoot}"**
+   Create a chart of accounts from template "{uTem}"
+   with root account "{uRoot}".
+   Before you do this, with the step 'Set the feature data with values:'
+   set the feature data as a |name|value| table for:
+   * account.template,main_receivable
+   * account.template,main_payable
+   * account.template,main_revenue
+   * account.template,main_expense
+   * account.template,main_cash
+
+**Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder**
+   Create a account.invoice.payment_term with name 'uTermName'
+   with a account.invoice.payment_term.line of type 'remainder',
+   and days=uNum.
+   Idempotent.
+
+**Create this fiscal year**
+
+**Create this fiscal year without Invoicing**
+
+**Create the fiscal year "{uYear}" without Invoicing**
+   Creates a fiscal year 'uYear' with a non-Strict move_sequence.
+   Create the company first before creating fiscal years.
+
+**Create this fiscal year with Invoicing**
+
+**Create the fiscal year "{uYear}" with Invoicing**
+   Creates a fiscal year 'uYear' with a non-Strict move_sequence
+   and a Strict invoice_sequence for Invoices.
+   Create the company first.
+
+**Create a chart of accounts from template "{uTem}" with root "{uRoot}"**
+   Create a chart of accounts from template "{uTem}"
+   with root account "{uRoot}".
+   Before you do this, with the step 'Set the feature data with values:'
+   set the feature data as a |name|value| table for:
+   * account.template,main_receivable
+   * account.template,main_payable
+   * account.template,main_revenue
+   * account.template,main_expense
+   * account.template,main_cash
+
+**Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder**
+   Create a account.invoice.payment_term with name 'uTermName'
+   with a account.invoice.payment_term.line of type 'remainder',
+   and days=uNum.
+   Idempotent.

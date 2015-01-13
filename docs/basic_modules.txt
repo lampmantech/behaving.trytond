@@ -4,6 +4,15 @@ From: ../features/steps/basic_modules.py
 From: ../features/steps/basic_modules.py
 
 
+From: ../features/steps/basic_modules.py
+
+
+From: ../features/steps/basic_modules.py
+
+
+From: ../features/steps/basic_modules.py
+
+
 
 **we have proteus installed**
 
@@ -42,6 +51,72 @@ From: ../features/steps/basic_modules.py
 **there are some instances of "{uMod}"**
    Asserts that there are some instances of the Model 'uMod'.
    Idempotent.
+
+**we have proteus installed**
+
+**Ensure that the "{mod}" module is loaded**
+   Load the "{mod}" module if it is not already loaded.
+   Idempotent.
+
+**the "{mod}" module is in the list of loaded modules**
+
+**we print the list of loaded modules**
+   Print the list of loaded modules on behave's stdout.
+
+**we have the following table of "{mod}" instances**
+   Creates the instances of the Model 'uMod' with the names from the table.
+   It expects a |name| table.
+   Idempotent.
+
+**there are some instances of "{uMod}"**
+   Asserts that there are some instances of the Model 'uMod'.
+   Idempotent.
+   This is the elementary test of Trytons basic modules.
+   If this test fails, trytond is not properly installed.
+
+**we have proteus installed**
+
+**Ensure that the "{mod}" module is loaded**
+   Load the "{mod}" module if it is not already loaded.
+   Idempotent.
+
+**the "{mod}" module is in the list of loaded modules**
+
+**we print the list of loaded modules**
+   Print the list of loaded modules on behave's stdout.
+
+**we have the following table of "{mod}" instances**
+   Creates the instances of the Model 'uMod' with the names from the table.
+   It expects a |name| table.
+   Idempotent.
+
+**there are some instances of "{uMod}"**
+   Asserts that there are some instances of the Model 'uMod'.
+   Idempotent.
+   This is the elementary test of Trytons basic modules.
+   If this test fails, trytond is not properly installed.
+
+**we have proteus installed**
+
+**Ensure that the "{mod}" module is loaded**
+   Load the "{mod}" module if it is not already loaded.
+   Idempotent.
+
+**the "{mod}" module is in the list of loaded modules**
+
+**we print the list of loaded modules**
+   Print the list of loaded modules on behave's stdout.
+
+**we have the following table of "{mod}" instances**
+   Creates the instances of the Model 'uMod' with the names from the table.
+   It expects a |name| table.
+   Idempotent.
+
+**there are some instances of "{uMod}"**
+   Asserts that there are some instances of the Model 'uMod'.
+   Idempotent.
+   This is the elementary test of Trytons basic modules.
+   If this test fails, trytond is not properly installed.
 
 **we have proteus installed**
 

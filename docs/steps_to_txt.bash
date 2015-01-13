@@ -4,7 +4,7 @@
 # I know this is a groddy hack: fork me!
 
 steps_to_txt () {
-    local state=outside
+    local state=before
     local line
     
     cat $1 | \

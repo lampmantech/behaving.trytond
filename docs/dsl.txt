@@ -4,6 +4,15 @@ From: ../features/steps/dsl.py
 From: ../features/steps/dsl.py
 
 
+From: ../features/steps/dsl.py
+
+
+From: ../features/steps/dsl.py
+
+
+From: ../features/steps/dsl.py
+
+
 
 **having**
 
@@ -36,6 +45,60 @@ From: ../features/steps/dsl.py
 **I am configuring the company with ref "{company_oid}"**
 
 **I delete it**
+
+**having**
+
+**I find a "{model_name}" with {domain}**
+
+**I need a "{model_name}" with {domain}**
+
+**I set global property named "{pname}" for model "{modelname}" and field "{fieldname}" for company with ref "{company_oid}"**
+
+**I set global property named "{pname}" for model "{modelname}" and field "{fieldname}"**
+
+**the property is related to model "{modelname}" using column "{column}" and value "{value}"**
+
+**I am configuring the company with ref "{company_oid}"**
+
+**I delete it**
+   This is the advanced syntax for behave testing.
+   This is from OpenERPScenario and may fail, as is not properly ported to Tryton yet.
+
+**having**
+
+**I find a "{model_name}" with {domain}**
+
+**I need a "{model_name}" with {domain}**
+
+**I set global property named "{pname}" for model "{modelname}" and field "{fieldname}" for company with ref "{company_oid}"**
+
+**I set global property named "{pname}" for model "{modelname}" and field "{fieldname}"**
+
+**the property is related to model "{modelname}" using column "{column}" and value "{value}"**
+
+**I am configuring the company with ref "{company_oid}"**
+
+**I delete it**
+   This is the advanced syntax for behave testing.
+   This is from OpenERPScenario and may fail, as is not properly ported to Tryton yet.
+
+**having**
+
+**I find a "{model_name}" with {domain}**
+
+**I need a "{model_name}" with {domain}**
+
+**I set global property named "{pname}" for model "{modelname}" and field "{fieldname}" for company with ref "{company_oid}"**
+
+**I set global property named "{pname}" for model "{modelname}" and field "{fieldname}"**
+
+**the property is related to model "{modelname}" using column "{column}" and value "{value}"**
+
+**I am configuring the company with ref "{company_oid}"**
+
+**I delete it**
+   This is the advanced syntax for behave testing.
+   This is from OpenERPScenario and may fail, as is not properly ported to Tryton yet.
 
 **having**
 

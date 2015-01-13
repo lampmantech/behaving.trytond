@@ -4,6 +4,15 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
 From: ../features/steps/scenario_account_stock_anglo_saxon.py
 
 
+From: ../features/steps/scenario_account_stock_anglo_saxon.py
+
+
+From: ../features/steps/scenario_account_stock_anglo_saxon.py
+
+
+From: ../features/steps/scenario_account_stock_anglo_saxon.py
+
+
 
 **T/ASAS/SASAS Create a ProductCategory named "{uName}"**
    Idempotent.
@@ -84,6 +93,144 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
 **T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
 
 **T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" by an accountant with quantities**
+
+**T/ASAS/SASAS Create a ProductCategory named "{uName}"**
+   Idempotent.
+
+**T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Create two products of type "{sType}" from the ProductTemplate named "{uName}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+   Idempotent.
+
+**T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
+
+**T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices**
+
+**T/ASAS/SASAS After paying for what we received assert the account credits and debits**
+
+**T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**T/ASAS/SASAS After shipping to customer assert the account credits and debits**
+
+**T/ASAS/SASAS Open customer invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
+
+**T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" by an accountant with quantities**
+   ==================================
+   Account Stock Continental Scenario
+   ==================================
+   This is a straight cut-and-paste from
+   trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
+   It should be improved to be more like a Behave BDD.
+
+**T/ASAS/SASAS Create a ProductCategory named "{uName}"**
+   Idempotent.
+
+**T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Create two products of type "{sType}" from the ProductTemplate named "{uName}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+   Idempotent.
+
+**T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
+
+**T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices**
+
+**T/ASAS/SASAS After paying for what we received assert the account credits and debits**
+
+**T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**T/ASAS/SASAS After shipping to customer assert the account credits and debits**
+
+**T/ASAS/SASAS Open customer invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
+
+**T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" by an accountant with quantities**
+   ==================================
+   Account Stock Continental Scenario
+   ==================================
+   This is a straight cut-and-paste from
+   trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
+   It should be improved to be more like a Behave BDD.
+
+**T/ASAS/SASAS Create a ProductCategory named "{uName}"**
+   Idempotent.
+
+**T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Create two products of type "{sType}" from the ProductTemplate named "{uName}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+   Idempotent.
+
+**T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
+
+**T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices**
+
+**T/ASAS/SASAS After paying for what we received assert the account credits and debits**
+
+**T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields**
+   Idempotent.
+
+**T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities**
+   Idempotent.
+
+**T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**T/ASAS/SASAS After shipping to customer assert the account credits and debits**
+
+**T/ASAS/SASAS Open customer invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
+
+**T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" by an accountant with quantities**
+   ==================================
+   Account Stock Continental Scenario
+   ==================================
+   This is a straight cut-and-paste from
+   trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
+   It should be improved to be more like a Behave BDD.
 
 **T/ASAS/SASAS Create a ProductCategory named "{uName}"**
    Idempotent.
