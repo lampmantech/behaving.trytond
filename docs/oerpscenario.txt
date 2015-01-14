@@ -1,60 +1,6 @@
 From: ../features/steps/oerpscenario.py
 
 
-From: ../features/steps/oerpscenario.py
-
-
-From: ../features/steps/oerpscenario.py
-
-
-From: ../features/steps/oerpscenario.py
-
-
-From: ../features/steps/oerpscenario.py
-
-
-
-**I do not want all demo data to be loaded on install**
-   WIP
-
-**I update the module list**
-   WIP
-
-**I install the required modules with dependencies**
-   Install the required modules.
-   It expects a |name| table.
-   Idempotent.
-
-**my modules should have been installed and models reloaded**
-   Null.
-
-**I do not want all demo data to be loaded on install**
-   WIP
-
-**I update the module list**
-   WIP
-
-**I install the required modules with dependencies**
-   Install the required modules.
-   It expects a |name| table.
-   Idempotent.
-
-**my modules should have been installed and models reloaded**
-   Null.
-
-**I do not want all demo data to be loaded on install**
-   WIP
-
-**I update the module list**
-   WIP
-
-**I install the required modules with dependencies**
-   Install the required modules.
-   It expects a |name| table.
-   Idempotent.
-
-**my modules should have been installed and models reloaded**
-   Null.
    These are the elementary tests from OpenERPScenario:
    <http:///launchpad.net/~camptocamp/oerpscenario/>
    The aim here is to make the same feature tests in OpenERPScenario
@@ -62,7 +8,7 @@ From: ../features/steps/oerpscenario.py
    UNFINISHED
 
 **I do not want all demo data to be loaded on install**
-   WIP
+   No-op - doesn't exist in Tryton.
 
 **I update the module list**
    WIP
@@ -73,42 +19,4 @@ From: ../features/steps/oerpscenario.py
    Idempotent.
 
 **my modules should have been installed and models reloaded**
-   Null.
-   These are the elementary tests from OpenERPScenario:
-   <http:///launchpad.net/~camptocamp/oerpscenario/>
-   The aim here is to make the same feature tests in OpenERPScenario
-   run in trytond_scenari on Tryton. YMMV!
-   UNFINISHED
-
-**I do not want all demo data to be loaded on install**
-   WIP
-
-**I update the module list**
-   WIP
-
-**I install the required modules with dependencies**
-   Install the required modules.
-   It expects a |name| table.
-   Idempotent.
-
-**my modules should have been installed and models reloaded**
-   Null.
-   These are the elementary tests from OpenERPScenario:
-   <http:///launchpad.net/~camptocamp/oerpscenario/>
-   The aim here is to make the same feature tests in OpenERPScenario
-   run in trytond_scenari on Tryton. YMMV!
-   UNFINISHED
-
-**I do not want all demo data to be loaded on install**
-   WIP
-
-**I update the module list**
-   WIP
-
-**I install the required modules with dependencies**
-   Install the required modules.
-   It expects a |name| table.
-   Idempotent.
-
-**my modules should have been installed and models reloaded**
-   Null.
+   No-op

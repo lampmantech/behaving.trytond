@@ -1,0 +1,10 @@
+From: ../features/steps/ir.py
+
+
+   Test the core trytond/ir/ functionalities.
+   1) Try to make an attachment in the form on a link
+
+**ir/attachment test**
+   Try to make an attachment in the form of a link
+   onto the admin user. Not working.
+   FixMe:

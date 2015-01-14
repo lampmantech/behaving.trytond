@@ -2,9 +2,13 @@
 """
 WIP - unfinished
 
-This is a straight cut-and-paste from
+This would be a straight cut-and-paste from
 trytond_bank-3.2.0/tests/
+but trytond_bank doesn't have any meaningful tests.
 
+trytond_bank also doesn't have any documentation, meaningful or not.
+Which makes it pretty hard to figure out, especially as its classes
+have self-referential fields. Grr.
 """
 
 from behave import *
@@ -14,6 +18,10 @@ from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 
 dBankCache={}
 def oGetCached(uLocation, sType):
+    """
+    Cache the creation of instances for commonly occcuring things
+    like location.
+    """
     global dBankCache
     
     Location = proteus.Model.get('bank.'+sType)
@@ -67,6 +75,8 @@ def step_impl(context, uIban, uParty):
     oBank, = Bank.find([('party.id', '=', oParty.id)])
     return
     if True:
+        # FixMe: cant search BankAccount or BankAccountNumber
+        # and BankAccountNumber refers to BankAccount
         oBankAccount = BankAccount()
         oBankAccountNumber = BankAccountNumber(account=oBankAccount,
                                                type='iban',

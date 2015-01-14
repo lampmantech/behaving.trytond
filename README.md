@@ -94,19 +94,21 @@ but should be short, like T/A/SAR for
 trytond/account/scenario_account_reconciliation etc.
 Generic steps, that are likely to be used by all scenari,
 may have no label, and are usually defined in the generic
-scenario_doctests.py. As specific steps get generalized
-and serve for many different scenari, they will get pulled
-into the generic file. If you are contributing on githib,
-it's best to write your steps with a label and add FixMe:
-comment to signal that you think the step is generic.
+scenario_doctests.py, or the name equivalent to the trytond_
+module (e.g. trytond_account.py). As specific steps get
+generalized and serve for many different scenari, they will get
+pulled out of the scenario_*.py into the generic file trytond_*.py.
+If you are contributing on github, it's best to write your steps with
+a label and add FixMe: comment to signal that you think the step is
+generic.
 
 Documentation
 -------------
 
 For the moment, the documentation is in the docstrings to the steps. 
-I'll write a step modification that can harvest these for the
+I've writen a step script that can harvest these for the
 documentation so that the documentation can be automatically generated
-from the steps.
+from the steps; if you think it's a hack (it is), write a better one!
 
 
 Versions

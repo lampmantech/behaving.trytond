@@ -1,53 +1,6 @@
 From: ../features/steps/trytond_calendar.py
 
 
-From: ../features/steps/trytond_calendar.py
-
-
-From: ../features/steps/trytond_calendar.py
-
-
-
-**Create a calendar named "{uCalName}" owned by the user "{uUserName}"**
-   WIP.
-   Idempotent.
-
-**Add an annual event to a calendar named "{uCalName}" owned by the user "{uUserName}" with dates:**
-   WIP.
-   It expects a |name|value| table.
-   Idempotent.
-
-**Create holidays in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
-   WIP.
-   Create holidays in the calendar named "{uCalName}" owned by the user
-   named "{uUserName}". You must firstly create the user with the step
-   'Create a user named'... in order to fields in the FeatureData.
-   It expects a |name|value| table.
-   Idempotent.
-
-**Create a calendar named "{uCalName}" owned by the user "{uUserName}"**
-   WIP.
-   Idempotent.
-
-**I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
-   Create "{uKind}" events in the calendar named "{uCalName}"
-   owned by the user named "{uUserName}". {uKind} can be empty, but
-   if not, it is the category.
-   You must firstly create the user with the step 'Create a
-   user named'... in order to fields in the FeatureData, or use 'Set
-   the feature data with values' ...
-   It expects a |date|name|location|description| table.
-   Idempotent.
-
-**I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
-   Create "{uKind}" annual events in the calendar named "{uCalName}"
-   owned by the user named "{uUserName}". {uKind} can be empty, but
-   if not, it is the category; things like Holiday or Birthday are
-   common.  You must firstly create the user with the step 'Create a
-   user named'... in order to fields in the FeatureData, or use 'Set
-   the feature data with values' ...
-   It expects a |name|date| table.
-   Idempotent.
 
 **Create a calendar named "{uCalName}" owned by the user "{uUserName}"**
    WIP.

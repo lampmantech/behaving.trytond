@@ -205,3 +205,58 @@ def step_impl(context, uTermName, uNum):
         payment_term.lines.append(payment_term_line)
         payment_term.save()
 
+# 10% Sales Tax
+@step('Create a tax named "{uTaxName}" with fields')
+def step_impl(context, uTaxName):
+    """Create a tax:
+	and Create a tax named "10% Sales Tax" with fields
+	    | name                  | value            |
+	    | description           | 10% Sales Tax    |
+	    | type 	            | percentage       |
+	    | rate 	            | .10	       |
+	    | invoice_base_code     | invoice base     |
+	    | invoice_tax_code      | invoice tax      |
+	    | credit_note_base_code | credit note base |
+	    | credit_note_tax_code  | credit note tax  |
+    """
+    Party = Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    Account = Model.get('account.account')
+    account_tax, = Account.find([
+        ('kind', '=', 'other'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),
+        ('company', '=', company.id),
+        ])
+
+    Tax = Model.get('account.tax')
+    if not Tax.find([('name', '=', uTaxName)]):
+        
+        TaxCode = Model.get('account.tax.code')
+        
+        tax = Tax()
+        tax.name = uTaxName
+        tax.invoice_account = account_tax
+        tax.credit_note_account = account_tax
+        for row in context.table:
+            if row['name'] == 'invoice_base_code' or \
+                   row['name'] == 'invoice_tax_code' or \
+                   row['name'] == 'credit_note_base_code' or \
+                   row['name'] == 'credit_note_tax_code':
+                # create these if they dont exist
+                l = TaxCode.find([('name', '=', row['value'])])
+                if l:
+                    tax_code = l[0]
+                else:
+                    tax_code = TaxCode(name=row['value'])
+                    tax_code.save()
+                setattr(tax, row['name'], tax_code)
+            else:
+                setattr(tax, row['name'],
+                    string_to_python(row['name'], row['value'], Tax))
+
+        tax.save()
+

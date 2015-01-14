@@ -42,7 +42,16 @@ def step_impl(context, uName):
 # product , 'fixed' or fifo
 @step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields')
 def step_impl(context, uName):
-    """
+    """Create a ProductTemplate named "{uName}" with fields:
+	  | name              | value |
+	  | type	      | goods |
+	  | cost_price_method | fifo  |
+	  | purchasable       | True  |
+	  | salable 	      | True  |
+	  | list_price 	      | 10    |
+	  | cost_price 	      | 5     |
+	  | delivery_time     | 0     |
+	  | default_uom	      | Unit  |
     Idempotent.
     """
 
@@ -135,14 +144,23 @@ def step_impl(context, uName):
 
         template.save()
 
+# cost_price_method - one of
+dCacheCostPriceMethod={}
+
 # goods, product
-@step('T/ASAS/SASAS Create two products of type "{sType}" from the ProductTemplate named "{uName}" with fields')
+@step('T/ASAS/SASAS Create two products of type "{uType}" from the ProductTemplate named "{uName}" with fields')
 # FixMe: actually creates 2 different Product and ProductTemplates
-def step_impl(context, sType, uName):
+def step_impl(context, uType, uName):
     """
+    Create two products of type "{uType}" from the ProductTemplate named 
+    "{uName}" with fields
+	  | name                | cost_price_method | description         |
+	  | product_fixed	| fifo   	    | product_fixed       |
+	  | product_average	| fifo		    | product_average     |
+
     Idempotent.
     """
-    
+    global dCacheCostPriceMethod
     current_config = context.oProteusConfig
     Product = Model.get('product.product')
 
@@ -151,42 +169,69 @@ def step_impl(context, sType, uName):
     # ProgrammingError: can't adapt type 'product.template'
 
     template = ProductTemplate.find([('name', '=', uName),
-                                     ('type', '=', sType)])[0]
+                                     ('type', '=', uType)])[0]
 
     for row in context.table:
         uRowName = row['name']
+        uRowDescription = row['description']
         uCostPriceMethod = row['cost_price_method']
 
-        if uCostPriceMethod == u'fixed':
-            if not Product.find([('description', '=', uRowName)]):
-                product = Product()
-                product.template = template
-                product.description = uRowName
-                product.save()
+        if Product.find([('description', '=', uRowName)]): continue
 
+        if uCostPriceMethod == u'fixed':
+            product = Product()
+            product.template = template
+            product.description = uRowDescription
+            product.save()
 
         elif uCostPriceMethod == u'average':
-            if not Product.find([('description', '=', uRowName)]):
+            if 'template_average' not in dCacheCostPriceMethod:
                 template_average = ProductTemplate(
                     ProductTemplate.copy([template.id],
                                          current_config.context)[0])
-                template_average.cost_price_method = uCostPriceMethod
+                template_average.cost_price_method = 'average'
                 template_average.save()
+                dCacheCostPriceMethod['template_average'] = template_average
+            else:
+                template_average = dCacheCostPriceMethod['template_average']
+            # FixMe: I dont understand this logic here
+            # hardcoded this would be ('description', '=', 'product_fixed')
+            #?product_fixed = Product.find([])[0]
+            #?product_average = Product(
+            #?    Product.copy([product_fixed.id], {
+            #?        'template': template_average.id,
+            #?        }, current_config.context)[0])
+            #? why use the copy? why not just:
+            product_average = Product()
+            product_average.template = template_average
+            product_average.description = uRowDescription
+            product_average.save()
 
-                # FixMe: I dont understand this logic here
-                # hardcoded this would be ('description', '=', 'product_fixed')
-                product_fixed = Product.find([])[0]
-                product_average = Product(
-                    Product.copy([product_fixed.id], {
-                        'template': template_average.id,
-                        }, current_config.context)[0])
-                product_average.description = uRowName
-                product_average.save()
+        elif uCostPriceMethod == u'fifo':
+            if 'template_fifo' not in dCacheCostPriceMethod:
+                template_fifo = ProductTemplate(
+                    ProductTemplate.copy([template.id],
+                                         current_config.context)[0])
+                template_fifo.cost_price_method = 'fifo'
+                template_fifo.save()
+                dCacheCostPriceMethod['template_fifo'] = template_fifo
+            else:
+                template_fifo = dCacheCostPriceMethod['template_fifo']
+            product_fifo = Product()
+            product_fifo.template = template_fifo
+            product_fifo.description = uRowDescription
+            product_fifo.save()
 
 # 12 products, Supplier
 @step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
     """
+    Purchase products on the P. O. with description "{uDescription}" 
+    from supplier "{uSupplier}" with quantities
+	  | description  	| quantity | unit_price |
+	  | product_fixed	| 5.0	   | 4		|
+	  | product_average	| 7.0	   | 6		|
+
     Idempotent.
     """
     current_config = context.oProteusConfig
@@ -202,13 +247,13 @@ def step_impl(context, uDescription, uSupplier):
     if not len(purchase.lines):
 
         for row in context.table:
-            uDescription = row['description']
+            uPDescription = row['description']
             quantity = float(row['quantity'])
             unit_price = Decimal(row['unit_price'])
             # allow 0 (<0.0001) quantity or price lines - just skip them
             if quantity < 0.0001 or unit_price == Decimal('0.00'): continue
 
-            product = Product.find([('description', '=', uDescription)])[0]
+            product = Product.find([('description', '=', uPDescription)])[0]
 
             PurchaseLine = Model.get('purchase.line')
             purchase_line = PurchaseLine()

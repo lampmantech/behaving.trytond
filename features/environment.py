@@ -18,7 +18,7 @@ def vCreateConfigFile(oConfig, sFile):
     oConfig.add_section('trytond')
     oConfig.set('trytond', 'password', 'foobar')
     oConfig.set('trytond', 'user', 'admin')
-    oConfig.set('trytond', 'database_name', 'test28')
+    oConfig.set('trytond', 'database_name', 'test32')
     oConfig.set('trytond', 'database_type', 'postgresql')
     oConfig.set('trytond', 'config_file', ETC_TRYTOND_CONF)
 

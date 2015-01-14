@@ -1,30 +1,13 @@
 From: ../features/steps/trytond_bank.py
 
 
-From: ../features/steps/trytond_bank.py
-
-
    WIP - unfinished
-   This is a straight cut-and-paste from
+   This would be a straight cut-and-paste from
    trytond_bank-3.2.0/tests/
-
-**Create a bank named "{uName}" associated to a bank party "{uParty}" with optional BIC "{uBic}"**
-
-**Create a bank named "{uName}" associated to a party "{uParty}" with optional BIC "{uBic}"**
-   Create a named bank associated to a party, with optional BIC.
-   Create the party first, with things like addresses, and
-   then use this to create the bank.
-   The uBic field can be empty; if not it has 11 characters.
-
-**Create a bank account number named "{uName}" at a bank "{uBank}" with optional currency "{uCur}, with a table of number and optional owner"**
-   Create a bank account at a bank "{uBank}" with optional currency "{uCur},
-   with a following table of | name | value |.
-   Each name is one of number or owner.
-   At least one number is required; if you want to add more,
-   just run this scenario again with the new number.
-   WIP - unfinished
-   This is a straight cut-and-paste from
-   trytond_bank-3.2.0/tests/
+   but trytond_bank doesn't have any meaningful tests.
+   trytond_bank also doesn't have any documentation, meaningful or not.
+   Which makes it pretty hard to figure out, especially as its classes
+   have self-referential fields. Grr.
 
 **Create a bank associated to a party "{uParty}" with optional BIC "{uBic}"**
    Create a named bank associated to a party, with optional BIC.

@@ -17,7 +17,7 @@ Feature: Run the Trytond scenario_invoice_supplier doctests
 	and Create a chart of accounts from template "Minimal Account Chart" with root "Minimal Account Chart"
 	and Create a saved instance of "party.party" named "Supplier"
 	and Create a PaymentTerm named "Term" with "0" days remainder
-	and TS/AIS Create a tax named "10% Sales Tax" with fields
+	and Create a tax named "10% Sales Tax" with fields
 	    | name                  | value            |
 	    | description           | 10% Sales Tax    |
 	    | type 	            | percentage       |
@@ -40,5 +40,5 @@ Feature: Run the Trytond scenario_invoice_supplier doctests
 	  | description       | quantity   | unit_price |
 	  | Services Bought   | 5	   | 		|
 	  | Test     	      | 1	   | 10.00	|
-       Then TS/AIS Post the invoice with description "Buy the Services Bought" and assert the taxes named "10% Sales Tax" with fields
+       Then TS/AIS Post the invoice with description "Buy the Services Bought" and assert the taxes named "10% Sales Tax" are right
         and TS/AIS Create a credit note for the invoice with description "Buy the Services Bought" and assert the amounts

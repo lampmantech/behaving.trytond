@@ -29,4 +29,3 @@ def step_impl(context):
     The trivial assertion did not fail.
     """
     assert context.failed is False
-

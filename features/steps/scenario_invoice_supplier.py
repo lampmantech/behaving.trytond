@@ -29,51 +29,6 @@ from .trytond_constants import *
 
 today = datetime.date.today()
 
-# 10% Sales Tax
-@step('TS/AIS Create a tax named "{uTaxName}" with fields')
-def step_impl(context, uTaxName):
-
-    Party = Model.get('party.party')
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    Account = Model.get('account.account')
-    account_tax, = Account.find([
-        ('kind', '=', 'other'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),
-        ('company', '=', company.id),
-        ])
-
-    Tax = Model.get('account.tax')
-    if not Tax.find([('name', '=', uTaxName)]):
-        
-        TaxCode = Model.get('account.tax.code')
-        
-        tax = Tax()
-        tax.name = uTaxName
-        tax.invoice_account = account_tax
-        tax.credit_note_account = account_tax
-        for row in context.table:
-            if row['name'] == 'invoice_base_code' or \
-                   row['name'] == 'invoice_tax_code' or \
-                   row['name'] == 'credit_note_base_code' or \
-                   row['name'] == 'credit_note_tax_code':
-                # create these if they dont exist
-                l = TaxCode.find([('name', '=', row['value'])])
-                if l:
-                    tax_code = l[0]
-                else:
-                    tax_code = TaxCode(name=row['value'])
-                    tax_code.save()
-                setattr(tax, row['name'], tax_code)
-            else:
-                setattr(tax, row['name'],
-                    string_to_python(row['name'], row['value'], Tax))
-
-        tax.save()
-
 # Service Product
 @step('TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields')
 def step_impl(context, uTemplateName, uTaxName):
@@ -134,6 +89,14 @@ def step_impl(context, uDescription, uTemplateName):
 # Buy the Services Bought, Supplier
 @step('TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields')
 def step_impl(context, uDescription, uSupplier):
+    """
+Create an invoice with description "{uDescription}" to supplier 
+"{uSupplier}" with fields | description | quantity | unit_price |
+# Note that this uses the heading description rather than name
+	  | description       | quantity   | unit_price |
+	  | Services Bought   | 5	   | 		|
+	  | Test     	      | 1	   | 10.00	|
+    """
     current_config = context.oProteusConfig
 
     Party = Model.get('party.party')
@@ -183,7 +146,7 @@ def step_impl(context, uDescription, uSupplier):
         invoice.save()
 
 # Buy the Services Bought, 10% Sales Tax
-@step('TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields')
+@step('TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right')
 def step_impl(context, uDescription, uTaxName):
     current_config = context.oProteusConfig
 

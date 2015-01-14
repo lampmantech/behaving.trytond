@@ -57,10 +57,11 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	  | list_price 	      | 10    |
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
+	  | default_uom	      | Unit    |
 	and T/ASAS/SASAS Create two products of type "goods" from the ProductTemplate named "product" with fields
-	  | name                | cost_price_method |
-	  | product_fixed	| fifo   	    |
-	  | product_average	| fifo		    |
+	  | name                | cost_price_method | description         |
+	  | product_fixed	| fifo   	    | product_fixed       |
+	  | product_average	| fifo		    | product_average     |
 	and Create a Purchase Order with description "12 products" from Supplier "Supplier" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |

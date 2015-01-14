@@ -16,7 +16,7 @@ from behave import *
 @step('I do not want all demo data to be loaded on install')
 def impl(ctx):
     """
-    WIP
+    No-op - doesn't exist in Tryton.
     """
     pass
 
@@ -46,7 +46,7 @@ def impl(ctx):
 @step('my modules should have been installed and models reloaded')
 def impl(ctx):
     """
-    Null.
+    No-op
     """
     # module_config.py
     pass

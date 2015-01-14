@@ -1,54 +1,6 @@
 From: ../features/steps/scenario_invoice_supplier.py
 
 
-From: ../features/steps/scenario_invoice_supplier.py
-
-
-From: ../features/steps/scenario_invoice_supplier.py
-
-
-From: ../features/steps/scenario_invoice_supplier.py
-
-
-From: ../features/steps/scenario_invoice_supplier.py
-
-
-
-**TS/AIS Create a tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
-
-**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
-
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
-
-**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
-
-**TS/AIS Create a tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
-
-**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
-
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
-
-**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
-
-**TS/AIS Create a tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
-
-**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
-
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
-
-**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
    =========================
    Invoice Supplier Scenario
    =========================
@@ -56,50 +8,18 @@ From: ../features/steps/scenario_invoice_supplier.py
    trytond_account_invoice-3.0.0/tests/scenario_invoice_supplier.rst
    It should be improved to be more like a Behave BDD.
 
-**TS/AIS Create a tax named "{uTaxName}" with fields**
-
 **TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
 
 **TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
 
 **TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
+   Create an invoice with description "{uDescription}" to supplier
+   "{uSupplier}" with fields | description | quantity | unit_price |
+   # Note that this uses the heading description rather than name
+   | description       | quantity   | unit_price |
+   | Services Bought   | 5	   | 		|
+   | Test     	      | 1	   | 10.00	|
 
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
-
-**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
-   =========================
-   Invoice Supplier Scenario
-   =========================
-   This is a straight cut-and-paste from
-   trytond_account_invoice-3.0.0/tests/scenario_invoice_supplier.rst
-   It should be improved to be more like a Behave BDD.
-
-**TS/AIS Create a tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
-
-**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
-
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
-
-**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
-   =========================
-   Invoice Supplier Scenario
-   =========================
-   This is a straight cut-and-paste from
-   trytond_account_invoice-3.0.0/tests/scenario_invoice_supplier.rst
-   It should be improved to be more like a Behave BDD.
-
-**TS/AIS Create a tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
-
-**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
-
-**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
-
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" with fields**
+**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
 
 **TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
