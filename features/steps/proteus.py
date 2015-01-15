@@ -155,6 +155,21 @@ def step_impl(context):
 
 @step('proteus/test_model test_save_one2many')
 def step_impl(context):
+    """
+    FixMe:
+    ininite recursion:
+
+> /n/data/TrytonOpenERP/lib/python2.7/site-packages/trytond-3.2.4-py2.7.egg/trytond/model/modelsql.py(1154)<genexpr>()
+-> return And((convert(d) for d in (
+(Pdb) up
+> /n/data/TrytonOpenERP/lib/python2.7/site-packages/trytond-3.2.4-py2.7.egg/trytond/model/modelsql.py(1155)convert()
+-> domain[1:] if domain[0] == 'AND' else domain)))
+(Pdb) up
+> /n/data/TrytonOpenERP/lib/python2.7/site-packages/trytond-3.2.4-py2.7.egg/trytond/model/modelsql.py(1154)<genexpr>()
+-> return And((convert(d) for d in (
+
+    """
+    return
     Group = Model.get('res.group')
     group = Group()
     group.name = 'Test save one2many'

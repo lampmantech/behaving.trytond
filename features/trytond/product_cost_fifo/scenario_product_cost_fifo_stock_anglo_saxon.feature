@@ -1,15 +1,11 @@
 # -*- encoding: utf-8 -*-
 
-# These are straight cut-and-paste from Trytond doctests.
-# It should be improved to be more like a Behave BDD.
-
-
+@wip
 Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
     "product_cost_fifo" module loaded and with a cost_price_method of "fifo.
-    This FAILS on the asserts as it should for now because it is a copy
+    This FAILS on the asserts, as it should for, now because it is a copy
     changed to use FIFO, but the accounting results have not yet been updated.
 
-    @wip
     Scenario: Run the tests of the module named "product_cost_fifo"
 
       Given Create database with pool.test set to True
@@ -42,13 +38,14 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 
 
     Scenario: Buy the products from the supplier, testing the module named "product_cost_fifo"
+
       Given Create a user named "Accountant" with the fields
 	  | name	| value		  |
 	  | login	| accountant	  |
 	  | password	| accountant	  |
 	  | group	| Account	  |
 	and Create a PaymentTerm named "Direct" with "0" days remainder
-	and T/ASAS/SASAS Create a ProductTemplate named "product" with fields
+	and T/ASAS/SASAS Create a ProductTemplate named "product" from a ProductCategory named "Category" with fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fifo  |
@@ -57,40 +54,49 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	  | list_price 	      | 10    |
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
-	  | default_uom	      | Unit    |
-	and T/ASAS/SASAS Create two products of type "goods" from the ProductTemplate named "product" with fields
+	  | default_uom	      | Unit  |
+	and T/ASAS/SASAS Create products of type "goods" from the ProductTemplate named "product" with fields
 	  | name                | cost_price_method | description         |
-	  | product_fixed	| fifo   	    | product_fixed       |
-	  | product_average	| fifo		    | product_average     |
+	  | product_fixed	| fifo   	    | Product Fixed       |
+	  | product_average	| fifo		    | Product Average     |
 	and Create a Purchase Order with description "12 products" from Supplier "Supplier" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct 	 |
 	  | purchase_date     | TODAY	 |
+#?	  | currency          | EUR	 |
 	and T/ASAS/SASAS Purchase products on the P. O. with description "12 products" from supplier "Supplier" with quantities
 	  | description  	| quantity | unit_price |
-	  | product_fixed	| 5.0	   | 4		|
-	  | product_average	| 7.0	   | 6		|
+	  | Product Fixed	| 5.0	   | 4		|
+	  | Product Average	| 7.0	   | 6		|
 	and T/ASAS/SASAS Quote and Confirm a P. O. with description "12 products" from supplier "Supplier"
 	and T/ASAS/SASAS Receive 9 products from the P. O. with description "12 products" from supplier "Supplier" with quantities
 	  | description     | quantity |
-	  | product_fixed   | 4.0      |
-	  | product_average | 5.0      |
+	  | Product Fixed   | 4.0      |
+	  | Product Average | 5.0      |
 	and T/ASAS/SASAS After receiving 9 products assert the account credits and debits
-	and T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "12 products" to supplier "Supplier"
+# AssertionError: Expected 50.00,0.00 but got 46.00,0.00
+	and T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "12 products" to supplier "Supplier" with prices
+	  | description     | unit_price |
+	  | Product Fixed   | 6.00     	 |
+	  | Product Average | 4.00     	 |
 	and T/ASAS/SASAS After paying for what we received assert the account credits and debits
 
     Scenario: Sell the products to the customer, testing the module named "product_cost_fifo"
-       Given T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
+
+      Given T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct   |
 	and T/ASAS/SASAS Sell products on the S. O. with description "Sell 5 products" to customer "Customer" with quantities
 	  | description     | quantity |
-	  | product_fixed   | 2.0      |
-	  | product_average | 3.0      |
+	  | Product Fixed   | 2.0      |
+	  | Product Average | 3.0      |
 	and T/ASAS/SASAS Send 5 products on the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After shipping to customer assert the account credits and debits
 	and T/ASAS/SASAS Open customer invoice for the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits
-	and T/ASAS/SASAS Now create a supplier invoice with an accountant
+	and T/ASAS/SASAS Create an invoice to supplier "Supplier" with PaymentTerm "Direct" by an accountant with quantities
+	  | description     | quantity	| unit_price |
+	  | Product Fixed   | 5.0      	| 4.00	     |
+

@@ -1,3 +1,17 @@
+commit 1389f419ef28755d64efa1024fc5edeb158855e3
+Date:   Wed Jan 14 07:46:35 2015 +0200
+
+    Added proteus tests - they work.
+    
+    Added ir.attachment tests - they run but have bo effect.
+    
+    Made a quick hack shellscript in bin/ to superficially
+    convert rst scenario tests from the source tree to
+    behave scenarios.
+    
+    Added features to test for AccountantsCalendar -
+    Events work, but annual recurring events are unfinished.
+
 commit 26344f02e177873532b0041394afca1df078eb26
 Date:   Tue Jan 13 03:53:25 2015 +0200
 

@@ -22,6 +22,7 @@ From: ../features/steps/trytond_account.py
    with root account "{uRoot}".
    Before you do this, with the step 'Set the feature data with values:'
    set the feature data as a |name|value| table for:
+   * party,company_name
    * account.template,main_receivable
    * account.template,main_payable
    * account.template,main_revenue

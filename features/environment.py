@@ -61,9 +61,9 @@ def before_all(context):
     context.oConfig = oConfig
     context.oProteusConfig = proteus.config.set_trytond(
         database_name=sDatabaseName,
-        user=sUser,
+        user=context.oConfig.get('trytond', 'user'),
         database_type=sDatabaseType,
-        password=sPassword,
+        password=context.oConfig.get('trytond', 'password'),
         language='en_US',
         config_file=sTrytonConfigFile)
 

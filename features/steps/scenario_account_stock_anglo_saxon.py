@@ -17,11 +17,12 @@ import time
 import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-from proteus import config, Model, Wizard
+import proteus
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support import tools
+from .support import stepfuns
 
 # Warning - these are hardwired from the Tryton code
 from .trytond_constants import *
@@ -33,16 +34,18 @@ today = datetime.date.today()
 @step('T/ASAS/SASAS Create a ProductCategory named "{uName}"')
 def step_impl(context, uName):
     """
+    Create a saved instance of "product.category" named "{uName}"
     Idempotent.
     """
     context.execute_steps(u'''
     Given Create a saved instance of "product.category" named "%s"
     ''' % (uName,))
 
-# product , 'fixed' or fifo
-@step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" with fields')
-def step_impl(context, uName):
-    """Create a ProductTemplate named "{uName}" with fields:
+# product , Category
+@step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" from a ProductCategory named "{uCatName}" with fields')
+def step_impl(context, uName, uCatName):
+    """Create a ProductTemplate named "{uName}" 
+    from a ProductCategory named "{uCatName}" with fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fifo  |
@@ -56,67 +59,23 @@ def step_impl(context, uName):
     """
 
     current_config = context.oProteusConfig
-    ProductTemplate = Model.get('product.template')
+    ProductTemplate = proteus.Model.get('product.template')
 
-    if not ProductTemplate.find([('name', '=', uName)]):
-        ProductCategory = Model.get('product.category')
-        category, = ProductCategory.find([('name', '=', 'Category')])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    Party = proteus.Model.get('party.party')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    if not ProductTemplate.find([('name', '=', uName),
+                                 ('category.name', '=', uCatName),
+                             ]):
+        ProductCategory = proteus.Model.get('product.category')
 
-        ProductUom = Model.get('product.uom')
+        ProductUom = proteus.Model.get('product.uom')
 
-        sCompanyName = sGetFeatureData(context, 'party,company_name')
-        Party = Model.get('party.party')
-        party, = Party.find([('name', '=', sCompanyName)])
-        Company = Model.get('company.company')
-        company, = Company.find([('party.id', '=', party.id)])
-
-        AccountJournal = Model.get('account.journal')
-        stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
-
-        Account = Model.get('account.account')
-        revenue, = Account.find([
-            ('kind', '=', 'revenue'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
-            ('company', '=', company.id),
-            ])
-        expense, = Account.find([
-            ('kind', '=', 'expense'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-            ('company', '=', company.id),
-            ])
-        cogs, = Account.find([
-            ('kind', '=', 'other'),
-            ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
-            ('company', '=', company.id),
-            ])
-
-        # These are in by trytond_account_stock_continental/account.xml
-        # which is pulled in by trytond_account_stock_anglo_saxon
-        stock, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock')),
-            ])
-        stock_customer, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_customer')),
-            ])
-        stock_lost_found, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_lost_found')),
-            ])
-        stock_production, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_production')),
-            ])
-        stock_supplier, = Account.find([
-            ('kind', '=', 'stock'),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_supplier')),
-            ('company', '=', company.id),
-            ])
+        AccountJournal = proteus.Model.get('account.journal')
+        Account = proteus.Model.get('account.account')
 
         template = ProductTemplate()
         template.name = uName
@@ -126,15 +85,33 @@ def step_impl(context, uName):
             setattr(template, row['name'],
                     string_to_python(row['name'], row['value'], ProductTemplate))
 
+        category, = ProductCategory.find([('name', '=', uCatName)])
         template.category = category
+        
+        revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
         template.account_expense = expense
         template.account_revenue = revenue
-        template.account_stock = stock
+        
+        cogs, = Account.find([
+            ('kind', '=', 'other'),
+            ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
+            ('company', '=', company.id),
+            ])
         template.account_cogs = cogs
+        
+        # These are in by trytond_account_stock_continental/account.xml
+        # which is pulled in by trytond_account_stock_anglo_saxon
+        stock, stock_customer, stock_lost_found, stock_production, \
+            stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
+
+        template.account_stock = stock
         template.account_stock_supplier = stock_supplier
         template.account_stock_customer = stock_customer
         template.account_stock_production = stock_production
         template.account_stock_lost_found = stock_lost_found
+
+        # who creates this and where?
+        stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
         template.account_journal_stock_supplier = stock_journal
         template.account_journal_stock_customer = stock_journal
         template.account_journal_stock_lost_found = stock_journal
@@ -143,40 +120,48 @@ def step_impl(context, uName):
             modules.lInstallModules(['product_cost_fifo'], current_config)
 
         template.save()
-
+    assert ProductTemplate.find([('name', '=', uName)])
+    
 # cost_price_method - one of
 dCacheCostPriceMethod={}
 
 # goods, product
-@step('T/ASAS/SASAS Create two products of type "{uType}" from the ProductTemplate named "{uName}" with fields')
+@step('T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields')
 # FixMe: actually creates 2 different Product and ProductTemplates
 def step_impl(context, uType, uName):
     """
     Create two products of type "{uType}" from the ProductTemplate named 
     "{uName}" with fields
 	  | name                | cost_price_method | description         |
-	  | product_fixed	| fifo   	    | product_fixed       |
-	  | product_average	| fifo		    | product_average     |
+	  | product_fixed	| fifo   	    | Product Fixed       |
+	  | product_average	| fifo		    | Product Average     |
 
     Idempotent.
     """
     global dCacheCostPriceMethod
     current_config = context.oProteusConfig
-    Product = Model.get('product.product')
-
-    ProductTemplate = Model.get('product.template')
+    Product = proteus.Model.get('product.product')
+    ProductTemplate = proteus.Model.get('product.template')
     # FixMe: ('cost_price_method', '=', 'fixed'), gives a SQL Error
     # ProgrammingError: can't adapt type 'product.template'
 
-    template = ProductTemplate.find([('name', '=', uName),
-                                     ('type', '=', uType)])[0]
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    Party = proteus.Model.get('party.party')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    # not ('company', '=', company.id),
+    template, = ProductTemplate.find([('name', '=', uName),
+                                      ('type', '=', uType)])
 
     for row in context.table:
         uRowName = row['name']
         uRowDescription = row['description']
         uCostPriceMethod = row['cost_price_method']
 
-        if Product.find([('description', '=', uRowName)]): continue
+        # not ('company', '=', company.id),
+        if Product.find([('description', '=', uRowDescription)]): continue
 
         if uCostPriceMethod == u'fixed':
             product = Product()
@@ -223,7 +208,7 @@ def step_impl(context, uType, uName):
             product_fifo.save()
 
 # 12 products, Supplier
-@step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
+@step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
     """
     Purchase products on the P. O. with description "{uDescription}" 
@@ -236,11 +221,16 @@ def step_impl(context, uDescription, uSupplier):
     """
     current_config = context.oProteusConfig
 
-    Purchase = Model.get('purchase.purchase')
-    Product = Model.get('product.product')
+    Purchase = proteus.Model.get('purchase.purchase')
+    Product = proteus.Model.get('product.product')
+    Party = proteus.Model.get('party.party')
 
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    supplier, = Party.find([('name', '=', uSupplier),])
 
     purchase, = Purchase.find([('description', '=', uDescription),
                                ('party.id', '=', supplier.id)])
@@ -255,7 +245,7 @@ def step_impl(context, uDescription, uSupplier):
 
             product = Product.find([('description', '=', uPDescription)])[0]
 
-            PurchaseLine = Model.get('purchase.line')
+            PurchaseLine = proteus.Model.get('purchase.line')
             purchase_line = PurchaseLine()
             purchase.lines.append(purchase_line)
             purchase_line.product = product
@@ -273,10 +263,15 @@ def step_impl(context, uDescription, uSupplier):
     """
     current_config = context.oProteusConfig
 
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
-
-    Purchase = Model.get('purchase.purchase')
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    supplier, = Party.find([('name', '=', uSupplier),])
+    
+    Purchase = proteus.Model.get('purchase.purchase')
     purchase, = Purchase.find([('description', '=', uDescription),
                                ('party.id', '=', supplier.id)])
 
@@ -294,21 +289,26 @@ def step_impl(context, uDescription, uSupplier):
     """
     current_config = context.oProteusConfig
 
-    ShipmentIn = Model.get('stock.shipment.in')
+    ShipmentIn = proteus.Model.get('stock.shipment.in')
+    Party = proteus.Model.get('party.party')
 
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
 
+    supplier, = Party.find([('name', '=', uSupplier),])
+    
     # FixMe: Hack alert - how do I find this Move again?
     if not ShipmentIn.find([('supplier.id', '=', supplier.id)]):
         shipment = ShipmentIn(supplier=supplier)
 
-        Purchase = Model.get('purchase.purchase')
+        Purchase = proteus.Model.get('purchase.purchase')
         purchase, = Purchase.find([('description', '=', uDescription),
                                    ('party.id', '=', supplier.id)])
 
-        Move = Model.get('stock.move')
-        Product = Model.get('product.product')
+        Move = proteus.Model.get('stock.move')
+        Product = proteus.Model.get('product.product')
         # purchase.moves[0].product.description == u'product_fixed'
         # purchase.moves[1].product.description == u'product_average' 5.0
         for row in context.table:
@@ -335,13 +335,13 @@ def step_impl(context):
     # NOT idempotent
     current_config = context.oProteusConfig
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
 
     stock, = Account.find([
         ('kind', '=', 'stock'),
@@ -380,16 +380,18 @@ def step_impl(context, uDescription, uSupplier):
 
     current_config = context.oProteusConfig
 
-    Purchase = Model.get('purchase.purchase')
+    Purchase = proteus.Model.get('purchase.purchase')
+    Party = proteus.Model.get('party.party')
 
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
+    
+    supplier, = Party.find([('name', '=', uSupplier),])
+
     purchase, = Purchase.find([('description', '=', uDescription),
-                               ('company', '=', company.id),
+#?                               ('company', '=', company.id),
                                ('party.id', '=', supplier.id)])
     purchase.reload()
     assert purchase.state == u'confirmed'
@@ -400,7 +402,7 @@ def step_impl(context, uDescription, uSupplier):
         invoice.accounting_date = invoice.invoice_date
         invoice.description = "pay for what we received from the P. O. with description '%s'" % (uDescription,)
         
-        Product = Model.get('product.product')
+        Product = proteus.Model.get('product.product')
         for row in context.table:
             uDescription = row['description']
             mUnitPrice = Decimal(row['unit_price'])
@@ -417,7 +419,7 @@ def step_impl(context, uDescription, uSupplier):
         # currency_date
         invoice.save()
 
-        Invoice = Model.get('account.invoice')
+        Invoice = proteus.Model.get('account.invoice')
         Invoice.post([invoice.id], current_config.context)
         assert invoice.state == u'posted'
 
@@ -426,28 +428,20 @@ def step_impl(context):
     # NOT idempotent
     current_config = context.oProteusConfig
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
-    Account = Model.get('account.account')
-    payable, = Account.find([
-        ('kind', '=', 'payable'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
-        ('company', '=', company.id),
-        ])
+    Account = proteus.Model.get('account.account')
+    payable, expense = stepfuns.gGetFeaturesPayExp(context, company)
+    
     payable.reload()
     assert (payable.debit, payable.credit) == \
         (Decimal('0.00'), Decimal('44.00')), \
         "Expected 0.00,44.00 but got %.2f,%.2f" % (expense.debit, expense.credit,)
 
-    expense, = Account.find([
-        ('kind', '=', 'expense'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-        ('company', '=', company.id),
-        ])
     expense.reload()
     assert (expense.debit, expense.credit) == \
         (Decimal('44.00'), Decimal('50.00')), \
@@ -470,17 +464,17 @@ def step_impl(context, uDescription, uCustomer):
     """
     current_config = context.oProteusConfig
 
-    Sale = Model.get('sale.sale')
+    Sale = proteus.Model.get('sale.sale')
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
     if not Sale.find([('description', '=', uDescription),
-                      ('company', '=', company.id),
+#?                      ('company', '=', company.id),
                       ('party.id', '=', customer.id)]):
         sale = Sale()
         sale.party = customer
@@ -491,31 +485,40 @@ def step_impl(context, uDescription, uCustomer):
             setattr(sale, row['name'],
                     string_to_python(row['name'], row['value'], Sale))
         sale.save()
-
+        
+    assert Sale.find([('description', '=', uDescription),
+#?                      ('company', '=', company.id),
+                      ('party.id', '=', customer.id)])
 
 @step('T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities')
 def step_impl(context, uDescription, uCustomer):
     """
+    Sell products on the S. O. with description "uDescription" 
+    to customer "uCustomer" with quantities
+	  | description     | quantity |
+	  | product_fixed   | 2.0      |
+	  | product_average | 3.0      |
+
     Idempotent.
     """
     current_config = context.oProteusConfig
 
-    Sale = Model.get('sale.sale')
+    Sale = proteus.Model.get('sale.sale')
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
     sale, = Sale.find([('description', '=', uDescription),
-                       ('company', '=', company.id),
+#?                       ('company', '=', company.id),
                        ('party.id', '=', customer.id)])
     if len(sale.lines) <= 0:
-        SaleLine = Model.get('sale.line')
+        SaleLine = proteus.Model.get('sale.line')
         
-        Product = Model.get('product.product')
+        Product = proteus.Model.get('product.product')
         # purchase.moves[0].product.description == u'product_fixed'
         # purchase.moves[1].product.description == u'product_average' 5.0
         for row in context.table:
@@ -543,45 +546,52 @@ def step_impl(context, uDescription, uCustomer):
     # NOT idempotent
     current_config = context.oProteusConfig
 
-    ShipmentOut = Model.get('stock.shipment.out')
+    ShipmentOut = proteus.Model.get('stock.shipment.out')
 
-    Sale = Model.get('sale.sale')
-    SaleLine = Model.get('sale.line')
+    Sale = proteus.Model.get('sale.sale')
+    SaleLine = proteus.Model.get('sale.line')
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
     sale, = Sale.find([('description', '=', uDescription),
-                       ('company', '=', company.id),
+#?                       ('company', '=', company.id),
                        ('party.id', '=', customer.id)])
 
     shipment, = sale.shipments
     assert ShipmentOut.assign_try([shipment.id], current_config.context)
+    # not idempotent
     assert shipment.state == u'assigned'
         
     shipment.reload()
+    # not idempotent
     ShipmentOut.pack([shipment.id], current_config.context)
     assert shipment.state == u'packed'
 
     shipment.reload()
+    # not idempotent
     ShipmentOut.done([shipment.id], current_config.context)
     assert shipment.state == u'done'
 
 @step('T/ASAS/SASAS After shipping to customer assert the account credits and debits')
 def step_impl(context):
-    # NOT idempotent?
+    """
+    T/ASAS/SASAS After shipping to customer assert the account credits and debits
+    NOT idempotent.
+    """
+    
     current_config = context.oProteusConfig
 
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
     
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
     stock, = Account.find([
@@ -607,27 +617,32 @@ def step_impl(context):
 # Customer
 @step('T/ASAS/SASAS Open customer invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDescription, uCustomer):
+    """
+    Open customer invoice for the Sales Order with description "uDescription"
+    to customer "uCustomer"
 
+    Not idempotent.
+    """
     current_config = context.oProteusConfig
 
-    Sale = Model.get('sale.sale')
+    Sale = proteus.Model.get('sale.sale')
 
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     customer, = Party.find([('name', '=', uCustomer)])
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
     
     sale, = Sale.find([('invoice_method', '=', 'shipment'),
-                       ('company', '=', company.id),
+#?                       ('company', '=', company.id),
                        ('party.id', '=', customer.id)])
-
-    # FixMe: not idempotent
+    # not idempotent
     sale.reload()
 
-    Invoice = Model.get('account.invoice')
+    Invoice = proteus.Model.get('account.invoice')
     invoice, = sale.invoices
+    # not idempotent
     Invoice.post([invoice.id], current_config.context)    
     assert invoice.state == u'posted'
 
@@ -636,13 +651,13 @@ def step_impl(context):
     # NOT idempotent?
     current_config = context.oProteusConfig
 
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
     
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
+    oCompanyParty, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', oCompanyParty.id)])
     
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
@@ -684,29 +699,42 @@ def step_impl(context):
         (Decimal('28.00'), Decimal('0.00')), \
         "Expected 28.00,0.00 but got %.2f,%.2f" % (cogs.debit, cogs.credit,)
 
-# Supplier
-@step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" by an accountant with quantities')
-def step_impl(context, uSupplier):
+# Supplier, Direct
+@step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities')
+def step_impl(context, uSupplier, uPaymentTerm):
+    """
+    Create an invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm" 
+    by an accountant with quantities
+	  | description     | quantity	| unit_price |
+	  | product_fixed   | 5.0      	| 4.00	     |
 
+    Idempotent.
+    """
     current_config = context.oProteusConfig
+    
+    Purchase = proteus.Model.get('purchase.purchase')
 
-    Purchase = Model.get('purchase.purchase')
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    oCompanyParty, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', oCompanyParty.id)])
 
-    Party = Model.get('party.party')
-    supplier, = Party.find([('name', '=', uSupplier)])
+    supplier, = Party.find([('name', '=', uSupplier),])
 
     if not Purchase.find([('invoice_method', '=', 'order'),
                           ('party.id', '=', supplier.id)]):
 
-        PaymentTerm = Model.get('account.invoice.payment_term')
-        payment_term, = PaymentTerm.find([('name', '=', 'Direct')])
+        PaymentTerm = proteus.Model.get('account.invoice.payment_term')
+        payment_term, = PaymentTerm.find([('name', '=', uPaymentTerm)])
+        
         purchase = Purchase()
         purchase.party = supplier
         purchase.payment_term = payment_term
         purchase.invoice_method = 'order'
 
-        Product = Model.get('product.product')
-        PurchaseLine = Model.get('purchase.line')
+        Product = proteus.Model.get('product.product')
+        PurchaseLine = proteus.Model.get('purchase.line')
         for row in context.table:
             uDescription = row['description']
             fQuantity = float(row['quantity'])
@@ -727,7 +755,6 @@ def step_impl(context, uSupplier):
         Purchase.confirm([purchase.id], current_config.context)
         assert purchase.state == u'confirmed'
 
-        import proteus
         new_config = proteus.config.set_trytond(
             user=ACCOUNTANT_USER,
             password=ACCOUNTANT_PASSWORD,
@@ -736,5 +763,5 @@ def step_impl(context, uSupplier):
             invoice.invoice_date = today
             invoice.save()
             
-        Invoice = Model.get('account.invoice')
+        Invoice = proteus.Model.get('account.invoice')
         Invoice.validate_invoice([i.id for i in purchase.invoices], new_config.context)

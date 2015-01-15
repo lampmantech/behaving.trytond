@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+@works32
 Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
     adapted from the file scenario_account_stock_anglo_saxon.rst
     in trytond_account_stock_anglo_saxon-2.8.0/tests/
@@ -42,7 +43,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | password	| accountant	  |
 	  | group	| Account	  |
 	and Create a PaymentTerm named "Direct" with "0" days remainder
-	and T/ASAS/SASAS Create a ProductTemplate named "product" with fields
+	and T/ASAS/SASAS Create a ProductTemplate named "product" from a ProductCategory named "Category" with fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fixed |
@@ -52,7 +53,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
 	  | default_uom	      | Unit  |
-	and T/ASAS/SASAS Create two products of type "goods" from the ProductTemplate named "product" with fields
+	and T/ASAS/SASAS Create products of type "goods" from the ProductTemplate named "product" with fields
 	  | name                | cost_price_method | description         |
 	  | product_fixed	| fixed   	    | Product Fixed       |
 	  | product_average	| average 	    | Product Average     |
@@ -64,18 +65,18 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 #?	  | currency          | EUR	 |
 	and T/ASAS/SASAS Purchase products on the P. O. with description "12 products" from supplier "Supplier" with quantities
 	  | description  	| quantity | unit_price |
-	  | product_fixed	| 5.0	   | 4		|
-	  | product_average	| 7.0	   | 6		|
+	  | Product Fixed	| 5.0	   | 4		|
+	  | Product Average	| 7.0	   | 6		|
 	and T/ASAS/SASAS Quote and Confirm a P. O. with description "12 products" from supplier "Supplier"
 	and T/ASAS/SASAS Receive 9 products from the P. O. with description "12 products" from supplier "Supplier" with quantities
 	  | description     | quantity |
-	  | product_fixed   | 4.0      |
-	  | product_average | 5.0      |
+	  | Product Fixed   | 4.0      |
+	  | Product Average | 5.0      |
 	and T/ASAS/SASAS After receiving 9 products assert the account credits and debits
 	and T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "12 products" to supplier "Supplier" with prices
 	  | description     | unit_price |
-	  | product_fixed   | 6.00     	 |
-	  | product_average | 4.00     	 |
+	  | Product Fixed   | 6.00     	 |
+	  | Product Average | 4.00     	 |
 	and T/ASAS/SASAS After paying for what we received assert the account credits and debits
 
     Scenario: Sell the products to the customer, testing the module named "account_stock_anglo_saxon"
@@ -86,12 +87,12 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | payment_term      | Direct   |
 	and T/ASAS/SASAS Sell products on the S. O. with description "Sell 5 products" to customer "Customer" with quantities
 	  | description     | quantity |
-	  | product_fixed   | 2.0      |
-	  | product_average | 3.0      |
+	  | Product Fixed   | 2.0      |
+	  | Product Average | 3.0      |
 	and T/ASAS/SASAS Send 5 products on the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After shipping to customer assert the account credits and debits
 	and T/ASAS/SASAS Open customer invoice for the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits
-	and T/ASAS/SASAS Create an invoice to supplier "Supplier" by an accountant with quantities
+	and T/ASAS/SASAS Create an invoice to supplier "Supplier" with PaymentTerm "Direct" by an accountant with quantities
 	  | description     | quantity	| unit_price |
-	  | product_fixed   | 5.0      	| 4.00	     |
+	  | Product Fixed   | 5.0      	| 4.00	     |

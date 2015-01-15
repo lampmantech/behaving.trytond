@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 
+@works32
 Feature: Create an Accountant user and give him a calendar
 
     Scenario: Create an Accountant user for various things
@@ -15,7 +16,7 @@ Feature: Create an Accountant user and give him a calendar
     Scenario: Set the Accountant feature data
 
 # FixMe: This needs wiring up so that it's derived from the user
-       Given Set the feature data with values:
+       Given Set the feature data with values
          | name                                  | value                    |
          | user,Accountant,name                  | Accountant		    |
          | user,Accountant,login                 | accountant               |

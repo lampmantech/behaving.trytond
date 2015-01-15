@@ -11,6 +11,8 @@ from behave import *
 from proteus import *
 import random
 
+from .support.stepfuns import oAttachLinkToResource
+
 @step('ir/attachment test')
 def step_impl(context):
     """
@@ -18,18 +20,15 @@ def step_impl(context):
     onto the admin user. Not working.
     FixMe:
     """
-    Attachment = Model.get('ir.attachment')
     User = Model.get('res.user')
     
-    admin = User.find([('login', '=', 'admin')])[0]
+    oUser = User.find([('login', '=', 'admin')])[0]
     
-    attachment = Attachment()
-    attachment.type = 'link'
-    attachment.name = 'Test Link %d' % int(random.random() * 1000000)
+    oResource = oUser
+    sLink = 'file:///mnt/n/data/TrytonOpenERP/3.2/trytond_scenari/features/steps/ir.py'
+    sDescription = 'Test Link to /n/data/TrytonOpenERP/3.2/trytond_scenari/features/steps/ir.py'
+    sName = 'Test Link %d' % int(random.random() * 1000000)
     
-    attachment.description = 'Test Link to /n/data/TrytonOpenERP/3.2/trytond_scenari/features/steps/ir.py'
-    attachment.link = 'file:///mnt/n/data/TrytonOpenERP/3.2/trytond_scenari/features/steps/ir.py'
-    attachment.resource = admin
-    attachment.save()
+    oAttachment = oAttachLinkToResource (sName, sDescription, sLink, oResource)
     
-    assert attachment.resource == admin
+    assert oAttachment.resource == oUser

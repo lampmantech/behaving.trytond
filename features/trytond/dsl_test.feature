@@ -3,6 +3,7 @@
 # This is the advanced syntax behave test of trytond.
 # This test  is not properly finished yet.
 
+@works32
 Feature: showing off trytond dsl from OpenERPScenario
 
    Scenario: run a simple test with the party module and an instance with a full_name

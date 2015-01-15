@@ -122,6 +122,7 @@ Given Create the Company associated with the party named "%s" and using the curr
 ''' % (uPartyName, uCode,)
                           )
 
+# ['code', 'create_date', 'addresses', 'supplier_location', 'write_uid', 'customer_location', 'full_name', 'vat_number', 'id', 'receivable', 'create_uid', 'receivable_today', 'account_payable', 'code_readonly', 'code_length', 'vat_code', 'email', 'website', 'rec_name', 'fax', 'account_receivable', 'customer_tax_rule', 'payable', 'contact_mechanisms', 'write_date', 'active', 'categories', 'lang', 'supplier_tax_rule', 'name', 'phone', 'mobile', 'supplier_payment_term', 'vat_country', 'customer_payment_term', 'payable_today']
 
 @step('Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"')
 def step_impl(context, uParty, uCode):

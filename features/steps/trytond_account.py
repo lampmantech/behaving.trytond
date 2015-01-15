@@ -126,13 +126,13 @@ def step_impl(context, uTem, uRoot):
     with root account "{uRoot}".
     Before you do this, with the step 'Set the feature data with values:'
     set the feature data as a |name|value| table for:
+    * party,company_name
     * account.template,main_receivable
     * account.template,main_payable
     * account.template,main_revenue
     * account.template,main_expense
     * account.template,main_cash
-    """
-    
+    """    
     Account = proteus.Model.get('account.account')
 
     sCompanyName = sGetFeatureData(context, 'party,company_name')
@@ -219,23 +219,23 @@ def step_impl(context, uTaxName):
 	    | credit_note_base_code | credit note base |
 	    | credit_note_tax_code  | credit note tax  |
     """
-    Party = Model.get('party.party')
+    Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
-    Company = Model.get('company.company')
+    Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
-    Account = Model.get('account.account')
+    Account = proteus.Model.get('account.account')
     account_tax, = Account.find([
         ('kind', '=', 'other'),
         ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),
         ('company', '=', company.id),
         ])
 
-    Tax = Model.get('account.tax')
+    Tax = proteus.Model.get('account.tax')
     if not Tax.find([('name', '=', uTaxName)]):
         
-        TaxCode = Model.get('account.tax.code')
+        TaxCode = proteus.Model.get('account.tax.code')
         
         tax = Tax()
         tax.name = uTaxName

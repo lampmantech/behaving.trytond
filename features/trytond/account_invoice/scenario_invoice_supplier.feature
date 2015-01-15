@@ -1,8 +1,9 @@
 # -*- encoding: utf-8 -*-
 
+@works32
 Feature: Run the Trytond scenario_invoice_supplier doctests
     adapted from the file scenario_invoice_supplier.rst
-    in /n/src/Tryton-3.0/trytond_account_invoice-3.0.0/tests/
+    in trytond_account_invoice-3.0.0/tests/
 
     Scenario: Setup the tests of the module named "account_invoice"
 
