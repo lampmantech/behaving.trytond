@@ -15,6 +15,10 @@ From: ../features/steps/basic_modules.py
 **we print the list of loaded modules**
    Print the list of loaded modules on behave's stdout.
 
+**Ensure that the WebDAV modules are loaded**
+   Ensure that the WebDAV modules are loaded so that we
+   can access the calendars and contacts via WebDAV
+
 **we have the following table of "{mod}" instances**
    Creates the instances of the Model 'uMod' with the names from the table.
    It expects a |name| table.

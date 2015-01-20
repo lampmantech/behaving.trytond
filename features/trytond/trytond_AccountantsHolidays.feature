@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 @works32
+@idempotent
 Feature: Load Holidays into the Accountants calendar
 Run trytond_AccountantsCalendar.feature before this to create the calendar.
 This isn't working really because we still don't have recurrence rules.

@@ -44,7 +44,7 @@ def step_impl(context, uName):
 # product , Category
 @step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" from a ProductCategory named "{uCatName}" with fields')
 def step_impl(context, uName, uCatName):
-    """Create a ProductTemplate named "{uName}" 
+    """Create a ProductTemplate named "{uName}"
     from a ProductCategory named "{uCatName}" with fields
 	  | name              | value |
 	  | type	      | goods |
@@ -66,7 +66,7 @@ def step_impl(context, uName, uCatName):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     if not ProductTemplate.find([('name', '=', uName),
                                  ('category.name', '=', uCatName),
                              ]):
@@ -87,18 +87,18 @@ def step_impl(context, uName, uCatName):
 
         category, = ProductCategory.find([('name', '=', uCatName)])
         template.category = category
-        
+
         revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
         template.account_expense = expense
         template.account_revenue = revenue
-        
+
         cogs, = Account.find([
             ('kind', '=', 'other'),
             ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
             ('company', '=', company.id),
             ])
         template.account_cogs = cogs
-        
+
         # These are in by trytond_account_stock_continental/account.xml
         # which is pulled in by trytond_account_stock_anglo_saxon
         stock, stock_customer, stock_lost_found, stock_production, \
@@ -111,6 +111,7 @@ def step_impl(context, uName, uCatName):
         template.account_stock_lost_found = stock_lost_found
 
         # who creates this and where?
+        # /n/data/TrytonOpenERP/src/Tryton-3.2/trytond_stock-3.2.3/location.xml
         stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
         template.account_journal_stock_supplier = stock_journal
         template.account_journal_stock_customer = stock_journal
@@ -121,7 +122,7 @@ def step_impl(context, uName, uCatName):
 
         template.save()
     assert ProductTemplate.find([('name', '=', uName)])
-    
+
 # cost_price_method - one of
 dCacheCostPriceMethod={}
 
@@ -130,7 +131,7 @@ dCacheCostPriceMethod={}
 # FixMe: actually creates 2 different Product and ProductTemplates
 def step_impl(context, uType, uName):
     """
-    Create two products of type "{uType}" from the ProductTemplate named 
+    Create two products of type "{uType}" from the ProductTemplate named
     "{uName}" with fields
 	  | name                | cost_price_method | description         |
 	  | product_fixed	| fifo   	    | Product Fixed       |
@@ -150,7 +151,7 @@ def step_impl(context, uType, uName):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     # not ('company', '=', company.id),
     template, = ProductTemplate.find([('name', '=', uName),
                                       ('type', '=', uType)])
@@ -211,7 +212,7 @@ def step_impl(context, uType, uName):
 @step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
     """
-    Purchase products on the P. O. with description "{uDescription}" 
+    Purchase products on the P. O. with description "{uDescription}"
     from supplier "{uSupplier}" with quantities
 	  | description  	| quantity | unit_price |
 	  | product_fixed	| 5.0	   | 4		|
@@ -229,7 +230,7 @@ def step_impl(context, uDescription, uSupplier):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     supplier, = Party.find([('name', '=', uSupplier),])
 
     purchase, = Purchase.find([('description', '=', uDescription),
@@ -268,9 +269,9 @@ def step_impl(context, uDescription, uSupplier):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     supplier, = Party.find([('name', '=', uSupplier),])
-    
+
     Purchase = proteus.Model.get('purchase.purchase')
     purchase, = Purchase.find([('description', '=', uDescription),
                                ('party.id', '=', supplier.id)])
@@ -280,7 +281,7 @@ def step_impl(context, uDescription, uSupplier):
         Purchase.confirm([purchase.id], current_config.context)
 
         # These create the moves on the purchase order
-        
+
 # 12 products, Supplier
 @step('T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
@@ -298,7 +299,7 @@ def step_impl(context, uDescription, uSupplier):
     company, = Company.find([('party.id', '=', party.id)])
 
     supplier, = Party.find([('name', '=', uSupplier),])
-    
+
     # FixMe: Hack alert - how do I find this Move again?
     if not ShipmentIn.find([('supplier.id', '=', supplier.id)]):
         shipment = ShipmentIn(supplier=supplier)
@@ -320,7 +321,7 @@ def step_impl(context, uDescription, uSupplier):
             product = Product.find([('description', '=', uDescription)])[0]
             stock_move = Move.find([('product.id', '=', product.id),
                                     ('supplier.id', '=', supplier.id)])[0]
-        
+
             move = Move(stock_move.id)
             shipment.incoming_moves.append(move)
             move.quantity = fQuantity
@@ -332,11 +333,13 @@ def step_impl(context, uDescription, uSupplier):
 
 @step('T/ASAS/SASAS After receiving 9 products assert the account credits and debits')
 def step_impl(context):
-    # NOT idempotent
+    """
+    NOT idempotent
+    """
     current_config = context.oProteusConfig
 
     Party = proteus.Model.get('party.party')
-    
+
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
@@ -387,7 +390,7 @@ def step_impl(context, uDescription, uSupplier):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     supplier, = Party.find([('name', '=', uSupplier),])
 
     purchase, = Purchase.find([('description', '=', uDescription),
@@ -401,14 +404,14 @@ def step_impl(context, uDescription, uSupplier):
         invoice.invoice_date = today
         invoice.accounting_date = invoice.invoice_date
         invoice.description = "pay for what we received from the P. O. with description '%s'" % (uDescription,)
-        
+
         Product = proteus.Model.get('product.product')
         for row in context.table:
             uDescription = row['description']
             mUnitPrice = Decimal(row['unit_price'])
             # allow 0 (<= Decimal(0.00)) quantity - just skip them
             if mUnitPrice <= Decimal(0.00): continue
-            
+
             product = Product.find([('description', '=', uDescription)])[0]
             for invoice_line in invoice.lines:
                 if invoice_line.product == product:
@@ -425,7 +428,9 @@ def step_impl(context, uDescription, uSupplier):
 
 @step('T/ASAS/SASAS After paying for what we received assert the account credits and debits')
 def step_impl(context):
-    # NOT idempotent
+    """
+    NOT idempotent
+    """
     current_config = context.oProteusConfig
 
     Party = proteus.Model.get('party.party')
@@ -433,10 +438,10 @@ def step_impl(context):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     Account = proteus.Model.get('account.account')
     payable, expense = stepfuns.gGetFeaturesPayExp(context, company)
-    
+
     payable.reload()
     assert (payable.debit, payable.credit) == \
         (Decimal('0.00'), Decimal('44.00')), \
@@ -479,13 +484,13 @@ def step_impl(context, uDescription, uCustomer):
         sale = Sale()
         sale.party = customer
         sale.description = uDescription
-        
+
         # 'payment_term', 'invoice_method'
         for row in context.table:
             setattr(sale, row['name'],
                     string_to_python(row['name'], row['value'], Sale))
         sale.save()
-        
+
     assert Sale.find([('description', '=', uDescription),
 #?                      ('company', '=', company.id),
                       ('party.id', '=', customer.id)])
@@ -493,7 +498,7 @@ def step_impl(context, uDescription, uCustomer):
 @step('T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities')
 def step_impl(context, uDescription, uCustomer):
     """
-    Sell products on the S. O. with description "uDescription" 
+    Sell products on the S. O. with description "uDescription"
     to customer "uCustomer" with quantities
 	  | description     | quantity |
 	  | product_fixed   | 2.0      |
@@ -517,7 +522,7 @@ def step_impl(context, uDescription, uCustomer):
                        ('party.id', '=', customer.id)])
     if len(sale.lines) <= 0:
         SaleLine = proteus.Model.get('sale.line')
-        
+
         Product = proteus.Model.get('product.product')
         # purchase.moves[0].product.description == u'product_fixed'
         # purchase.moves[1].product.description == u'product_average' 5.0
@@ -532,7 +537,7 @@ def step_impl(context, uDescription, uCustomer):
             sale.lines.append(sale_line)
             sale_line.product = product
             sale_line.quantity = fQuantity
-            
+
         sale.save()
 
         Sale.quote([sale.id], current_config.context)
@@ -543,7 +548,9 @@ def step_impl(context, uDescription, uCustomer):
 
 @step('T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDescription, uCustomer):
-    # NOT idempotent
+    """
+    NOT idempotent
+    """
     current_config = context.oProteusConfig
 
     ShipmentOut = proteus.Model.get('stock.shipment.out')
@@ -566,7 +573,7 @@ def step_impl(context, uDescription, uCustomer):
     assert ShipmentOut.assign_try([shipment.id], current_config.context)
     # not idempotent
     assert shipment.state == u'assigned'
-        
+
     shipment.reload()
     # not idempotent
     ShipmentOut.pack([shipment.id], current_config.context)
@@ -583,17 +590,17 @@ def step_impl(context):
     T/ASAS/SASAS After shipping to customer assert the account credits and debits
     NOT idempotent.
     """
-    
+
     current_config = context.oProteusConfig
 
     Account = proteus.Model.get('account.account')
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     stock, = Account.find([
         ('kind', '=', 'stock'),
         ('company', '=', company.id),
@@ -633,7 +640,7 @@ def step_impl(context, uDescription, uCustomer):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     sale, = Sale.find([('invoice_method', '=', 'shipment'),
 #?                       ('company', '=', company.id),
                        ('party.id', '=', customer.id)])
@@ -643,7 +650,7 @@ def step_impl(context, uDescription, uCustomer):
     Invoice = proteus.Model.get('account.invoice')
     invoice, = sale.invoices
     # not idempotent
-    Invoice.post([invoice.id], current_config.context)    
+    Invoice.post([invoice.id], current_config.context)
     assert invoice.state == u'posted'
 
 @step('T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits')
@@ -652,13 +659,13 @@ def step_impl(context):
     current_config = context.oProteusConfig
 
     Account = proteus.Model.get('account.account')
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     oCompanyParty, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', oCompanyParty.id)])
-    
+
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
         ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
@@ -703,7 +710,7 @@ def step_impl(context):
 @step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities')
 def step_impl(context, uSupplier, uPaymentTerm):
     """
-    Create an invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm" 
+    Create an invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm"
     by an accountant with quantities
 	  | description     | quantity	| unit_price |
 	  | product_fixed   | 5.0      	| 4.00	     |
@@ -711,7 +718,7 @@ def step_impl(context, uSupplier, uPaymentTerm):
     Idempotent.
     """
     current_config = context.oProteusConfig
-    
+
     Purchase = proteus.Model.get('purchase.purchase')
 
     Party = proteus.Model.get('party.party')
@@ -727,7 +734,7 @@ def step_impl(context, uSupplier, uPaymentTerm):
 
         PaymentTerm = proteus.Model.get('account.invoice.payment_term')
         payment_term, = PaymentTerm.find([('name', '=', uPaymentTerm)])
-        
+
         purchase = Purchase()
         purchase.party = supplier
         purchase.payment_term = payment_term
@@ -741,7 +748,7 @@ def step_impl(context, uSupplier, uPaymentTerm):
             mUnitPrice = Decimal(row['unit_price'])
             # allow 0 (<0.0001) quantity - just skip them
             if fQuantity < 0.0001 or mUnitPrice <= Decimal(0.0): continue
-            
+
             product = Product.find([('description', '=', uDescription)])[0]
 
             purchase_line = PurchaseLine()
@@ -762,6 +769,6 @@ def step_impl(context, uSupplier, uPaymentTerm):
         for invoice in purchase.invoices:
             invoice.invoice_date = today
             invoice.save()
-            
+
         Invoice = proteus.Model.get('account.invoice')
         Invoice.validate_invoice([i.id for i in purchase.invoices], new_config.context)

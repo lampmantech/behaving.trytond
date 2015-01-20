@@ -12,6 +12,7 @@ from decimal import Decimal
 import pdb
 
 from behave import *
+import proteus
 from proteus import Model
 from .support import modules
 from .support.tools import *
@@ -44,7 +45,7 @@ def build_search_domain(ctx, obj, values):
         module, name = xml_id.split('.')
         search_domain = [('module', '=', module), ('name', '=', name)]
         #?
-        records = Model.get('ir.model.data').browse(search_domain)
+        records = proteus.Model.get('ir.model.data').browse(search_domain)
         if not records:
             return None
         res = records[0].read('model res_id')
@@ -58,10 +59,10 @@ def build_search_domain(ctx, obj, values):
         search_domain = [('id', '=', res_id)] + search_domain
     #?
     if hasattr(ctx, 'company_id') and \
-       'company_id' in Model.get(obj)._fields and \
+       'company_id' in proteus.Model.get(obj)._fields and \
        not [term for term in search_domain if term[0] == 'company_id']:
         # we add a company_id domain restriction if there is one definied in ctx,
-        # and there is a company_id column in the Model
+        # and there is a company_id column in the proteus.Model
         # and there was no explicit company_id restriction in the domain
         # (we need this to search shared records, such as res.currencies)
         search_domain.append(('company_id', '=', ctx.company_id))
@@ -69,7 +70,7 @@ def build_search_domain(ctx, obj, values):
 
 
 def parse_table_values(ctx, obj, table):
-    fields = Model.get(obj)._fields
+    fields = proteus.Model.get(obj)._fields
     if hasattr(table, 'headings'):
         # if we have a real table, ensure it has 2 columns
         # otherwise, we will just fail during iteration
@@ -96,14 +97,14 @@ def parse_table_values(ctx, obj, table):
                 values = parse_domain(value)
                 search_domain = build_search_domain(ctx, relation, values)
                 if search_domain:
-                    value = Model.get(relation).browse(search_domain).id
+                    value = proteus.Model.get(relation).browse(search_domain).id
                     assert value, "no value found for col %s domain %s" % (key, str(search_domain))
                 else:
                     value = []
                 if add_mode:
                     value = res.get(key, []) + value
             else:
-                method = getattr(Model.get(relation), value)
+                method = getattr(proteus.Model.get(relation), value)
                 value = method()
             if value and field_type == 'many2one':
                 assert_equal(len(value), 1, msg="more than item found for %s" % key)
@@ -140,7 +141,7 @@ def impl_having(ctx):
         values.update(table_values)
         if 'company_id' not in values and \
            hasattr(ctx, 'company_id') and \
-           'company_id' in Model.get(ctx.search_model_name)._fields.keys():
+           'company_id' in proteus.Model.get(ctx.search_model_name)._fields.keys():
             values['company_id'] = ctx.company_id
         ctx.found_item = create_new_obj(ctx, ctx.search_model_name, values)
 
@@ -158,13 +159,13 @@ def create_new_obj(ctx, model_name, values):
     values = values.copy()
     xmlid = values.pop('xmlid', None)
 
-    #record = Model.get(model_name).create(values)
-    record = Model.get(model_name).create([values],
+    #record = proteus.Model.get(model_name).create(values)
+    record = proteus.Model.get(model_name).create([values],
                                           config.context)
 
     if xmlid is not None:
         #?
-        ModelData = Model.get('ir.model.data')
+        ModelData = proteus.Model.get('ir.model.data')
         module, xmlid = xmlid.split('.', 1)
         _model_data = ModelData.create({'name': xmlid,
                                        'model': model_name,
@@ -178,7 +179,7 @@ def create_new_obj(ctx, model_name, values):
 
 @step(u'I find a "{model_name}" with {domain}')
 def impl(ctx, model_name, domain):
-    ModelKlass = Model.get(model_name)
+    ModelKlass = proteus.Model.get(model_name)
     ctx.search_model_name = model_name
     values = parse_domain(domain)
     domain = build_search_domain(ctx, model_name, values)
@@ -198,7 +199,7 @@ def impl(ctx, model_name, domain):
 def impl(ctx, model_name, domain):
     config = ctx.oProteusConfig
 
-    ModelKlass = Model.get(model_name)
+    ModelKlass = proteus.Model.get(model_name)
     ctx.search_model_name = model_name
     values = parse_domain(domain)
     # if the scenario specifies xmlid + other attributes in an "I
@@ -236,18 +237,18 @@ def get_company_property(ctx, pname, modelname, fieldname, company_oid=None):
     company = None
     if company_oid:
         c_domain = build_search_domain(ctx, 'res.company', {'xmlid': company_oid})
-        company = Model.get('res.company').get(c_domain)
+        company = proteus.Model.get('res.company').get(c_domain)
         assert company
-    field = Model.get('ir.model.fields').get([('name', '=', fieldname), ('model', '=', modelname)])
+    field = proteus.Model.get('ir.model.fields').get([('name', '=', fieldname), ('model', '=', modelname)])
     assert field is not None, 'no field %s in model %s' % (fieldname, modelname)
     domain = [('name', '=', pname),
               ('fields_id', '=', field.id),
               ('res_id', '=', False)]
     if company:
         domain.append(('company_id', '=', company.id))
-    ir_property = Model.get('ir.property').get(domain)
+    ir_property = proteus.Model.get('ir.property').get(domain)
     if ir_property is None:
-        ir_property = Model.get('ir.property').create({'fields_id': field.id,
+        ir_property = proteus.Model.get('ir.property').create({'fields_id': field.id,
                                                    'name': pname,
                                                    'res_id': False,
                                                    'type': 'many2one'})
@@ -268,16 +269,16 @@ def impl(ctx, modelname, column, value):
     assert hasattr(ctx, 'ir_property')
     ir_property = ctx.ir_property
     domain = [(column, '=', value)]
-    if ir_property.company_id and 'company_id' in Model.get(modelname)._fields:
+    if ir_property.company_id and 'company_id' in proteus.Model.get(modelname)._fields:
         domain.append(('company_id', '=', ir_property.company_id.id))
-    res = Model.get(modelname).get(domain)
+    res = proteus.Model.get(modelname).get(domain)
     assert res, "no value for %s value %s" % (column, value)
     ir_property.write({'value_reference': '%s,%s' % (modelname, res.id)})
 
 @given('I am configuring the company with ref "{company_oid}"')
 def impl(ctx, company_oid):
     c_domain = build_search_domain(ctx, 'res.company', {'xmlid': company_oid})
-    company = Model.get('res.company').get(c_domain)
+    company = proteus.Model.get('res.company').get(c_domain)
     ctx.company_id = company.id
 
 @step('I delete it')

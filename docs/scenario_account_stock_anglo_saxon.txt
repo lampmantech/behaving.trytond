@@ -48,10 +48,12 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    Idempotent.
 
 **T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
+   NOT idempotent
 
 **T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices**
 
 **T/ASAS/SASAS After paying for what we received assert the account credits and debits**
+   NOT idempotent
 
 **T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields**
    Idempotent.
@@ -65,6 +67,7 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    Idempotent.
 
 **T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+   NOT idempotent
 
 **T/ASAS/SASAS After shipping to customer assert the account credits and debits**
    T/ASAS/SASAS After shipping to customer assert the account credits and debits

@@ -20,11 +20,14 @@ today = datetime.date.today()
 # 'Stock Admin', 'stock_admin', 'Stock Administration'
 @step('Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"')
 def step_impl(context, uName, uLogin, uGroup):
+    """
+    Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"
+    """
     current_config = context.oProteusConfig
 
     User = proteus.Model.get('res.user')
     Company = proteus.Model.get('company.company')
-    
+
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
@@ -34,16 +37,19 @@ def step_impl(context, uName, uLogin, uGroup):
         stock_admin_user.name = uName
         stock_admin_user.login = uLogin
         stock_admin_user.main_company = company
-        
+
         Group = proteus.Model.get('res.group')
         stock_admin_group, = Group.find([('name', '=', uGroup)])
         stock_admin_user.groups.append(stock_admin_group)
         stock_admin_user.save()
     assert User.find([('name', '=', uName)])
-    
+
 # 'Provisioning Location', 'storage', 'WH'
 @step('Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"')
 def step_impl(context, uName, uType, uParent):
+    """
+    Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"
+    """
     current_config = context.oProteusConfig
 
 # these can take a lot of fields including address
@@ -60,5 +66,5 @@ def step_impl(context, uName, uType, uParent):
         provisioning_loc.type = uType
         provisioning_loc.parent = storage_loc
         provisioning_loc.save()
-        
+
     assert Location.find([('name', '=', uName)])

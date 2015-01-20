@@ -3,7 +3,7 @@
 # These are straight cut-and-paste from Trytond doctests.
 # It should be improved to be more like a Behave BDD.
 
-@works
+@works32
 Feature: Run the Trytond scenario doctests (e.g. from
    trytond_account-2.8.1/tests/scenario_account_reconciliation.rst )
 

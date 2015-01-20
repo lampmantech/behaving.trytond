@@ -11,7 +11,7 @@ From: ../features/steps/oerpscenario.py
    No-op - doesn't exist in Tryton.
 
 **I update the module list**
-   WIP
+   No-op in Tryton?
 
 **I install the required modules with dependencies**
    Install the required modules.

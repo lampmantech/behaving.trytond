@@ -53,7 +53,9 @@ def _get_context(level=2):
 
 
 def puts(*args):
-    """Print the arguments, after the step is finished."""
+    """
+    Print the arguments, after the step is finished.
+    """
     ctx = _get_context()
     if ctx:
         # Append to the list of messages

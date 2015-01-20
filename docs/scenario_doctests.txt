@@ -36,6 +36,8 @@ From: ../features/steps/scenario_doctests.py
    in case thats different to installing a module.
 
 **Create the company with default COMPANY_NAME and Currency code "{uCode}"**
+   Create the Company associated with the party named "party,company_name"
+   and using the currency "{uCode}"
 
 **Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"**
 
@@ -55,28 +57,51 @@ From: ../features/steps/scenario_doctests.py
 **Create a party named "{uName}"**
 
 **Create an instance of "{uKlass}" named "{uName}" with fields**
+
+**Create an instance of "{uKlass}" named "{uName}" with |name|value| fields**
    Create an instance of a Model, like Model.get('party.party')
    with the name attribute of 'uName' and the fields from the table.
    It expects a |name|value| table.
    Idempotent.
 
 **Set the slots of the instance named "{uName}" of model "{uKlass}" to the values**
-   Guven an instance of a Model, like Model.get('party.party')
-   with the name attribute of 'uName', set the attributes to the values.
-   It expects a |name|value| table.
+
+**Set the instance named "{uName}" of model "{uKlass}" with fields**
+   Guven an instance named "uName" of a Model, like Model.get('party.party')
+   set the attributes to the values.   It expects a |name|value| table.
    Idempotent.
 
 **Create parties**
+   Create a party named "Supplier"
+   Create a party named "Customer"
+
+**Create a party named "{uName}" with Payable and Receivable**
 
 **Create a party named "{uName}" with an account_payable attribute**
-   Create a party named 'uName' with an account_payable attribute.
+
+**Create a party named "{uName}" with payable and receivable properties**
+   Create a party named 'uName' with payable and receivable properties.
    The account_payable Account is taken from the
    'account.template,main_payable' entry of the feature data
    (use 'Set the feature data with values' to override)
    Idempotent.
 
+**Create a party named "{uName}" with payable and receivable properties with fields**
+
+**Create a party named "{uName}" with payable and receivable properties with |name|value| fields**
+   Create a party named 'uName' with payable and receivable properties.
+   The account_payable Account is taken from the
+   'account.template,main_payable' entry of the feature data
+   (use 'Set the feature data with values' to override)
+   Then use the following |name|value| fields to set fields on the party.
+   Idempotent.
+
 **Create a user named "{uName}" with the fields**
+
+**Create a user named "{uName}" with the |name|value| fields**
    Create a res.user named 'uName' and the given field values.
    It expects a |name|value| table.
    If one of the field names is 'group', it will add the User to that group.
+   It also loads the values into the feature data under the  keys
+   'user,'+uName+","+row['name']
    Idempotent.

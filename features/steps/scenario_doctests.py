@@ -25,6 +25,8 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
+from .support.stepfuns import gGetFeaturesPayRec, vAssertContentTable, \
+    vSetNamedInstanceFields, vCreatePartyWithPayRec
 from .support import modules
 from .support.tools import *
 
@@ -116,6 +118,10 @@ def step_impl(context, uName):
 
 @step('Create the company with default COMPANY_NAME and Currency code "{uCode}"')
 def step_impl(context, uCode):
+    """
+    Create the Company associated with the party named "party,company_name" 
+    and using the currency "{uCode}"
+    """
     uPartyName = sGetFeatureData(context, 'party,company_name')
     context.execute_steps(u'''
 Given Create the Company associated with the party named "%s" and using the currency "%s"
@@ -140,7 +146,7 @@ def step_impl(context, uParty, uCode):
         oParty.save()
     else:
         oParty = l[0]
-    
+
     if not Company.find([('party.id', '=', oParty.id)]):
         oCompanyConfig = proteus.Wizard('company.company.config')
         oCompanyConfig.execute('company')
@@ -199,7 +205,7 @@ def step_impl(context, uCode):
     You'll need to do this before you use any other currencies
     than the company's base currency.
     """
-    
+
     Currency = proteus.Model.get('currency.currency')
     currencies = Currency.find([('code', '=', uCode)])
     if not currencies:
@@ -246,23 +252,24 @@ def step_impl(context, uKlass, uName):
     with the name attribute of 'uName'.
     Idempotent.
     """
-    Party = proteus.Model.get(uKlass)
-    if not Party.find([('name', '=', uName)]):
-        instance = Party(name=uName)
+    oKlass = proteus.Model.get(uKlass)
+    if not oKlass.find([('name', '=', uName)]):
+        instance = oKlass(name=uName)
         instance.save()
 
 @step('Create a party named "{uName}"')
 def step_impl(context, uName):
-# broken in 3.2
 #    context.execute_steps(u'''
 #    Given Create a saved instance of "party.party" named "%s"
 #    ''' % (uName,))
     Party = proteus.Model.get('party.party')
     if not Party.find([('name', '=', uName)]):
-        instance = Party(name=uName)
-        instance.save()
+        oParty = Party(name=uName)
+        oParty.save()
+
 
 @step('Create an instance of "{uKlass}" named "{uName}" with fields')
+@step('Create an instance of "{uKlass}" named "{uName}" with |name|value| fields')
 def step_impl(context, uKlass, uName):
     """
     Create an instance of a Model, like Model.get('party.party')
@@ -270,53 +277,45 @@ def step_impl(context, uKlass, uName):
     It expects a |name|value| table.
     Idempotent.
     """
-
-    assert context.table, "Please supply a table of field name and values"
-    if hasattr(context.table, 'headings'):
-        # if we have a real table, ensure it has 2 columns
-        # otherwise, we will just fail during iteration
-        assert_equal(len(context.table.headings), 2)
+    vAssertContentTable(context, 2)
 
     Klass = proteus.Model.get(uKlass)
-    if not Klass.find([('name', '=', uName)]):
+    l = Klass.find([('name', '=', uName)])
+    if l:
+        oInstance = l[0]
+    else:
         oInstance = Klass(name=uName)
-        for row in context.table:
-            gValue = string_to_python(row['name'], row['value'], Klass)
-            setattr(oInstance, row['name'], gValue )
-        oInstance.save()
+    for row in context.table:
+        gValue = string_to_python(row['name'], row['value'], Klass)
+        setattr(oInstance, row['name'], gValue )
+    oInstance.save()
 
 @step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
+@step('Set the instance named "{uName}" of model "{uKlass}" with fields')
 def step_impl(context, uName, uKlass):
     """
-    Guven an instance of a Model, like Model.get('party.party')
-    with the name attribute of 'uName', set the attributes to the values.
-    It expects a |name|value| table.
+    Guven an instance named "uName" of a Model, like Model.get('party.party')
+    set the attributes to the values.   It expects a |name|value| table.
     Idempotent.
     """
-
-    assert context.table, "Please supply a table of field name and values"
-    if hasattr(context.table, 'headings'):
-        # if we have a real table, ensure it has 2 columns
-        # otherwise, we will just fail during iteration
-        assert_equal(len(context.table.headings), 2)
-
-    Klass = proteus.Model.get(uKlass)
-    oInstance, = Klass.find([('name', '=', uName)])
-    for row in context.table:
-        setattr(oInstance, row['name'],
-                string_to_python(row['name'], row['value'], Klass))
-    oInstance.save()
+    vSetNamedInstanceFields(context, uName, uKlass)
 
 @step('Create parties')
 def step_impl(context):
+    """
+    Create a party named "Supplier"
+    Create a party named "Customer"
+    """
     context.execute_steps(u'''Given Create a party named "Supplier"''')
     context.execute_steps(u'''Given Create a party named "Customer"''')
 
 # Customer
+@step('Create a party named "{uName}" with Payable and Receivable')
 @step('Create a party named "{uName}" with an account_payable attribute')
+@step('Create a party named "{uName}" with payable and receivable properties')
 def step_impl(context, uName):
     """
-    Create a party named 'uName' with an account_payable attribute.
+    Create a party named 'uName' with payable and receivable properties.
     The account_payable Account is taken from the
     'account.template,main_payable' entry of the feature data
     (use 'Set the feature data with values' to override)
@@ -324,39 +323,53 @@ def step_impl(context, uName):
     """
     Party = proteus.Model.get('party.party')
     Company = proteus.Model.get('company.company')
-    Account = proteus.Model.get('account.account')
 
-    if not Party.find([('name', '=', uName)]):
-        sCompanyName = sGetFeatureData(context, 'party,company_name')
-        party, = Party.find([('name', '=', sCompanyName)])
-        company, = Company.find([('party.id', '=', party.id)])
-        payables = Account.find([
-                ('kind', '=', 'payable'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
-                ('company', '=', company.id),
-                ])
-        assert payables
-        payable = payables[0]
-        customer = Party(name=uName)
-        customer.account_payable = payable
-        customer.save()
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    company, = Company.find([('party.id', '=', party.id)])
 
-    assert Party.find([('name', '=', uName)])
+    vCreatePartyWithPayRec(context, uName, company)
+
+@step('Create a party named "{uName}" with payable and receivable properties with fields')
+@step('Create a party named "{uName}" with payable and receivable properties with |name|value| fields')
+def step_impl(context, uName):
+    """
+    Create a party named 'uName' with payable and receivable properties.
+    The account_payable Account is taken from the
+    'account.template,main_payable' entry of the feature data
+    (use 'Set the feature data with values' to override)
+    Then use the following |name|value| fields to set fields on the party.
+    Idempotent.
+    """
+    Party = proteus.Model.get('party.party')
+    Company = proteus.Model.get('company.company')
+
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    company, = Company.find([('party.id', '=', party.id)])
+
+    vCreatePartyWithPayRec(context, uName, company)
+    vSetNamedInstanceFields(context, uName, 'party.party')
+
+
 
 # Accountant, Account
 @step('Create a user named "{uName}" with the fields')
+@step('Create a user named "{uName}" with the |name|value| fields')
 def step_impl(context, uName):
     """
     Create a res.user named 'uName' and the given field values.
     It expects a |name|value| table.
     If one of the field names is 'group', it will add the User to that group.
+    It also loads the values into the feature data under the  keys
+    'user,'+uName+","+row['name']
     Idempotent.
     """
     User = proteus.Model.get('res.user')
 
     if not User.find([('name', '=', uName)]):
         Group = proteus.Model.get('res.group')
-        
+
         user = User()
         user.name = uName
         # login password

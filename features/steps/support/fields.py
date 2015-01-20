@@ -10,10 +10,17 @@ from decimal import Decimal
 from proteus import config, Model, Wizard
 
 def sGetFeatureData(context, sKey):
-    assert sKey in context.dData['feature'], \
-           "ERROR: Use 'Set the feature data with values' to set the value of "+sKey
-    return context.dData['feature'][sKey]
+    if sKey in context.dData['feature']:
+        return context.dData['feature'][sKey]
+    
+    # fall through to oEnvironmentCfg
+    lKeys=sKey.split(',', 1)
+    assert len(lKeys) == 2
+    g = context.oEnvironmentCfg.get(*lKeys)
+    if g: return g
 
+    raise UserError("ERROR: Use 'Set the feature data with values' to set the value of "+sKey)
+    
 def vSetFeatureData(context, sKey, sValue):
     context.dData['feature'][sKey] = sValue
 

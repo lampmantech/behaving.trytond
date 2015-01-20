@@ -40,7 +40,7 @@ def step_impl(context, uDescription, uSupplier):
         purchase.party = supplier
         purchase.description = uDescription
         purchase.purchase_date = today
-        
+
         for row in context.table:
             setattr(purchase, row['name'],
                     string_to_python(row['name'], row['value'], Purchase))

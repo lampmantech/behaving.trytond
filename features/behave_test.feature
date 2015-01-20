@@ -4,7 +4,7 @@
 # If this test fails, behave is not properly installed.
 # See http://pypi.python.org/pypi/behave
 
-@works
+@works32
 Feature: showing off behave
 
    Scenario: run a simple test

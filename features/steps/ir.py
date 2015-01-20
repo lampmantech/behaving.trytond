@@ -8,8 +8,8 @@ Test the core trytond/ir/ functionalities.
 
 """
 from behave import *
-from proteus import *
-import random
+import proteus
+import random, os, sys
 
 from .support.stepfuns import oAttachLinkToResource
 
@@ -20,15 +20,16 @@ def step_impl(context):
     onto the admin user. Not working.
     FixMe:
     """
-    User = Model.get('res.user')
-    
+    User = proteus.Model.get('res.user')
+
     oUser = User.find([('login', '=', 'admin')])[0]
-    
+
     oResource = oUser
-    sLink = 'file:///mnt/n/data/TrytonOpenERP/3.2/trytond_scenari/features/steps/ir.py'
-    sDescription = 'Test Link to /n/data/TrytonOpenERP/3.2/trytond_scenari/features/steps/ir.py'
+    sFile = os.path.join(os.path.dirname(__file__), 'environment.cfg')
+    sLink = 'file://' + sFile
+    sDescription = 'Test Link to ' + sFile
     sName = 'Test Link %d' % int(random.random() * 1000000)
-    
+
     oAttachment = oAttachLinkToResource (sName, sDescription, sLink, oResource)
-    
+
     assert oAttachment.resource == oUser

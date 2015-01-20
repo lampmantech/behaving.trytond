@@ -16,8 +16,27 @@ From: ../features/steps/trytond_bank.py
    The uBic field can be empty; if not it has 11 characters.
 
 **Create a bank account with IBAN "{uIban}" at a bank associated to a party "{uParty}", with following optional number, owner or currency**
-   Create a bank account at a bank "{uBank}" with optional currency "{uCur},
+   Create a bank account with IBAN "{uBank}" associated with a party "{uParty}
    with a following table of | name | value |.
-   Each name is one of number or owner.
-   At least one number is required; if you want to add more,
-   just run this scenario again with the new number.
+   Each name is one of: iban number owner or currency.
+   Owner is a party name, and currency is a currency code.
+
+**Create a sequence on account.journal named "{uBankSequenceName}"**
+   Create a non-strict sequence on account.journal named "{uBankSequenceName}"
+   Idempotent.
+
+**Create a Bank Statement Journal named "{uName}" from the account.journal named "{uStatementAJName}" with currency "{uCur}"**
+   Create an account.bank.statement.journal named "{uName}"
+   from the account.journal named "{uStatementAJName}"
+   with currency "{uCur}"
+   Idempotent.
+
+**Create a cash account.journal named "{uName}" from the sequence named "{uBankSequenceName}" with following |name|value| credit_account, debit_account fields**
+   Create a cash account.journal named "{uName}"
+   with the sequence named "{uBankSequenceName}"
+   with a following |name|value| table
+   with credit_account, debit_account fields, e.g.
+   | name 	     	  | value	  |
+   | credit_account  | Main Cash	  |
+   | debit_account   | Main Cash	  |
+   Idempotent.

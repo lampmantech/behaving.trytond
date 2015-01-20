@@ -4,32 +4,33 @@
 
 """
 from behave import *
-from proteus import *
+import proteus
+from proteus import Model
 
 @step('proteus/test_model test_class_cache')
 def step_impl(context):
-    User1 = Model.get('res.user')
-    User2 = Model.get('res.user')
+    User1 = proteus.Model.get('res.user')
+    User2 = proteus.Model.get('res.user')
     assert id(User1) == id(User2)
 
-    Model.reset()
-    User3 = Model.get('res.user')
+    proteus.Model.reset()
+    User3 = proteus.Model.get('res.user')
     assert id(User1) != id(User3)
 
 @step('proteus/test_model test_class_method')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     assert len(User.search([('login', '=', 'admin')], {}))
 
 @step('proteus/test_model test_find')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     admin = User.find([('login', '=', 'admin')])[0]
     assert admin.login == 'admin'
 
 @step('proteus/test_model test_many2one')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     admin = User.find([('login', '=', 'admin')])[0]
     assert isinstance(admin.create_uid, User)
     try:
@@ -44,11 +45,11 @@ def step_impl(context):
 
 @step('proteus/test_model test_one2many')
 def step_impl(context):
-    Group = Model.get('res.group')
+    Group = proteus.Model.get('res.group')
     administration = Group.find([('name', '=', 'Administration')])[0]
     assert isinstance(administration.model_access, list)
     assert isinstance(administration.model_access[0],
-        Model.get('ir.model.access'))
+        proteus.Model.get('ir.model.access'))
     try:
         administration.model_access = []
         raise RuntimeError
@@ -57,11 +58,11 @@ def step_impl(context):
 
 @step('proteus/test_model test_many2many')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     admin = User.find([('login', '=', 'admin')])[0]
     assert isinstance(admin.groups, list)
     assert isinstance(admin.groups[0],
-        Model.get('res.group'))
+        proteus.Model.get('res.group'))
     try:
         admin.groups = []
         raise RuntimeError
@@ -72,8 +73,8 @@ def step_impl(context):
 
 @step('proteus/test_model test_reference')
 def step_impl(context):
-    Attachment = Model.get('ir.attachment')
-    User = Model.get('res.user')
+    Attachment = proteus.Model.get('ir.attachment')
+    User = proteus.Model.get('res.user')
     admin = User.find([('login', '=', 'admin')])[0]
     attachment = Attachment()
     attachment.name = 'Test'
@@ -83,7 +84,7 @@ def step_impl(context):
 
 @step('proteus/test_model test_id_counter')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     test1 = User()
     assert test1.id < 0
     test2 = User()
@@ -92,23 +93,23 @@ def step_impl(context):
 
 @step('proteus/test_model test_init')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     assert User(1).id == 1
     assert User(name='Foo').name == 'Foo'
 
-    Lang = Model.get('ir.lang')
+    Lang = proteus.Model.get('ir.lang')
     en_US = Lang.find([('code', '=', 'en_US')])[0]
     assert User(language=en_US).language == en_US
     assert User(language=en_US.id).language == en_US
 
-    Group = Model.get('res.group')
+    Group = proteus.Model.get('res.group')
     groups = Group.find()
     assert len(User(groups=groups).groups) == len(groups)
     assert len(User(groups=[x.id for x in groups]).groups) == len(groups)
 
 @step('proteus/test_model test_save')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     test = User()
     test.name = 'Test'
     test.login = 'test'
@@ -127,7 +128,7 @@ def step_impl(context):
     test = User(test.id)
     assert test.signature == 'Test signature'
 
-    Group = Model.get('res.group')
+    Group = proteus.Model.get('res.group')
     test2 = User(name='Test 2', login='test2',
             groups=[Group(name='Test 2')])
     test2.save()
@@ -137,13 +138,13 @@ def step_impl(context):
 
 @step('proteus/test_model test_save_many2one')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     test = User()
     test.name = 'Test save many2one'
     test.login = 'test_save_many2one'
     test.save()
 
-    Lang = Model.get('ir.lang')
+    Lang = proteus.Model.get('ir.lang')
     en_US = Lang.find([('code', '=', 'en_US')])[0]
     test.language = en_US
     test.save()
@@ -170,15 +171,15 @@ def step_impl(context):
 
     """
     return
-    Group = Model.get('res.group')
+    Group = proteus.Model.get('res.group')
     group = Group()
     group.name = 'Test save one2many'
     group.save()
 
-    ModelAccess = Model.get('ir.model.access')
-    Model_ = Model.get('ir.model')
+    ModelAccess = proteus.Model.get('ir.model.access')
+    Model_ = proteus.Model.get('ir.model')
     model_access = ModelAccess()
-    model_access.model = Model_.find([('model', '=', 'res.group')])[0]
+    model_access.model = proteus.Model_.find([('model', '=', 'res.group')])[0]
     model_access.perm_read = True
     model_access.perm_write = True
     model_access.perm_create = True
@@ -212,13 +213,13 @@ def step_impl(context):
 
 @step('proteus/test_model test_save_many2many')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     test = User()
     test.name = 'Test save many2many'
     test.login = 'test_save_many2many'
     test.save()
 
-    Group = Model.get('res.group')
+    Group = proteus.Model.get('res.group')
     group = Group()
     group.name = 'Test save many2many'
     group.save()
@@ -251,7 +252,7 @@ def step_impl(context):
 
 @step('proteus/test_model test_cmp')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     test = User()
     test.name = 'Test cmp'
     test.login = 'test_cmp'
@@ -268,8 +269,8 @@ def step_impl(context):
 
 @step('proteus/test_model test_default_set')
 def step_impl(context):
-    User = Model.get('res.user')
-    Group = Model.get('res.group')
+    User = proteus.Model.get('res.user')
+    Group = proteus.Model.get('res.group')
     group_ids = [x.id for x in Group.find()]
     test = User()
     test._default_set({
@@ -292,11 +293,11 @@ def step_impl(context):
             ],
         })
     assert test.name == 'Test'
-    assert [x.name for x in test.groups] == ['Group 1' == 'Group 2']
+    assert [x.name for x in test.groups] == ['Group 1', 'Group 2']
 
 @step('proteus/test_model test_delete')
 def step_impl(context):
-    User = Model.get('res.user')
+    User = proteus.Model.get('res.user')
     test = User()
     test.name = 'Test delete'
     test.login = 'test delete'
@@ -305,7 +306,7 @@ def step_impl(context):
 
 @step('proteus/test_model test_on_change')
 def step_impl(context):
-    Trigger = Model.get('ir.trigger')
+    Trigger = proteus.Model.get('ir.trigger')
 
     trigger = Trigger()
 
@@ -317,7 +318,7 @@ def step_impl(context):
 
 @step('proteus/test_model test_on_change_with')
 def step_impl(context):
-    Attachment = Model.get('ir.attachment')
+    Attachment = proteus.Model.get('ir.attachment')
 
     attachment = Attachment()
 
@@ -326,8 +327,8 @@ def step_impl(context):
 
 @step('proteus/test_model test_on_change_set')
 def step_impl(context):
-    User = Model.get('res.user')
-    Group = Model.get('res.group')
+    User = proteus.Model.get('res.user')
+    Group = proteus.Model.get('res.group')
 
     test = User()
     test._on_change_set('name', 'Test')

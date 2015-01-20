@@ -1,3 +1,23 @@
+commit a7f166f6ff08dcc56c60aaa4b95e04820fd3a30f
+Date:   Sun Jan 18 16:20:24 2015 +0200
+
+    Added a file for stock modules: trytond_stock.py
+    
+    Changed the coding style to use proteus.{Model,Wizard,config}
+    to remind us that these are RPC objects; besides, config is dangerous.
+
+commit c00ca8ca3f59be27cff3e9452ce8630997cb6c35
+Date:   Thu Jan 15 10:11:13 2015 +0200
+
+    Fixed more of the scenari, and tagged features with
+      @works32 - works in Tryton-3.2
+      @wip - work in progress, and probably broken
+    
+    Fixed the calendar scenari
+    
+    Will overhaul the way feature data is stored to make it more
+    persistent.
+
 commit 1389f419ef28755d64efa1024fc5edeb158855e3
 Date:   Wed Jan 14 07:46:35 2015 +0200
 

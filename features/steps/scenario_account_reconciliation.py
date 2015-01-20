@@ -75,7 +75,7 @@ def step_impl(context):
     move.save()
 
     reconcile1, = [l for l in move.lines if l.account == receivable]
-    # FixMe: Hack alert - we want to avoid using context.dData
+    # FixMe: bring up - we want to avoid using context.dData in the code
     context.dData['feature']['reconcile1'] = reconcile1
 
     move = Move()
@@ -94,7 +94,7 @@ def step_impl(context):
     move.save()
 
     reconcile2, = [l for l in move.lines if l.account == receivable]
-    # FixMe: Hack alert - we want to avoid using context.dData
+    # FixMe: bring up - we want to avoid using context.dData in the code
     context.dData['feature']['reconcile2'] = reconcile2
 
 @step('T/A/SAR Reconcile Lines without writeoff')
@@ -149,7 +149,7 @@ def step_impl(context):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     Account = proteus.Model.get('account.account')
     receivable, = Account.find([
         ('kind', '=', 'receivable'),
@@ -177,7 +177,7 @@ def step_impl(context):
     move.save()
 
     reconcile1, = [l for l in move.lines if l.account == receivable]
-    # FixMe: Hack alert - we want to avoid using context.dData
+    # FixMe: bring up - we want to avoid using context.dData in the code
     context.dData['feature']['reconcile1'] = reconcile1
 
     move = Move()
@@ -197,7 +197,7 @@ def step_impl(context):
     move.save()
 
     reconcile2, = [l for l in move.lines if l.account == receivable]
-    # FixMe: Hack alert - we want to avoid using context.dData
+    # FixMe: bring up - we want to avoid using context.dData in the code
     context.dData['feature']['reconcile2'] = reconcile2
 
 @step('T/A/SAR Reconcile Lines with writeoff')
@@ -232,7 +232,7 @@ def step_impl(context):
     reconcile_lines = proteus.Wizard('account.move.reconcile_lines',
             [reconcile1, reconcile2])
     assert reconcile_lines.form_state == 'writeoff'
-    
+
     Journal = proteus.Model.get('account.journal')
     # Fixme: how do we know the tryton version we are talking to?
     # I'll assume it's the same as the proteus for now
@@ -267,6 +267,6 @@ def step_impl(context):
             if l.credit == Decimal(3)]
     writeoff_line2, = [l for l in writeoff_line1.move.lines
             if l != writeoff_line1]
-    
+
     assert writeoff_line2.account == expense
     assert writeoff_line2.debit == Decimal(3)

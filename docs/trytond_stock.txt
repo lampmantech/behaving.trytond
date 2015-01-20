@@ -3,5 +3,7 @@ From: ../features/steps/trytond_stock.py
 
 
 **Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"**
+   Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"
 
 **Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"**
+   Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"

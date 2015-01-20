@@ -17,7 +17,7 @@ Updated for 3.0 and 3.2.
 	and Reload the default User preferences into the context
 	and Create this fiscal year
 	and Create a chart of accounts from template "Minimal Account Chart" with root "Minimal Account Chart"
-        and Create a party named "Customer" with an account_payable attribute
+        and Create a party named "Customer" with payable and receivable properties
        	and T/A/SAR Create Moves for direct reconciliation
        	and T/A/SAR Reconcile Lines without writeoff
        	and T/A/SAR Create Moves for writeoff reconciliation

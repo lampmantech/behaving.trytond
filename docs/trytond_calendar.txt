@@ -20,7 +20,8 @@ From: ../features/steps/trytond_calendar.py
    Create "{uKind}" annual events in the calendar named "{uCalName}"
    owned by the user named "{uUserName}". {uKind} can be empty, but
    if not, it is the category; things like Holiday or Birthday are
-   common.  You must firstly create the user with the step 'Create a
+   common.  Use 0000 as the year of any dates you want to recur.
+   You must firstly create the user with the step 'Create a
    user named'... in order to fields in the FeatureData, or use 'Set
    the feature data with values' ...
    It expects a |name|date| table.

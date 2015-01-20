@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 @works32
+@idempotent
 Feature: Create an Accountant user and give him a calendar
 
     Scenario: Create an Accountant user for various things

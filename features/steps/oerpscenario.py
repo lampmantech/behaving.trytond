@@ -20,11 +20,10 @@ def impl(ctx):
     """
     pass
 
-# FixMe: UNFINISHED
 @step('I update the module list')
 def impl(ctx):
     """
-    WIP
+    No-op in Tryton?
     """
     pass
 

@@ -14,27 +14,26 @@ from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
 
-
-today = datetime.date.today()
+TODAY = datetime.date.today()
 
 @step('Create this fiscal year')
 @step('Create this fiscal year without Invoicing')
 def step_impl(context):
+    """
+    Create the fiscal year "TODAY" without Invoicing
+    """
     context.execute_steps(u'''
     Given Create the fiscal year "TODAY" without Invoicing
     ''')
-    
+
 @step('Create the fiscal year "{uYear}" without Invoicing')
 def step_impl(context, uYear):
     """
-    Creates a fiscal year 'uYear' with a non-Strict move_sequence.
+    Creates a fiscal year 'uYear' with a non-Strict post_move_seq.
     Create the company first before creating fiscal years.
     """
-    
     config = context.oProteusConfig
 
-    if uYear == u'TODAY': uYear = str(today.year)
-        
     Company = proteus.Model.get('company.company')
     FiscalYear = proteus.Model.get('account.fiscalyear')
     Party = proteus.Model.get('party.party')
@@ -42,18 +41,21 @@ def step_impl(context, uYear):
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
+    if uYear.lower() == "now" or uYear.upper() == "TODAY":
+        uYear=str(TODAY.year)
     if not FiscalYear.find([('name', '=', uYear),
                             ('company', '=', company.id),]):
         oDate = datetime.date(int(uYear), 1, 1)
-        
-        fiscalyear = FiscalYear(name='%s' % (uYear,))
+
+        fiscalyear = FiscalYear(name=uYear)
         fiscalyear.start_date = oDate + relativedelta(month=1, day=1)
         fiscalyear.end_date = oDate + relativedelta(month=12, day=31)
         fiscalyear.company = company
 
         Sequence = proteus.Model.get('ir.sequence')
-        post_move_sequence = Sequence(name='%s' % (uYear,),
-            code='account.move', company=company)
+        post_move_sequence = Sequence(name='post_move_seq %s' % (uYear,),
+                                      code='account.move',
+                                      company=company)
         post_move_sequence.save()
         fiscalyear.post_move_sequence = post_move_sequence
         fiscalyear.save()
@@ -65,20 +67,23 @@ def step_impl(context, uYear):
 
 @step('Create this fiscal year with Invoicing')
 def step_impl(context):
+    """
+    Create the fiscal year "TODAY" with Invoicing
+    """
     context.execute_steps(u'''
     Given Create the fiscal year "TODAY" with Invoicing
     ''')
-    
+
 @step('Create the fiscal year "{uYear}" with Invoicing')
 def step_impl(context, uYear):
     """
     Creates a fiscal year 'uYear' with a non-Strict move_sequence
-    and a Strict invoice_sequence for Invoices.
+    and a Strict invoice_sequence for account.invoice.
     Create the company first.
     """
     config = context.oProteusConfig
 
-    if uYear == u'TODAY': uYear = str(today.year)
+    if uYear == u'TODAY': uYear = str(TODAY.year)
 
     FiscalYear = proteus.Model.get('account.fiscalyear')
     Party = proteus.Model.get('party.party')
@@ -118,11 +123,62 @@ def step_impl(context, uYear):
 
     assert FiscalYear.find([('name', '=', str(uYear))])
 
+@step('Create this fiscal year with a non-strict post_move_seq')
+def step_impl(context):
+    """
+    Create the fiscal year "TODAY.year" with a non-Strict post_move_seq
+    """
+    uYear=str(TODAY.year)
+    context.execute_steps(u'''
+    Given Create the fiscal year "%s" with a non-Strict post_move_seq
+    '''  % (uYear,))
+
+# same as
+# @step('Create the fiscal year "{uYear}" without Invoicing')
+@step('Create the fiscal year "{uYear}" with a non-Strict post_move_seq')
+def step_impl(context, uYear):
+    """
+    Creates a fiscal year 'uYear' with a non-Strict post_move_seq.
+    Create the company first.
+    """
+    current_config = context.oProteusConfig
+
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    FiscalYear = proteus.Model.get('account.fiscalyear')
+
+    if uYear.lower() == "now" or uYear.upper() == "TODAY":
+        uYear=str(TODAY.year)
+    oDate=datetime.date(int(uYear), TODAY.month, TODAY.day)
+    if not FiscalYear.find([('name', '=', uYear),
+                            ('company', '=', company.id),]):
+        fiscalyear = FiscalYear(name=uYear)
+        fiscalyear.start_date = oDate + relativedelta(month=1, day=1)
+        fiscalyear.end_date = oDate + relativedelta(month=12, day=31)
+        fiscalyear.company = company
+
+        Sequence = proteus.Model.get('ir.sequence')
+        post_move_seq = Sequence(name="post_move_seq %s" %(uYear,),
+                                 code='account.move',
+                                 company=company)
+        post_move_seq.save()
+
+        fiscalyear.post_move_sequence = post_move_seq
+        fiscalyear.save()
+
+        FiscalYear.create_period([fiscalyear.id], current_config.context)
+
+    assert FiscalYear.find([('name', '=', uYear)])
+
 # 'Minimal Account Chart', 'Minimal Account Chart'
 @step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
 def step_impl(context, uTem, uRoot):
     """
-    Create a chart of accounts from template "{uTem}" 
+    Create a chart of accounts from template "{uTem}"
     with root account "{uRoot}".
     Before you do this, with the step 'Set the feature data with values:'
     set the feature data as a |name|value| table for:
@@ -132,7 +188,7 @@ def step_impl(context, uTem, uRoot):
     * account.template,main_revenue
     * account.template,main_expense
     * account.template,main_cash
-    """    
+    """
     Account = proteus.Model.get('account.account')
 
     sCompanyName = sGetFeatureData(context, 'party,company_name')
@@ -154,6 +210,11 @@ def step_impl(context, uTem, uRoot):
         create_chart.form.account_template = account_template
         create_chart.form.company = company
         create_chart.execute('create_account')
+
+        iLen = len( Account.find([
+                ('company', '=', company.id),
+                ]))
+        assert iLen >= 6
 
         receivable = Account.find([
                 ('kind', '=', 'receivable'),
@@ -180,6 +241,8 @@ def step_impl(context, uTem, uRoot):
                 ('company', '=', company.id),
                 ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
                 ])
+        cash.bank_reconcile = True
+        cash.save()
         create_chart.form.account_receivable = receivable
         create_chart.form.account_payable = payable
         create_chart.execute('create_properties')
@@ -234,9 +297,9 @@ def step_impl(context, uTaxName):
 
     Tax = proteus.Model.get('account.tax')
     if not Tax.find([('name', '=', uTaxName)]):
-        
+
         TaxCode = proteus.Model.get('account.tax.code')
-        
+
         tax = Tax()
         tax.name = uTaxName
         tax.invoice_account = account_tax

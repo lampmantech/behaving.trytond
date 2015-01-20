@@ -17,17 +17,6 @@ from .support.stepfuns import oAttachLinkToResource
 
 today = datetime.date.today()
 
-dCalendarCache={}
-def oGetCached(uLocation, sType, oConfig):
-    global dCalendarCache
-    
-    Location = proteus.Model.get('calendar.'+sType)
-    
-    uKey= sType+','+uLocation
-    if uKey not in dCalendarCache:
-        iLocation, = Location.create([{'name': uLocation}], {})
-        dCalendarCache[uKey] = Location(iLocation)
-    return dCalendarCache[uKey]
 
 @step('Create a calendar named "{uCalName}" owned by the user "{uUserName}"')
 def step_impl(context, uCalName, uUserName):
@@ -45,7 +34,7 @@ def step_impl(context, uCalName, uUserName):
     uUserLogin=sGetFeatureData(context, 'user,'+uUserName+',login')
     uUserPassword=sGetFeatureData(context, 'user,'+uUserName+',password')
     oUser, = User.find([('name', '=', uUserName)])
-    
+
     oAdminUser, = User.find([('name', '=', 'Administrator')])
     # calendar names must be unique
     if not Calendar.find([('name', '=', uCalName)]):
@@ -55,7 +44,7 @@ def step_impl(context, uCalName, uUserName):
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
             oNewConfig = proteus.config.set_trytond(**dNewConfig)
-            
+
             dElt = dict(name=uCalName,
                         write_users=[('add', [oAdminUser.id])],
                         read_users=[('add', [oAdminUser.id])],
@@ -65,8 +54,8 @@ def step_impl(context, uCalName, uUserName):
             oCalendar._config = oNewConfig
             oCalendar.save()
         finally:
-            proteus.config.set_trytond(user=context.oConfig.get('trytond', 'user'),
-                                       password=context.oConfig.get('trytond', 'password'),
+            proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+                                       password=context.oEnvironmentCfg.get('trytond', 'password'),
                                        config_file=oCurrentConfig.config_file,
                                        database_name=oCurrentConfig.database_name)
 
@@ -74,14 +63,14 @@ def step_impl(context, uCalName, uUserName):
 
 @step('I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
 def step_impl(context, uKind, uCalName, uUserName):
-    """WIP.  
+    """WIP.
     Create "{uKind}" events in the calendar named "{uCalName}"
     owned by the user named "{uUserName}". {uKind} can be empty, but
     if not, it is the category.
     You must firstly create the user with the step 'Create a
     user named'... in order to fields in the FeatureData, or use 'Set
     the feature data with values' ...
-    It expects a |date|name|location|description| table.  
+    It expects a |date|name|location|description| table.
     Idempotent.
 
     """
@@ -93,7 +82,7 @@ def step_impl(context, uKind, uCalName, uUserName):
     Category = proteus.Model.get('calendar.category')
 
     # NewCalendar=proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('meec32', 'accountant', 'postgresql', config_file='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'))
-    
+
     if True:
         uUserLogin=sGetFeatureData(context, 'user,'+uUserName+',login')
         uUserPassword=sGetFeatureData(context, 'user,'+uUserName+',password')
@@ -103,7 +92,7 @@ def step_impl(context, uKind, uCalName, uUserName):
         User = proteus.Model.get('res.user')
         oUser, = User.find([('name', '=', uUserName)])
         uUserEmail = oUser.email
-    
+
     # I think Calendar names are unique across all users
     oCalendar, = Calendar.find([('name', '=', uCalName)])
 
@@ -185,7 +174,7 @@ def step_impl(context, uKind, uCalName, uUserName):
             assert Event.find([
                     ('calendar.owner.email', '=', uUserEmail),
                     ('classification', '=', 'public'),
-                    ('status', '=', 'confirmed'),                    
+                    ('status', '=', 'confirmed'),
                     ('description', '=', uDescription),
 #                    ('location', '!=', None),
                 ])
@@ -193,8 +182,8 @@ def step_impl(context, uKind, uCalName, uUserName):
     # accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
 
     finally:
-        proteus.config.set_trytond(user=context.oConfig.get('trytond', 'user'),
-                                   password=context.oConfig.get('trytond', 'password'),
+        proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+                                   password=context.oEnvironmentCfg.get('trytond', 'password'),
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
 
@@ -206,10 +195,11 @@ def step_impl(context, uKind, uCalName, uUserName):
     Create "{uKind}" annual events in the calendar named "{uCalName}"
     owned by the user named "{uUserName}". {uKind} can be empty, but
     if not, it is the category; things like Holiday or Birthday are
-    common.  You must firstly create the user with the step 'Create a
+    common.  Use 0000 as the year of any dates you want to recur.
+    You must firstly create the user with the step 'Create a
     user named'... in order to fields in the FeatureData, or use 'Set
     the feature data with values' ...
-    It expects a |name|date| table.  
+    It expects a |name|date| table.
     Idempotent.
     """
     oCurrentConfig = context.oProteusConfig
@@ -219,7 +209,7 @@ def step_impl(context, uKind, uCalName, uUserName):
     Category = proteus.Model.get('calendar.category')
     RRule = proteus.Model.get('calendar.event.rrule') # create write
 #?    oAnnualRule = RRule.create([{'freq': 'yearly'}], {})
-    
+
     if True:
         uUserLogin=sGetFeatureData(context, 'user,'+uUserName+',login')
         uUserPassword=sGetFeatureData(context, 'user,'+uUserName+',password')
@@ -257,11 +247,12 @@ def step_impl(context, uKind, uCalName, uUserName):
             if not Event.find([
                     ('calendar.owner.email', '=', uUserEmail),
                     ('classification', '=', 'public'),
-                    ('status', '=', 'confirmed'),                    
+                    ('status', '=', 'confirmed'),
                     ('summary', '=', uSummary),
             ]):
                 lDate = map(int,uDate.split('-'))
-                lDate[0] = iTHIS_YEAR
+                if not lDate[0]:
+                    lDate[0] = iTHIS_YEAR
                 oDate = datetime.datetime(*lDate)
                 # I think Calendar names are unique across all users
                 oCalendar, = Calendar.find([('name', '=', uCalName)])
@@ -277,8 +268,8 @@ def step_impl(context, uKind, uCalName, uUserName):
                 iEvent = Event.create([dElt], dNewConfig)
                 oEvent = Event(iEvent)
                 # oEvent._config = oNewConfig
-                oEvent.save()                    
-                
+                oEvent.save()
+
             assert Event.find([
                 ('calendar.owner.email', '=', uUserEmail),
                 ('summary', '=', uSummary),
@@ -287,8 +278,8 @@ def step_impl(context, uKind, uCalName, uUserName):
     # accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
 
     finally:
-        proteus.config.set_trytond(user=context.oConfig.get('trytond', 'user'),
-                                   password=context.oConfig.get('trytond', 'password'),
+        proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+                                   password=context.oEnvironmentCfg.get('trytond', 'password'),
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
-    
+

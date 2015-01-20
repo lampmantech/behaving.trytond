@@ -41,6 +41,20 @@ def gGetFeaturesPayExp(context, company):
         ])
     return payable, expense
 
+def gGetFeaturesPayRec(context, company):
+    Account = proteus.Model.get('account.account')
+    payable, = Account.find([
+        ('kind', '=', 'payable'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
+        ('company', '=', company.id),
+        ])
+    receivable, = Account.find([
+        ('kind', '=', 'receivable'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
+        ('company', '=', company.id),
+        ])
+    return payable, receivable
+
 def gGetFeaturesStockAccs(context, company):
         """
         These are in by trytond_account_stock_continental/account.xml
@@ -88,3 +102,38 @@ def oAttachLinkToResource (sName, sDescription, sLink, oResource):
     oAttachment.save()
     
     return oAttachment
+
+def vAssertContentTable(context, iMin=2):
+    assert context.table, "Please supply a table of field name and values"
+    if hasattr(context.table, 'headings'):
+        # if we have a real table, ensure it has 2 columns
+        # otherwise, we will just fail during iteration
+        assert len(context.table.headings) >= iMin
+
+def vCreatePartyWithPayRec(context, uName, company):
+    Party = proteus.Model.get('party.party')
+    Company = proteus.Model.get('company.company')
+
+    if not Party.find([('name', '=', uName)]):
+        payable, receivable = gGetFeaturesPayRec(context, company)
+        customer = Party(name=uName)
+        customer.account_payable = payable
+        customer.account_receivable = receivable
+        customer.save()
+
+    assert Party.find([('name', '=', uName)])
+        
+def vSetNamedInstanceFields(context, uName, uKlass):
+    assert context.table, "Please supply a table of |name|value| fields"
+    if hasattr(context.table, 'headings'):
+        # if we have a real table, ensure it has 2 columns
+        # otherwise, we will just fail during iteration
+        assert len(context.table.headings) >= 2
+
+    Klass = proteus.Model.get(uKlass)
+    oInstance, = Klass.find([('name', '=', uName)])
+    for row in context.table:
+        setattr(oInstance, row['name'],
+                string_to_python(row['name'], row['value'], Klass))
+    oInstance.save()
+        

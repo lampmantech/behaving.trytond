@@ -13,62 +13,62 @@ from .steps.support import tools
 
 ETC_TRYTOND_CONF='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'
 
-def vCreateConfigFile(oConfig, sFile):
+def vCreateConfigFile(oEnvironmentCfg, sFile):
 
-    oConfig.add_section('trytond')
-    oConfig.set('trytond', 'password', 'foobar')
-    oConfig.set('trytond', 'user', 'admin')
-    oConfig.set('trytond', 'database_name', 'test32')
-    oConfig.set('trytond', 'database_type', 'postgresql')
-    oConfig.set('trytond', 'config_file', ETC_TRYTOND_CONF)
+    oEnvironmentCfg.add_section('trytond')
+    oEnvironmentCfg.set('trytond', 'password', 'foobar')
+    oEnvironmentCfg.set('trytond', 'user', 'admin')
+    oEnvironmentCfg.set('trytond', 'database_name', 'test32')
+    oEnvironmentCfg.set('trytond', 'database_type', 'postgresql')
+    oEnvironmentCfg.set('trytond', 'config_file', ETC_TRYTOND_CONF)
 
-    oConfig.add_section('scenari')
-    oConfig.set('scenari', 'verbosity', '0')
-    oConfig.set('scenari', 'tracer', '')
+    oEnvironmentCfg.add_section('scenari')
+    oEnvironmentCfg.set('scenari', 'verbosity', '0')
+    oEnvironmentCfg.set('scenari', 'tracer', '')
 
     # Writing our configuration file to 'example.cfg'
     with open(sFile, 'wb') as oFd:
-        oConfig.write(oFd)
+        oEnvironmentCfg.write(oFd)
 
 def oReadConfigFile():
-    oConfig = ConfigParser.RawConfigParser()
+    oEnvironmentCfg = ConfigParser.RawConfigParser()
 
     sFile = os.path.splitext(__file__)[0]+'.cfg'
     if os.path.exists(sFile):
-        oConfig.read(sFile)
+        oEnvironmentCfg.read(sFile)
     else:
-        vCreateConfigFile(oConfig, sFile)
-    return oConfig
+        vCreateConfigFile(oEnvironmentCfg, sFile)
+    return oEnvironmentCfg
 
 
 def before_all(context):
     """These run before and after the whole shooting match.
     """
-    oConfig = oReadConfigFile()
+    oEnvironmentCfg = oReadConfigFile()
 
-    sUser=oConfig.get('trytond', 'user')
+    sUser=oEnvironmentCfg.get('trytond', 'user')
     assert sUser
-    sDatabaseName=oConfig.get('trytond', 'database_name')
+    sDatabaseName=oEnvironmentCfg.get('trytond', 'database_name')
     assert sDatabaseName
-    sPassword = oConfig.get('trytond', 'password')
+    sPassword = oEnvironmentCfg.get('trytond', 'password')
     assert sPassword
-    sDatabaseType=oConfig.get('trytond', 'database_type')
+    sDatabaseType=oEnvironmentCfg.get('trytond', 'database_type')
 #?    assert sDatabaseType in ['postgresql'], "Unsupported database type: " + sDatabaseType
-    sTrytonConfigFile=oConfig.get('trytond', 'config_file')
+    sTrytonConfigFile=oEnvironmentCfg.get('trytond', 'config_file')
     assert os.path.exists(sTrytonConfigFile), \
         "Required file not found: " + sTrytonConfigFile
 
-    context.oConfig = oConfig
+    context.oEnvironmentCfg = oEnvironmentCfg
     context.oProteusConfig = proteus.config.set_trytond(
         database_name=sDatabaseName,
-        user=context.oConfig.get('trytond', 'user'),
+        user=context.oEnvironmentCfg.get('trytond', 'user'),
         database_type=sDatabaseType,
-        password=context.oConfig.get('trytond', 'password'),
+        password=context.oEnvironmentCfg.get('trytond', 'password'),
         language='en_US',
         config_file=sTrytonConfigFile)
 
     # one of ['pdb', 'pydbgr']
-    sTracer = oConfig.get('scenari', 'tracer')
+    sTracer = oEnvironmentCfg.get('scenari', 'tracer')
     if sTracer:
         try:
             import pydbgr
@@ -80,11 +80,6 @@ def before_all(context):
     # use this dictionary as a last resort to pass data around
     if not hasattr(context, 'dData'):
         context.dData = dict()
-    context.dData['trytond,user'] = sUser
-    context.dData['trytond,password'] = sPassword
-    context.dData['trytond,database_name'] = sDatabaseName
-    context.dData['trytond,database_type'] = sDatabaseType
-    context.dData['trytond,config_file'] = sTrytonConfigFile
 
 def after_all(context):
     """These run after the whole shooting match.
@@ -134,7 +129,7 @@ def after_step(context, laststep):
     """These run after every step.
     N.B.: only called after a failed step if behave --stop
     """
-    sTracer = context.oConfig.get('scenari', 'tracer')
+    sTracer = context.oEnvironmentCfg.get('scenari', 'tracer')
     ctx = context # From OpenERPScenario
     if len(ctx.config.outputs):
         # FixMe: figure these out and formatters

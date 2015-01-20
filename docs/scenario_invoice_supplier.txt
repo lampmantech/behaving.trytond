@@ -11,6 +11,8 @@ From: ../features/steps/scenario_invoice_supplier.py
 **TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
 
 **TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
+   Create a product with description "{uDescription}" from template "{uTemplateName}"
+   Idempotent.
 
 **TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
    Create an invoice with description "{uDescription}" to supplier
@@ -23,3 +25,6 @@ From: ../features/steps/scenario_invoice_supplier.py
 **TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
 
 **TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
+   Create a credit note for the invoice with description "{uDescription}"
+   and assert the amounts for the credit note equal the invoice amounts.
+   Not idempotent.
