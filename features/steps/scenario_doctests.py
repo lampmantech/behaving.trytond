@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 This is a straight cut-and-paste from
@@ -25,7 +25,8 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
-from .support.stepfuns import gGetFeaturesPayRec, vAssertContentTable, \
+from .support.stepfuns import vAssertContentTable
+from .support.stepfuns import gGetFeaturesPayRec, \
     vSetNamedInstanceFields, vCreatePartyWithPayRec
 from .support import modules
 from .support.tools import *
@@ -119,7 +120,7 @@ def step_impl(context, uName):
 @step('Create the company with default COMPANY_NAME and Currency code "{uCode}"')
 def step_impl(context, uCode):
     """
-    Create the Company associated with the party named "party,company_name" 
+    Create the Company associated with the party named "party,company_name"
     and using the currency "{uCode}"
     """
     uPartyName = sGetFeatureData(context, 'party,company_name')

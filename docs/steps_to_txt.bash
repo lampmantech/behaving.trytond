@@ -41,7 +41,8 @@ find ../features/steps -type f -name \*.py | \
 	outfile=`echo $file | sed -e 's@../features/steps/@@' -e 's@/@-@g' -e 's@py$@txt@'`
 	steps_to_txt "$file" >> ${outfile}
 	[ -s ${outfile} ] || { rm -f ${outfile} ; continue ; }
-	echo -e "From: $file\n\n" > foo
+	echo -e "# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-\n" > foo
+	echo -e "From: $file\n\n" >> foo
 	cat ${outfile} >> foo
 	mv foo ${outfile}
       done

@@ -9,9 +9,7 @@ Updated for 3.0 and 3.2.
 
    Scenario: Run the scenario_account_reconciliation
 
-      Given Create database
-        and Ensure that the "account" module is loaded
-	and the "account" module is in the list of loaded modules
+      Given Ensure that the "account" module is loaded
 	and Set the default feature data
 	and Create the Company with default COMPANY_NAME and Currency code "EUR"
 	and Reload the default User preferences into the context

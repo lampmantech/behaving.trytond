@@ -1,3 +1,5 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
 From: ../features/steps/scenario_invoice_supplier.py
 
 
@@ -8,19 +10,25 @@ From: ../features/steps/scenario_invoice_supplier.py
    trytond_account_invoice-3.0.0/tests/scenario_invoice_supplier.rst
    It should be improved to be more like a Behave BDD.
 
-**TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields**
+**Create an "{uKind}" invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account| fields**
 
-**TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"**
-   Create a product with description "{uDescription}" from template "{uTemplateName}"
-   Idempotent.
+**Create an "{uKind}" invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account| fields**
 
-**TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields**
+**Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account| fields**
    Create an invoice with description "{uDescription}" to supplier
-   "{uSupplier}" with fields | description | quantity | unit_price |
-   # Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price |
-   | Services Bought   | 5	   | 		|
-   | Test     	      | 1	   | 10.00	|
+   "{uSupplier}" with following |description|quantity|unit_price|account| fields
+   Note that this uses the heading description rather than name
+   | description       | quantity   | unit_price | account      |
+   | Services Bought   | 5	   | 		|              |
+   | Test     	      | 1	   | 10.00	| Main Expense |
+
+**Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account| fields**
+   Create an invoice with description "{uDescription}" to customer
+   "{uCustomer}" with following |description|quantity|unit_price|account| fields
+   Note that this uses the heading description rather than name
+   | description       | quantity   | unit_price | account      |
+   | Services Bought   | 5	   | 		|              |
+   | Test     	      | 1	   | 10.00	| Main Revenue |
 
 **TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
 

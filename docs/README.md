@@ -1,4 +1,4 @@
-# -*- encoding: utf-8  coding: utf8-unix -*-
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
 
 A quick hack to pull the docstrings out of each step
 as a starting point for documentation.

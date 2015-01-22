@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 These are the elementary tests from OpenERPScenario:
  <http:///launchpad.net/~camptocamp/oerpscenario/>
@@ -9,7 +9,9 @@ run in trytond_scenari on Tryton. YMMV!
 UNFINISHED
 """
 
+import proteus
 from behave import *
+from .support.stepfuns import vAssertContentTable
 
 # module_config.py
 # FixMe: UNFINISHED

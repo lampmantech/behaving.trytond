@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 WIP - unfinished
 
@@ -15,6 +15,7 @@ from behave import *
 import proteus
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
+from .support.stepfuns import vAssertContentTable
 
 @step('Create a bank associated to a party "{uParty}" with optional BIC "{uBic}"')
 def step_impl(context, uParty, uBic):
@@ -46,7 +47,7 @@ def step_impl(context, uIban, uParty):
     Owner is a party name, and currency is a currency code.
     """
     config = context.oProteusConfig
-    
+
     BankAccountNumber = proteus.Model.get('bank.account.number')
     BankAccount = proteus.Model.get('bank.account')
     Bank = proteus.Model.get('bank')
@@ -86,7 +87,7 @@ def step_impl(context, uIban, uParty):
                     'type': 'other',
                     'number': row['value'],
                 })
-                                
+
         dBankAccount['numbers'] = [('create', lNumbers)]
         iBankAccount, = BankAccount.create([dBankAccount], config.context)
         oBankAccount = BankAccount(iBankAccount)
@@ -115,7 +116,7 @@ def step_impl(context, uBankSequenceName):
                             code='account.journal',
                             company=company)
         oSequence.save()
-    
+
     assert Sequence.find([('name', '=', uBankSequenceName,)])
 
     # is this needed?
@@ -132,8 +133,8 @@ def step_impl(context, uBankSequenceName):
 @step('Create a Bank Statement Journal named "{uName}" from the account.journal named "{uStatementAJName}" with currency "{uCur}"')
 def step_impl(context, uName, uStatementAJName, uCur):
     """
-    Create an account.bank.statement.journal named "{uName}" 
-    from the account.journal named "{uStatementAJName}" 
+    Create an account.bank.statement.journal named "{uName}"
+    from the account.journal named "{uStatementAJName}"
     with currency "{uCur}"
     Idempotent.
     """
@@ -158,18 +159,19 @@ def step_impl(context, uName, uStatementAJName, uCur):
 @step('Create a cash account.journal named "{uName}" from the sequence named "{uBankSequenceName}" with following |name|value| credit_account, debit_account fields')
 def step_impl(context, uName, uBankSequenceName):
     """
-    Create a cash account.journal named "{uName}" 
-    with the sequence named "{uBankSequenceName}" 
+    Create a cash account.journal named "{uName}"
+    with the sequence named "{uBankSequenceName}"
     with a following |name|value| table
     with credit_account, debit_account fields, e.g.
 	| name 	     	  | value	  |
 	| credit_account  | Main Cash	  |
 	| debit_account   | Main Cash	  |
+    The accounts must be of domain: ('kind', '=', 'other')
     Idempotent.
     """
     Account = proteus.Model.get('account.account')
     AccountJournal = proteus.Model.get('account.journal')
-    
+
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     Party = proteus.Model.get('party.party')
     party, = Party.find([('name', '=', sCompanyName)])
@@ -179,7 +181,7 @@ def step_impl(context, uName, uBankSequenceName):
     Sequence = proteus.Model.get('ir.sequence')
     oSequence, = Sequence.find([('name', '=', uBankSequenceName,)])
 
-    
+
     if not AccountJournal.find([('name', '=', uName),
                                 ('type', '=', 'cash')]):
             oDefaultCash, = Account.find([
@@ -188,7 +190,7 @@ def step_impl(context, uName, uBankSequenceName):
                 ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
             ])
             credit_account = debit_account = oDefaultCash
-            
+
             for row in context.table:
                 if row['name'] == 'credit_account':
                     credit_account, = Account.find([
@@ -207,6 +209,87 @@ def step_impl(context, uName, uBankSequenceName):
                                              debit_account=credit_account,
                                              sequence=oSequence)
             oAccountJournal.save()
-            
+
     assert AccountJournal.find([('name', '=', uName),
                                 ('type', '=', 'cash')])
+
+@step('Create a financial account under "{sTemplate}" for the bank account with IBAN "{uIban}"')
+def step_impl(context, uTemplate, uIban):
+    """
+    Create a new account into the chart of accounts for a bank account.
+    It takes "{uTemplate}" as an argument which is the name an existing account
+    in the chart where the new account will be created: if uTemplate is of 
+    kind view, the new chart will have it as its parent; if not,
+    the new chart will be the next available sibling, with code += 1.
+    The step assumes that the sTemplate account has an integer code, <= 9999;
+    it just adds 1 until it finds the next available account, so you can
+    have many calls to this step with different IBANS. 
+    The name of the new account is the IBAN.
+
+    The account_bank_statement module has to be loaded
+    before ANY accounts are created or this will error.
+    """
+    # sFormat = sGetFeatureData('account.template', 'bank_account_format')
+    o = oCreateNewChartAccountforBank(context, uIban, uTemplate)
+
+def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
+    """
+    Create a new account into the chart of accounts for a bank account.
+    The account_bank_statement module has to be loaded
+    before ANY accounts are created or this will error.
+
+    """
+    config = context.oProteusConfig
+    # FixMe: do accounts have currency?
+    Account = proteus.Model.get('account.account')
+
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    Party = proteus.Model.get('party.party')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    sNumber = sNumber.replace(' ','')
+    if sFormat:
+        sNewName = sFormat % (sNumber,)
+    else:
+        sNewName = sNumber
+    # sTemplate = sGetFeatureData('account.template,bank_account_template')
+    oTemplate, = Account.find([('name', '=', sTemplate),
+                               ('company', '=', company.id),])
+    if not Account.find([('name', '=', sNewName),
+                         ('company', '=', company.id),]):
+        iCode=int(oTemplate.code)
+        while iCode < 9999 and Account.find([('code', '=', str(iCode)),
+                                             ('company', '=', company.id),]):
+            iCode += 1
+        # bank_reconcile is added by trytond-account_bank_statement/account.py
+        # account_bank_statement module has to be loaded
+        # before accounts are created or this will error.
+        iNewAccount, = Account.create([dict(name=sNewName,
+                                            bank_reconcile=True,
+                                            code=str(iCode))], config.context)
+        oNewAccount= Account(iNewAccount)
+        oParent = oTemplate.parent
+        # FixMe: any others?
+        for row in ['type', 'kind']:
+            gValue = getattr(oTemplate, row)
+            if not gValue: continue
+            # gValue = string_to_python(row, value, Account)
+            if row == 'kind' and gValue == 'view':
+                gValue = 'other'
+                oParent = oTemplate
+            setattr(oNewAccount, row, gValue)
+
+        oNewAccount.parent = oParent
+        #? is this right? are bank accounts always reconcile = True
+        oNewAccount.reconcile = True
+        oNewAccount.bank_reconcile = True
+        oNewAccount.save()
+
+    l = Account.find([('name', '=', sNewName),
+                      ('company', '=', company.id),])
+    assert l
+    return l[0]
+
+

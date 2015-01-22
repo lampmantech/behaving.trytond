@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 
 """
 Convenience functions.
@@ -48,7 +48,7 @@ def string_to_python (sField, uValue, Party=None):
     if sType == 'integer':
         return int(uValue)
     if sType == 'float':
-        return int(uValue)
+        return float(uValue)
     if sType == 'selection':
         # FixMe: are selections always strings or can they be otherwise?
         # sSelection = dField['selection']

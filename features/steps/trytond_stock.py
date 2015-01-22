@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 
@@ -14,8 +14,7 @@ from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
 
-
-today = datetime.date.today()
+TODAY = datetime.date.today()
 
 # 'Stock Admin', 'stock_admin', 'Stock Administration'
 @step('Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"')

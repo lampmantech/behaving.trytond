@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 This is the elementary test of Trytons basic modules.
 
@@ -7,9 +7,9 @@ If this test fails, trytond is not properly installed.
 
 from behave import *
 import proteus
-from proteus import Model
 from .support import modules
 from .support import tools
+from .support.stepfuns import vAssertContentTable
 
 @given('we have proteus installed')
 def step_impl(context):
@@ -38,7 +38,7 @@ def step_impl(context):
 @step('Ensure that the WebDAV modules are loaded')
 def step_impl(context):
     """
-    Ensure that the WebDAV modules are loaded so that we 
+    Ensure that the WebDAV modules are loaded so that we
     can access the calendars and contacts via WebDAV
     """
     context.execute_steps(u'''

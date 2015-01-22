@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 
@@ -13,6 +13,8 @@ from decimal import Decimal
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
+from .support.stepfuns import gGetFeaturesRevExp
+from .support.stepfuns import vAssertContentTable
 
 TODAY = datetime.date.today()
 
@@ -268,6 +270,7 @@ def step_impl(context, uTermName, uNum):
         payment_term.lines.append(payment_term_line)
         payment_term.save()
 
+    assert PaymentTerm.find([('name', '=', uTermName)])
 # 10% Sales Tax
 @step('Create a tax named "{uTaxName}" with fields')
 def step_impl(context, uTaxName):

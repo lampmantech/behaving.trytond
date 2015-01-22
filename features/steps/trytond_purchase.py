@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 
@@ -12,6 +12,7 @@ from decimal import Decimal
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
+from .support.stepfuns import vAssertContentTable
 
 today = datetime.date.today()
 

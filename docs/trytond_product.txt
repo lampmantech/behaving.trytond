@@ -1,0 +1,50 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/trytond_product.py
+
+
+
+**Create a ProductCategory named "{uName}"**
+   Create a saved instance of "product.category" named "{uName}"
+   Idempotent.
+
+**Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields**
+   from a ProductCategory named "{uCatName}" with fields
+   | name              | value |
+   | type	      | goods |
+   | cost_price_method | fifo  |
+   | purchasable       | True  |
+   | salable 	      | True  |
+   | list_price 	      | 10    |
+   | cost_price 	      | 5     |
+   | delivery_time     | 0     |
+   | default_uom	      | Unit  |
+   | account_expense   | Main Expense |
+   | account_revenue   | Main Revenue |
+   | account_cogs      | Main Expense |
+   This requires that anglo_saxon
+   Idempotent.
+
+**Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields**
+   Create a ProductTemplate named "{uTemplateName}"
+   with a supplier_tax named "{uTaxName}"
+   with |name|value| fields such as:
+   type, cost_price_method, default_uom, list_price, cost_price.
+   The fields account_expense, account_revenue become the related accounts.
+   E. g.
+   | name              | value   |
+   | type	      | service |
+   | list_price 	      | 40      |
+   | cost_price 	      | 20      |
+   | default_uom	      | Unit    |
+   | account_expense   | Main Expense |
+   | account_revenue   | Main Revenue |
+   #	  | cost_price_method | fixed        |
+   You can try currency and see what happens!
+   We'll put a haack to work on systems without a CoTs:
+   just call the tax "0% Sales Tax".
+   Idempotent.
+
+**Create a product with description "{uDescription}" from template "{uTemplateName}"**
+   Create a product with description "{uDescription}" from template "{uTemplateName}"
+   Idempotent.

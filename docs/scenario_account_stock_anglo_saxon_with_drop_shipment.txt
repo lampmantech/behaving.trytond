@@ -1,0 +1,11 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/scenario_account_stock_anglo_saxon_with_drop_shipment.py
+
+
+   =====================================================
+   Account Stock Anglo-Saxon with Drop Shipment Scenario
+   =====================================================
+   Unfinished
+
+**Account Stock Anglo-Saxon with Drop Shipment Scenario**

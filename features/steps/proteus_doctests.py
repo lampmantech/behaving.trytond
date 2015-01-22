@@ -1,11 +1,11 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 
 """
 from behave import *
 import proteus
-from proteus import Model
+import random
 
 @step('proteus/test_model test_class_cache')
 def step_impl(context):
@@ -77,7 +77,7 @@ def step_impl(context):
     User = proteus.Model.get('res.user')
     admin = User.find([('login', '=', 'admin')])[0]
     attachment = Attachment()
-    attachment.name = 'Test'
+    attachment.name = 'Test %d' % int(random.random()*1000000)
     attachment.resource = admin
     attachment.save()
     assert attachment.resource == admin

@@ -1,8 +1,12 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 This is the advanced syntax for behave testing.
 
 This is from OpenERPScenario and may fail, as is not properly ported to Tryton yet.
+It could be that there's a lot in here that is unused and cleaned out.
+Or, it just needs some TLC by someone who knows Tryton+oDooDoo internals
+to port missing features over to trytond_scenari.
+
 """
 
 from ast import literal_eval
@@ -13,7 +17,6 @@ import pdb
 
 from behave import *
 import proteus
-from proteus import Model
 from .support import modules
 from .support.tools import *
 
@@ -122,6 +125,8 @@ def parse_table_values(ctx, obj, table):
         elif field_type == 'datetime':
             # maybe Tryton wants a datetime object?
             value = time.strftime(value)
+            # FixMe: is this good enough
+            value = datetime.datetime(*map(int,value.split('-')))
         res[key] = value
     return res
 

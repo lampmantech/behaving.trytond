@@ -1,3 +1,5 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
 From: ../features/steps/scenario_account_stock_anglo_saxon.py
 
 
@@ -8,29 +10,12 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
    It should be improved to be more like a Behave BDD.
 
-**T/ASAS/SASAS Create a ProductCategory named "{uName}"**
-   Create a saved instance of "product.category" named "{uName}"
-   Idempotent.
-
-**T/ASAS/SASAS Create a ProductTemplate named "{uName}" from a ProductCategory named "{uCatName}" with fields**
-   from a ProductCategory named "{uCatName}" with fields
-   | name              | value |
-   | type	      | goods |
-   | cost_price_method | fifo  |
-   | purchasable       | True  |
-   | salable 	      | True  |
-   | list_price 	      | 10    |
-   | cost_price 	      | 5     |
-   | delivery_time     | 0     |
-   | default_uom	      | Unit  |
-   Idempotent.
-
 **T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields**
    Create two products of type "{uType}" from the ProductTemplate named
    "{uName}" with fields
    | name                | cost_price_method | description         |
-   | product_fixed	| fifo   	    | Product Fixed       |
-   | product_average	| fifo		    | Product Average     |
+   | product_fixed	| fixed   	    | Product Fixed       |
+   | product_average	| average	    | Product Average     |
    Idempotent.
 
 **T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities**
@@ -86,3 +71,23 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    | description     | quantity	| unit_price |
    | product_fixed   | 5.0      	| 4.00	     |
    Idempotent.
+
+**T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities**
+   Unfinished
+   >>> invoice = Invoice()
+   >>> invoice.party = customer
+   >>> invoice.payment_term = payment_term
+   >>> invoice_line = invoice.lines.new()
+   >>> invoice_line.product = product
+   >>> invoice_line.quantity = -1
+   >>> invoice.save()
+   >>> Invoice.post([invoice.id], config.context)
+   >>> invoice.state
+   u'posted'
+   >>> move = invoice.move
+   >>> line_cogs, = (l for l in move.lines if l.account == cogs)
+   >>> line_cogs.credit
+   Decimal('5.00')
+   >>> line_stock, = (l for l in move.lines if l.account == stock_customer)
+   >>> line_stock.debit
+   Decimal('5.00')

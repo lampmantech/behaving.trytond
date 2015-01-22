@@ -1,3 +1,8 @@
+commit b5f8533d6565916e956b673c8d4250aa787494a0
+Date:   Tue Jan 20 05:31:47 2015 +0200
+
+    dded more docstrings to generate more documentation in docs.
+
 commit a7f166f6ff08dcc56c60aaa4b95e04820fd3a30f
 Date:   Sun Jan 18 16:20:24 2015 +0200
 

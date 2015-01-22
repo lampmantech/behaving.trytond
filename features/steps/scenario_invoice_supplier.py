@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 =========================
@@ -21,85 +21,60 @@ from decimal import Decimal
 from operator import attrgetter
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
+from .support.stepfuns import vAssertContentTable
 from .support import modules
 from .support import tools
 
 # Warning - these are hardwired from the Tryton code
 from .trytond_constants import *
 
-today = datetime.date.today()
+TODAY = datetime.date.today()
 
-# Service Product
-@step('TS/AIS Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with fields')
-def step_impl(context, uTemplateName, uTaxName):
+# TODAY, Buy the Services Bought, Term 30 days, Supplier
+@step('Create an "{uKind}" invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account| fields')
+def step_impl(context, uKind, uDate, uDescription, uPaymentTerm, uSupplier):
+    sType = 'in_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
+    
+# TODAY, Services Sold, Customer
+@step('Create an "{uKind}" invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account| fields')
+def step_impl(context, uKind, uDate, uDescription, uPaymentTerm, uCustomer):
+    sType = 'out_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uCustomer, sType)
 
-
-    ProductTemplate = proteus.Model.get('product.template')
-
-    Party = proteus.Model.get('party.party')
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    if not ProductTemplate.find([('name', '=', uTemplateName)]):
-        template = ProductTemplate()
-        template.name = uTemplateName
-        # type, cost_price_method, default_uom, list_price, cost_price
-        for row in context.table:
-            setattr(template, row['name'],
-                    string_to_python(row['name'], row['value'], ProductTemplate))
-        Account = proteus.Model.get('account.account')
-        expense, = Account.find([
-            ('kind', '=', 'expense'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-            ('company', '=', company.id),
-            ])
-        revenue, = Account.find([
-            ('kind', '=', 'revenue'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
-            ('company', '=', company.id),
-            ])
-
-        template.account_expense = expense
-        template.account_revenue = revenue
-
-        Tax = proteus.Model.get('account.tax')
-        # FixMe: need to handle supplier_tax as an append in string_to_python
-        tax, = Tax.find([('name', '=', uTaxName)])
-        template.supplier_taxes.append(tax)
-
-        template.save()
-
-# Services Bought, Service Product
-@step('TS/AIS Create a product with description "{uDescription}" from template "{uTemplateName}"')
-def step_impl(context, uDescription, uTemplateName):
-    """
-    Create a product with description "{uDescription}" from template "{uTemplateName}"
-    Idempotent.
-    """
-    ProductTemplate = proteus.Model.get('product.template')
-    template, = ProductTemplate.find([('name', '=', uTemplateName)])
-
-    Product = proteus.Model.get('product.product')
-    if not Product.find([('description', '=', uDescription)]):
-        product = Product()
-        product.template = template
-        product.description = uDescription
-        product.save()
-    assert Product.find([('description', '=', uDescription)])
-
-# Buy the Services Bought, Supplier
-@step('TS/AIS Create an invoice with description "{uDescription}" to supplier "{uSupplier}" with fields')
-def step_impl(context, uDescription, uSupplier):
+# TODAY, Buy the Services Bought, Term 30 days, Supplier
+@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account| fields')
+def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
     """
 Create an invoice with description "{uDescription}" to supplier
-"{uSupplier}" with fields | description | quantity | unit_price |
-# Note that this uses the heading description rather than name
-	  | description       | quantity   | unit_price |
-	  | Services Bought   | 5	   | 		|
-	  | Test     	      | 1	   | 10.00	|
+"{uSupplier}" with following |description|quantity|unit_price|account| fields
+Note that this uses the heading description rather than name
+	  | description       | quantity   | unit_price | account      |
+	  | Services Bought   | 5	   | 		|              |
+	  | Test     	      | 1	   | 10.00	| Main Expense |
     """
+    sType = 'in_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
+    
+# TODAY, Services Sold, Customer
+@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account| fields')
+def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
+    """
+Create an invoice with description "{uDescription}" to customer
+"{uCustomer}" with following |description|quantity|unit_price|account| fields
+Note that this uses the heading description rather than name
+	  | description       | quantity   | unit_price | account      |
+	  | Services Bought   | 5	   | 		|              |
+	  | Test     	      | 1	   | 10.00	| Main Revenue |
+    """
+    sType = 'out_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uCustomer, sType)
+
+def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
     current_config = context.oProteusConfig
 
     Party = proteus.Model.get('party.party')
@@ -109,29 +84,49 @@ Create an invoice with description "{uDescription}" to supplier
     company, = Company.find([('party.id', '=', party.id)])
 
     Invoice = proteus.Model.get('account.invoice')
+    #? company.id
     if not Invoice.find(['description', '=', uDescription]):
         invoice = Invoice()
-        invoice.type = 'in_invoice'
-        invoice.invoice_date = today
+        invoice.type = sType
+        if uDate.lower() == 'today' or uDate.lower() == 'now':
+            oDate = TODAY
+        else:
+            oDate = datetime.date(*map(int, uDate.split('-')))
+        invoice.invoice_date = oDate
         invoice.accounting_date = invoice.invoice_date
         invoice.description = uDescription
 
-        PaymentTerm = proteus.Model.get('account.invoice.payment_term')
-        payment_term, = PaymentTerm.find([('name', '=', 'Term')])
-        party, = Party.find([('name', '=', uSupplier)])
+        party, = Party.find([('name', '=', uParty)])
         invoice.party = party
+
+        PaymentTerm = proteus.Model.get('account.invoice.payment_term')
+        payment_term, = PaymentTerm.find([('name', '=', uPaymentTerm)])
         invoice.payment_term = payment_term
 
         Account = proteus.Model.get('account.account')
-        expense, = Account.find([
-            ('kind', '=', 'expense'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
+        if sType == 'in_invoice':
+            sMainKind = 'payable'
+            uKind = 'expense'
+        else:
+            sMainKind = 'receivable'
+            uKind = 'revenue'
+        oMain, = Account.find([
+            ('kind', '=', sMainKind),
+            ('name', '=', sGetFeatureData(context, 'account.template,main_'+sMainKind)),
             ('company', '=', company.id),
-            ])
+        ])
+        invoice.account = oMain
+        
+        oLineDefault, = Account.find([
+            ('kind', '=', uKind),
+            ('name', '=', sGetFeatureData(context, 'account.template,main_'+uKind)),
+            ('company', '=', company.id),
+        ])
 
         InvoiceLine = proteus.Model.get('account.invoice.line')
         Product = proteus.Model.get('product.product')
         for row in context.table:
+            # lines can have currency
             line = InvoiceLine()
             invoice.lines.append(line)
             # Note that this uses the heading 'description' rather than 'name'
@@ -140,9 +135,16 @@ Create an invoice with description "{uDescription}" to supplier
                 line.product = lProducts[0]
                 # 'unit_price' is derived from the Product
             else:
-                line.account = expense
                 line.description = row['description']
                 line.unit_price = Decimal(row['unit_price'])
+                #? need this if line.product too? No it's derived
+                if row['account']:
+                    # FixMe: domain for line.account is ['kind', '=', 'expense']
+                    line.account, = Account.find([('kind', '=', uKind),
+                                                 ('name', '=', row['account']),
+                                                 ('company.id', '=', company.id)])
+                else:
+                    line.account = oLineDefault
             line.quantity = \
                     string_to_python('quantity', row['quantity'], InvoiceLine)
 
@@ -223,7 +225,7 @@ def step_impl(context, uDescription, uTaxName):
 @step('TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts')
 def step_impl(context, uDescription):
     """
-    Create a credit note for the invoice with description "{uDescription}" 
+    Create a credit note for the invoice with description "{uDescription}"
     and assert the amounts for the credit note equal the invoice amounts.
     Not idempotent.
     """

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 
@@ -14,6 +14,7 @@ from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
 from .support.stepfuns import oAttachLinkToResource
+from .support.stepfuns import vAssertContentTable
 
 today = datetime.date.today()
 
@@ -170,7 +171,7 @@ def step_impl(context, uKind, uCalName, uUserName):
                                                                 oEvent)
                             assert oAttachment.type == 'link'
                         else:
-                            sys.__stderr__.write('Not found '+uDescription+'\n')
+                            puts('>>> WARN: Not found '+uDescription+'\n')
             assert Event.find([
                     ('calendar.owner.email', '=', uUserEmail),
                     ('classification', '=', 'public'),

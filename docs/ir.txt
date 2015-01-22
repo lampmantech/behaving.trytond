@@ -1,3 +1,5 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
 From: ../features/steps/ir.py
 
 
@@ -8,3 +10,10 @@ From: ../features/steps/ir.py
    Try to make an attachment in the form of a link
    onto the admin user. Not working.
    FixMe:
+
+**Attach to an instance named "{uName}" of class "{uClass}" a link to an existing file with the following |filename| fields**
+
+**Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields**
+   Attach to an existing instance with name "{uName}"
+   of class "{uClass}", a link to
+   to an existing file with the following |filename| fields

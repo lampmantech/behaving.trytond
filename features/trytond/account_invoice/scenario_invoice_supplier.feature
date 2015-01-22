@@ -27,19 +27,20 @@ Feature: Run the Trytond scenario_invoice_supplier doctests
 	    | invoice_tax_code      | invoice tax      |
 	    | credit_note_base_code | credit note base |
 	    | credit_note_tax_code  | credit note tax  |
-# FixMe: need to handle supplier_tax named "10% Sales Tax" in string_to_python
-	and TS/AIS Create a ProductTemplate named "Service Product" with supplier_tax named "10% Sales Tax" with fields
-	  | name              | value   |
-	  | type	      | service |
-	  | list_price 	      | 40      |
-	  | cost_price 	      | 20      |
-	  | default_uom	      | Unit    |
-#	  | cost_price_method | fixed   |
-	and TS/AIS Create a product with description "Services Bought" from template "Service Product"
-	and TS/AIS Create an invoice with description "Buy the Services Bought" to supplier "Supplier" with fields
+	and Create a ProductTemplate named "Service Product" with supplier_tax named "10% Sales Tax" with |name|value| fields
+	  | name              | value        |
+	  | type	      | service      |
+	  | list_price 	      | 40           |
+	  | cost_price 	      | 20           |
+	  | default_uom	      | Unit         |
+	  | account_expense   | Main Expense |
+	  | account_revenue   | Main Revenue |
+	  | cost_price_method | fixed        |
+	and Create a product with description "Services Bought" from template "Service Product"
+	and Create an invoice on date "TODAY" with description "Buy the Services Bought" and a PaymentTerm named "Term" to supplier "Supplier" with following |description|quantity|unit_price|account| fields
 # Note that this uses the heading description rather than name
-	  | description       | quantity   | unit_price |
-	  | Services Bought   | 5	   | 		|
-	  | Test     	      | 1	   | 10.00	|
+	  | description       | quantity   | unit_price | account      |
+	  | Services Bought   | 5	   | 		|              |
+	  | Test     	      | 1	   | 10.00	| Main Expense |
        Then TS/AIS Post the invoice with description "Buy the Services Bought" and assert the taxes named "10% Sales Tax" are right
         and TS/AIS Create a credit note for the invoice with description "Buy the Services Bought" and assert the amounts

@@ -34,12 +34,13 @@ if su postgres -c "psql -l" | grep -q $TUSER ; then
 	    [ -n "$a" ] || continue
 	    echo "INFO: $TUSER database, have: $a looking for: ${db}"
 	    [ "$a" = "${db}" ] || continue
-	    if ! /etc/init.d/trytond-$TRYTOND_VER status ; then
+	    if /etc/init.d/trytond-$TRYTOND_VER status ; then
 		if /etc/init.d/trytond-$TRYTOND_VER stop 2>&1| \
 		  grep ERROR: ; then
 		    echo "ERROR: dropdb, failed to stop $?"
 		    exit 12
-		  fi
+		fi
+		sleep 10
 	      fi
 	    echo "INFO: psql -c 'DROP DATABASE \"$a\";'"
 	    if su $PG_USER -c "psql -c 'DROP DATABASE \"$a\";'" \

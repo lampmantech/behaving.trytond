@@ -1,31 +1,32 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 
 """
 stepfuns has some convenience funtions used within steps.
 
 """
+import proteus
 
 import time
 import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-import proteus
+import hashlib
 
 from .fields import string_to_python, sGetFeatureData, vSetFeatureData
 
 def gGetFeaturesRevExp(context, company):
-        Account = proteus.Model.get('account.account')
-        revenue, = Account.find([
-            ('kind', '=', 'revenue'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
-            ('company', '=', company.id),
-            ])
-        expense, = Account.find([
-            ('kind', '=', 'expense'),
-            ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-            ('company', '=', company.id),
-            ])
-        return revenue, expense
+    Account = proteus.Model.get('account.account')
+    revenue, = Account.find([
+        ('kind', '=', 'revenue'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
+        ('company', '=', company.id),
+        ])
+    expense, = Account.find([
+        ('kind', '=', 'expense'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
+        ('company', '=', company.id),
+        ])
+    return revenue, expense
 
 def gGetFeaturesPayExp(context, company):
     Account = proteus.Model.get('account.account')
@@ -56,45 +57,70 @@ def gGetFeaturesPayRec(context, company):
     return payable, receivable
 
 def gGetFeaturesStockAccs(context, company):
-        """
-        These are in by trytond_account_stock_continental/account.xml
-        which is pulled in by trytond_account_stock_anglo_saxon
-        """
-        Account = proteus.Model.get('account.account')
-        stock, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock')),
-            ])
-        stock_customer, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_customer')),
-            ])
-        stock_lost_found, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_lost_found')),
-            ])
-        stock_production, = Account.find([
-            ('kind', '=', 'stock'),
-            ('company', '=', company.id),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_production')),
-            ])
-        stock_supplier, = Account.find([
-            ('kind', '=', 'stock'),
-            ('name', '=', sGetFeatureData(context, 'account.template,stock_supplier')),
-            ('company', '=', company.id),
-            ])
-        return stock, stock_customer, stock_lost_found, \
-            stock_production, stock_supplier, 
+    """
+    These are in by trytond_account_stock_continental/account.xml
+    which is pulled in by trytond_account_stock_anglo_saxon
+    """
+    Account = proteus.Model.get('account.account')
+    # Fixme:             ('kind', '=', 'stock'), should be flagged early
+    stock, = Account.find([
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock')),
+        ])
+    stock_customer, = Account.find([
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_customer')),
+        ])
+    stock_lost_found, = Account.find([
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_lost_found')),
+        ])
+    stock_production, = Account.find([
+        ('kind', '=', 'stock'),
+        ('company', '=', company.id),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_production')),
+        ])
+    stock_supplier, = Account.find([
+        ('kind', '=', 'stock'),
+        ('name', '=', sGetFeatureData(context, 'account.template,stock_supplier')),
+        ('company', '=', company.id),
+        ])
+    return stock, stock_customer, stock_lost_found, \
+        stock_production, stock_supplier, 
 
-def oAttachLinkToResource (sName, sDescription, sLink, oResource):
-        
+def oAttachLinkToFileToResource(oResource, uFile):
+    sLink = 'file://' + uFile
+    sDescription = uFile
+    # ToDo cannonicalize the filename
+    # Use a sha of the filename to make it unique
+    sName = hashlib.sha1(uFile).hexdigest()
+    try:
+        oAttachment = oAttachLinkToResource (sName, sDescription, sLink, oResource)
+        return oAttachment
+    except Exception, e:
+        sys.__stderr__.write(">>> ERROR: creating link, %s,\n%s\n%s\n" % (
+            str(e), uFile, sName,))
+
+    
+def oAttachLinkToResource(sName, sDescription, sLink, oResource):
+    """
+    Attach to an existing instance "{uResource}" a link to
+    to something with a name sName and description sDescription.
+    Updates the fields if the named attachment exists.
+    Idempotent.
+    """
     Attachment = proteus.Model.get('ir.attachment')
-    oAttachment = Attachment()
 
-    oAttachment.type = 'link'
+    #? oResource.__class__.rec_name
+    #? oResource.__class__.name
+    l = Attachment.find([('type', '=', 'link'), ('name', '=', sName)])
+    if not l:
+        oAttachment = Attachment(type='link')
+    else:
+        oAttachment = l[0]
     oAttachment.name = sName
     oAttachment.description = sDescription
     oAttachment.link = sLink

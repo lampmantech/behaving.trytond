@@ -8,11 +8,11 @@ Call it with 1 argument: rst-file-to-convert.rst
 and it will convert it to rst-file-to-convert.feature
 in the current directory.
 "
-[ "$#" -eq 1 ] || {
+[ "$#" -lt 1 ] && {
     echo "USAGE: $0 rst-file-to-convert"
     exit 1
 }
-[ "$1" = "--help" ] || {
+[ "$1" = "--help" ] && {
     echo "USAGE: $0 rst-file-to-convert"
     echo $__doc__
     exit 0

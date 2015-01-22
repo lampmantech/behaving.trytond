@@ -18,7 +18,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 # which is pulled in by trytond_account_stock_anglo_saxon
 	and Set the feature data with values
 	     | name                                  | value                |
-	     | account.template,COGS                 | COGS                 |
+	     | account.template,main_cogs            | COGS                 |
 	     | account.template,stock                | Stock                |
 	     | account.template,stock_customer       | Stock Customer       |
 	     | account.template,stock_lost_found     | Stock Lost and Found |
@@ -45,7 +45,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	  | password	| accountant	  |
 	  | group	| Account	  |
 	and Create a PaymentTerm named "Direct" with "0" days remainder
-	and T/ASAS/SASAS Create a ProductTemplate named "product" from a ProductCategory named "Category" with fields
+	and Create a ProductTemplate named "product" with stock accounts from features from a ProductCategory named "Category" with |name|value| fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fifo  |
@@ -55,6 +55,9 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
 	  | default_uom	      | Unit  |
+	  | account_expense   | Main Expense |
+	  | account_revenue   | Main Revenue |
+	  | account_cogs      | Main Expense |
 	and T/ASAS/SASAS Create products of type "goods" from the ProductTemplate named "product" with fields
 	  | name                | cost_price_method | description         |
 	  | product_fixed	| fifo   	    | Product Fixed       |

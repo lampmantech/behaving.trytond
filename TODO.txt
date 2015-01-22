@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
 
 0) Fix all the occurences of "FixMe" : 
   grep FixMe features/steps/*.py

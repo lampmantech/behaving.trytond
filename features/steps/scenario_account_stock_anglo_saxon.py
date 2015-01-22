@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
 
 ==================================
@@ -12,116 +12,23 @@ It should be improved to be more like a Behave BDD.
 """
 
 from behave import *
+import proteus
 
 import time
 import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-import proteus
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
+from .support.stepfuns import vAssertContentTable
 from .support import modules
 from .support import tools
 from .support import stepfuns
 
-# Warning - these are hardwired from the Tryton code
+TODAY = datetime.date.today()
+
+# FixMe: move these over to FeatureData
 from .trytond_constants import *
-
-today = datetime.date.today()
-
-#unused Category
-# Create a saved instance of "product.category" named "Category"
-@step('T/ASAS/SASAS Create a ProductCategory named "{uName}"')
-def step_impl(context, uName):
-    """
-    Create a saved instance of "product.category" named "{uName}"
-    Idempotent.
-    """
-    context.execute_steps(u'''
-    Given Create a saved instance of "product.category" named "%s"
-    ''' % (uName,))
-
-# product , Category
-@step('T/ASAS/SASAS Create a ProductTemplate named "{uName}" from a ProductCategory named "{uCatName}" with fields')
-def step_impl(context, uName, uCatName):
-    """Create a ProductTemplate named "{uName}"
-    from a ProductCategory named "{uCatName}" with fields
-	  | name              | value |
-	  | type	      | goods |
-	  | cost_price_method | fifo  |
-	  | purchasable       | True  |
-	  | salable 	      | True  |
-	  | list_price 	      | 10    |
-	  | cost_price 	      | 5     |
-	  | delivery_time     | 0     |
-	  | default_uom	      | Unit  |
-    Idempotent.
-    """
-
-    current_config = context.oProteusConfig
-    ProductTemplate = proteus.Model.get('product.template')
-
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    Party = proteus.Model.get('party.party')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    if not ProductTemplate.find([('name', '=', uName),
-                                 ('category.name', '=', uCatName),
-                             ]):
-        ProductCategory = proteus.Model.get('product.category')
-
-        ProductUom = proteus.Model.get('product.uom')
-
-        AccountJournal = proteus.Model.get('account.journal')
-        Account = proteus.Model.get('account.account')
-
-        template = ProductTemplate()
-        template.name = uName
-        # template_average.cost_price_method = 'fixed'
-        # type, cost_price_method, default_uom
-        for row in context.table:
-            setattr(template, row['name'],
-                    string_to_python(row['name'], row['value'], ProductTemplate))
-
-        category, = ProductCategory.find([('name', '=', uCatName)])
-        template.category = category
-
-        revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
-        template.account_expense = expense
-        template.account_revenue = revenue
-
-        cogs, = Account.find([
-            ('kind', '=', 'other'),
-            ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
-            ('company', '=', company.id),
-            ])
-        template.account_cogs = cogs
-
-        # These are in by trytond_account_stock_continental/account.xml
-        # which is pulled in by trytond_account_stock_anglo_saxon
-        stock, stock_customer, stock_lost_found, stock_production, \
-            stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
-
-        template.account_stock = stock
-        template.account_stock_supplier = stock_supplier
-        template.account_stock_customer = stock_customer
-        template.account_stock_production = stock_production
-        template.account_stock_lost_found = stock_lost_found
-
-        # who creates this and where?
-        # /n/data/TrytonOpenERP/src/Tryton-3.2/trytond_stock-3.2.3/location.xml
-        stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
-        template.account_journal_stock_supplier = stock_journal
-        template.account_journal_stock_customer = stock_journal
-        template.account_journal_stock_lost_found = stock_journal
-
-        if template.cost_price_method == 'fifo':
-            modules.lInstallModules(['product_cost_fifo'], current_config)
-
-        template.save()
-    assert ProductTemplate.find([('name', '=', uName)])
 
 # cost_price_method - one of
 dCacheCostPriceMethod={}
@@ -134,8 +41,8 @@ def step_impl(context, uType, uName):
     Create two products of type "{uType}" from the ProductTemplate named
     "{uName}" with fields
 	  | name                | cost_price_method | description         |
-	  | product_fixed	| fifo   	    | Product Fixed       |
-	  | product_average	| fifo		    | Product Average     |
+	  | product_fixed	| fixed   	    | Product Fixed       |
+	  | product_average	| average	    | Product Average     |
 
     Idempotent.
     """
@@ -153,7 +60,7 @@ def step_impl(context, uType, uName):
     company, = Company.find([('party.id', '=', party.id)])
 
     # not ('company', '=', company.id),
-    template, = ProductTemplate.find([('name', '=', uName),
+    oTemplate, = ProductTemplate.find([('name', '=', uName),
                                       ('type', '=', uType)])
 
     for row in context.table:
@@ -165,15 +72,15 @@ def step_impl(context, uType, uName):
         if Product.find([('description', '=', uRowDescription)]): continue
 
         if uCostPriceMethod == u'fixed':
-            product = Product()
-            product.template = template
-            product.description = uRowDescription
-            product.save()
+            product_fixed = Product()
+            product_fixed.template = oTemplate
+            product_fixed.description = uRowDescription
+            product_fixed.save()
 
         elif uCostPriceMethod == u'average':
             if 'template_average' not in dCacheCostPriceMethod:
                 template_average = ProductTemplate(
-                    ProductTemplate.copy([template.id],
+                    ProductTemplate.copy([oTemplate.id],
                                          current_config.context)[0])
                 template_average.cost_price_method = 'average'
                 template_average.save()
@@ -183,28 +90,31 @@ def step_impl(context, uType, uName):
             # FixMe: I dont understand this logic here
             # hardcoded this would be ('description', '=', 'product_fixed')
             #?product_fixed = Product.find([])[0]
-            #?product_average = Product(
-            #?    Product.copy([product_fixed.id], {
-            #?        'template': template_average.id,
-            #?        }, current_config.context)[0])
+            product_average = Product(
+                Product.copy([product_fixed.id], {
+                    'template': template_average.id,
+                    }, current_config.context)[0])
             #? why use the copy? why not just:
-            product_average = Product()
-            product_average.template = template_average
+            #product_average = Product()
+            #product_average.template = oTemplate_average
+            #product_average.description = uRowDescription
             product_average.description = uRowDescription
             product_average.save()
 
         elif uCostPriceMethod == u'fifo':
             if 'template_fifo' not in dCacheCostPriceMethod:
                 template_fifo = ProductTemplate(
-                    ProductTemplate.copy([template.id],
+                    ProductTemplate.copy([oTemplate.id],
                                          current_config.context)[0])
                 template_fifo.cost_price_method = 'fifo'
                 template_fifo.save()
                 dCacheCostPriceMethod['template_fifo'] = template_fifo
             else:
                 template_fifo = dCacheCostPriceMethod['template_fifo']
-            product_fifo = Product()
-            product_fifo.template = template_fifo
+            product_fifo = Product(
+                Product.copy([product_fixed.id], {
+                    'template': template_fifo.id,
+                    }, current_config.context)[0])
             product_fifo.description = uRowDescription
             product_fifo.save()
 
@@ -401,7 +311,7 @@ def step_impl(context, uDescription, uSupplier):
     invoice, = purchase.invoices
 
     if invoice.state == u'draft':
-        invoice.invoice_date = today
+        invoice.invoice_date = TODAY
         invoice.accounting_date = invoice.invoice_date
         invoice.description = "pay for what we received from the P. O. with description '%s'" % (uDescription,)
 
@@ -699,7 +609,7 @@ def step_impl(context):
     cogs, = Account.find([
         ('kind', '=', 'other'),
         ('company', '=', company.id),
-        ('name', '=', sGetFeatureData(context, 'account.template,COGS')),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_cogs')),
         ])
     cogs.reload()
     assert (cogs.debit, cogs.credit) == \
@@ -766,9 +676,40 @@ def step_impl(context, uSupplier, uPaymentTerm):
             user=ACCOUNTANT_USER,
             password=ACCOUNTANT_PASSWORD,
             database_name=current_config.database_name)
-        for invoice in purchase.invoices:
-            invoice.invoice_date = today
-            invoice.save()
-
+        invoice_ids = [i.id for i in purchase.invoices]
+        #? is this right? or does it matter?
+        #? current_config.user = accountant.id
+        
         Invoice = proteus.Model.get('account.invoice')
+        Invoice.write(invoice_ids, {
+            'invoice_date': TODAY,
+        }, new_config.context)
+        #? invoice.save()
+
         Invoice.validate_invoice([i.id for i in purchase.invoices], new_config.context)
+
+# Supplier, Direct
+@step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities')
+def step_impl(context, uSupplier, uPaymentTerm):
+    """
+    Unfinished
+
+    >>> invoice = Invoice()
+    >>> invoice.party = customer
+    >>> invoice.payment_term = payment_term
+    >>> invoice_line = invoice.lines.new()
+    >>> invoice_line.product = product
+    >>> invoice_line.quantity = -1
+    >>> invoice.save()
+    >>> Invoice.post([invoice.id], config.context)
+    >>> invoice.state
+    u'posted'
+    >>> move = invoice.move
+    >>> line_cogs, = (l for l in move.lines if l.account == cogs)
+    >>> line_cogs.credit
+    Decimal('5.00')
+    >>> line_stock, = (l for l in move.lines if l.account == stock_customer)
+    >>> line_stock.debit
+    Decimal('5.00')
+    """
+    pass
