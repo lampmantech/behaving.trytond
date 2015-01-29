@@ -8,4 +8,20 @@ From: ../features/steps/scenario_account_stock_anglo_saxon_with_drop_shipment.py
    =====================================================
    Unfinished
 
-**Account Stock Anglo-Saxon with Drop Shipment Scenario**
+**T/ASASDS Create ProductTemplate**
+   Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields
+   | name              | value |
+   | type	      | goods |
+   | cost_price_method | fixed  |
+   | purchasable       | True  |
+   | salable 	      | True  |
+   | list_price 	      | 10    |
+   | cost_price 	      | 5     |
+   | delivery_time     | 0     |
+   | default_uom	      | Unit  |
+   | account_expense   | Main Expense |
+   | account_revenue   | Main Revenue |
+   | account_cogs      | COGS |
+   | supply_on_sale    | True |
+
+**T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario**

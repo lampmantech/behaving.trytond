@@ -15,222 +15,127 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
+from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
+from .support import stepfuns
+
 TODAY = datetime.date.today()
 
-@step('Account Stock Anglo-Saxon with Drop Shipment Scenario')
+@step('T/ASASDS Create ProductTemplate')
+def step_impl(context):
+    """
+    Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields
+	  | name              | value |
+	  | type	      | goods |
+	  | cost_price_method | fixed  |
+	  | purchasable       | True  |
+	  | salable 	      | True  |
+	  | list_price 	      | 10    |
+	  | cost_price 	      | 5     |
+	  | delivery_time     | 0     |
+	  | default_uom	      | Unit  |
+	  | account_expense   | Main Expense |
+	  | account_revenue   | Main Revenue |
+	  | account_cogs      | COGS |
+          | supply_on_sale    | True |
+    """
+    config = context.oProteusConfig
+
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    Account = proteus.Model.get('account.account')
+    
+    payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
+    revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
+    
+    # These are in by trytond_account_stock_continental/account.xml
+    # which is pulled in by trytond_account_stock_anglo_saxon
+    stock, stock_customer, stock_lost_found, stock_production, \
+        stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
+    cogs, = Account.find([
+        # what kind is cogs and why is it not in the default accounts?
+        ('kind', '=', 'other'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_cogs')),
+        ('company', '=', company.id),
+    ])
+    
+    ProductTemplate = proteus.Model.get('product.template')
+    template = ProductTemplate()
+    uName = 'product'
+    if not ProductTemplate.find([('name','=', uName)]):
+        ProductUom = proteus.Model.get('product.uom')
+        unit, = ProductUom.find([('name', '=', 'Unit')])
+        template.name = uName
+        template.default_uom = unit
+        template.type = 'goods'
+        template.purchasable = True
+        template.salable = True
+        template.list_price = Decimal('10')
+        template.cost_price = Decimal('5')
+        template.cost_price_method = 'fixed'
+        template.delivery_time = 0
+        template.account_expense = expense
+        template.account_revenue = revenue
+        template.account_cogs = cogs
+        template.supply_on_sale = True
+        
+        template.account_stock = stock
+        template.account_stock_supplier = stock_supplier
+        template.account_stock_customer = stock_customer
+        template.account_stock_production = stock_production
+        template.account_stock_lost_found = stock_lost_found
+        
+        AccountJournal = proteus.Model.get('account.journal')
+        stock_journal, = AccountJournal.find([('code', '=', 'STO')])
+        template.account_journal_stock_supplier = stock_journal
+        template.account_journal_stock_customer = stock_journal
+        template.account_journal_stock_lost_found = stock_journal
+        template.save()
+    template, = ProductTemplate.find([('name','=', uName)])
+    
+@step('T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario')
 def step_impl(context):
 
-#@step('T/ASASDS Create database')
-#def step_impl(context):
-## replaced by Create database with pool.test set to True
-#    config = proteus.config.set_trytond()
-#    config.pool.test = True
     config = context.oProteusConfig
-    
-#@step('T/ASASDS Install sale_supply_drop_shipment, sale, purchase')
-#def step_impl(context):
-
-    Module = proteus.Model.get('ir.module.module')
-    modules = Module.find([
-                ('name', 'in', ('account_stock_anglo_saxon',
-                    'sale_supply_drop_shipment', 'sale', 'purchase')),
-                ])
-    Module.install([x.id for x in modules], config.context)
-    proteus.Wizard('ir.module.module.install_upgrade').execute('upgrade')
-
-#@step('T/ASASDS Create company')
-#def step_impl(context):
-
-    Currency = proteus.Model.get('currency.currency')
-    CurrencyRate = proteus.Model.get('currency.currency.rate')
-    Company = proteus.Model.get('company.company')
     Party = proteus.Model.get('party.party')
-    company_config = proteus.Wizard('company.company.config')
-    company_config.execute('company')
-    company = company_config.form
-    party = Party(name='Dunder Mifflin')
-    party.save()
-    company.party = party
-    currencies = Currency.find([('code', '=', 'USD')])
-    if not currencies:
-        currency = Currency(name='USD', symbol=u'$', code='USD',
-                            rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-                            mon_decimal_point='.')
-        currency.save()
-        CurrencyRate(date=TODAY + relativedelta(month=1, day=1),
-                     rate=Decimal('1.0'), currency=currency).save()
-    else:
-        currency, = currencies
-    company.currency = currency
-    company_config.execute('add')
-    company, = Company.find()
-
-#@step('T/ASASDS Reload the context')
-#def step_impl(context):
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
 
     User = proteus.Model.get('res.user')
     Group = proteus.Model.get('res.group')
-    config._context = User.get_preferences(True, config.context)
-
-#@step('T/ASASDS Create sale user')
-#def step_impl(context):
-
-    sale_user = User()
-    sale_user.name = 'Sale'
-    sale_user.login = 'sale'
-    sale_user.main_company = company
-    sale_group, = Group.find([('name', '=', 'Sales')])
-    sale_user.groups.append(sale_group)
-    sale_user.save()
-    sale_user, = User.find([('name', '=', 'Sale')])
-
-#@step('T/ASASDS Create purchase user')
-#def step_impl(context):
-
-    purchase_user = User()
-    purchase_user.name = 'Purchase'
-    purchase_user.login = 'purchase'
-    purchase_user.main_company = company
-    purchase_group, = Group.find([('name', '=', 'Purchase')])
-    purchase_user.groups.append(purchase_group)
-    purchase_request_group, = Group.find(
-            [('name', '=', 'Purchase Request')])
-    purchase_user.groups.append(purchase_request_group)
-    purchase_user.save()
-
-#@step('T/ASASDS Create stock user')
-#def step_impl(context):
-
-    stock_user = User()
-    stock_user.name = 'Stock'
-    stock_user.login = 'stock'
-    stock_user.main_company = company
-    stock_group, = Group.find([('name', '=', 'Stock')])
-    stock_user.groups.append(stock_group)
-    stock_user.save()
-
-#@step('T/ASASDS Create account user')
-#def step_impl(context):
-
-    account_user = User()
-    account_user.name = 'Account'
-    account_user.login = 'account'
-    account_user.main_company = company
-    account_group, = Group.find([('name', '=', 'Account')])
-    account_user.groups.append(account_group)
-    account_user.save()
-
-#@step('T/ASASDS Create fiscal year')
-#def step_impl(context):
-
-    FiscalYear = proteus.Model.get('account.fiscalyear')
-    Sequence = proteus.Model.get('ir.sequence')
-    SequenceStrict = proteus.Model.get('ir.sequence.strict')
-    fiscalyear = FiscalYear(name='%s' % TODAY.year)
-    fiscalyear.start_date = TODAY + relativedelta(month=1, day=1)
-    fiscalyear.end_date = TODAY + relativedelta(month=12, day=31)
-    fiscalyear.company = company
-    post_move_sequence = Sequence(name='%s' % TODAY.year,
-            code='account.move',
-            company=company)
-    post_move_sequence.save()
-    fiscalyear.post_move_sequence = post_move_sequence
-    invoice_sequence = SequenceStrict(name='%s' % TODAY.year,
-                                      code='account.invoice',
-                                      company=company)
-    invoice_sequence.save()
-    fiscalyear.out_invoice_sequence = invoice_sequence
-    fiscalyear.in_invoice_sequence = invoice_sequence
-    fiscalyear.out_credit_note_sequence = invoice_sequence
-    fiscalyear.in_credit_note_sequence = invoice_sequence
-    fiscalyear.save()
-    FiscalYear.create_period([fiscalyear.id], config.context)
-
-#@step('T/ASASDS Create chart of accounts')
-#def step_impl(context):
-
-    AccountTemplate = proteus.Model.get('account.account.template')
+    
     Account = proteus.Model.get('account.account')
     AccountJournal = proteus.Model.get('account.journal')
-    account_template, = AccountTemplate.find([('parent', '=', None)])
-    create_chart = proteus.Wizard('account.create_chart')
-    create_chart.execute('account')
-    create_chart.form.account_template = account_template
-    create_chart.form.company = company
-    create_chart.execute('create_account')
-    receivable, = Account.find([
-                ('kind', '=', 'receivable'),
-                ('company', '=', company.id),
-                ])
-    payable, = Account.find([
-                ('kind', '=', 'payable'),
-                ('company', '=', company.id),
-                ])
-    revenue, = Account.find([
-                ('kind', '=', 'revenue'),
-                ('company', '=', company.id),
-                ])
-    expense, = Account.find([
-                ('kind', '=', 'expense'),
-                ('company', '=', company.id),
-                ])
-    (stock, stock_customer, stock_lost_found, stock_production,
-            stock_supplier) = Account.find([
-                ('kind', '=', 'stock'),
-                ('company', '=', company.id),
-                ('name', 'like', 'Stock%'),
-                ], order=[('name', 'ASC')])
-    cogs, = Account.find([
-                ('kind', '=', 'other'),
-                ('company', '=', company.id),
-                ('name', '=', 'COGS'),
-                ])
-    create_chart.form.account_receivable = receivable
-    create_chart.form.account_payable = payable
-    create_chart.execute('create_properties')
-    stock_journal, = AccountJournal.find([('code', '=', 'STO')])
-
-#@step('T/ASASDS Create parties')
-#def step_impl(context):
-
-    Party = proteus.Model.get('party.party')
-    supplier = Party(name='Supplier')
-    supplier.save()
-    customer = Party(name='Customer')
-    customer.save()
-
-#@step('T/ASASDS Create product')
-#def step_impl(context):
-
-    ProductUom = proteus.Model.get('product.uom')
+    
     ProductSupplier = proteus.Model.get('purchase.product_supplier')
-    unit, = ProductUom.find([('name', '=', 'Unit')])
-    ProductTemplate = proteus.Model.get('product.template')
     Product = proteus.Model.get('product.product')
+
+    payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
+    revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
+    
+    # These are in by trytond_account_stock_continental/account.xml
+    # which is pulled in by trytond_account_stock_anglo_saxon
+    stock, stock_customer, stock_lost_found, stock_production, \
+        stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
+    cogs, = Account.find([
+        # what kind is cogs and why is it not in the default accounts?
+        ('kind', '=', 'other'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_cogs')),
+        ('company', '=', company.id),
+    ])
+
+    uSupplier = u'Supplier'
+    supplier, = Party.find([('name', '=', uSupplier),])
+
+    ProductTemplate = proteus.Model.get('product.template')
+    uName = 'product'
     product = Product()
-    template = ProductTemplate()
-    template.name = 'product'
-    template.default_uom = unit
-    template.type = 'goods'
-    template.purchasable = True
-    template.salable = True
-    template.list_price = Decimal('10')
-    template.cost_price = Decimal('5')
-    template.cost_price_method = 'fixed'
-    template.delivery_time = 0
-    template.account_expense = expense
-    template.account_revenue = revenue
-    template.account_stock = stock
-    template.account_cogs = cogs
-    template.account_stock_supplier = stock_supplier
-    template.account_stock_customer = stock_customer
-    template.account_stock_production = stock_production
-    template.account_stock_lost_found = stock_lost_found
-    template.account_journal_stock_supplier = stock_journal
-    template.account_journal_stock_customer = stock_journal
-    template.account_journal_stock_lost_found = stock_journal
-    template.supply_on_sale = True
-    template.save()
+    template, = ProductTemplate.find([('name','=', uName)])
     product.template = template
     product.save()
     
@@ -254,7 +159,12 @@ def step_impl(context):
 #@step('T/ASASDS Sale 50 products')
 #def step_impl(context):
 
+    customer, = Party.find([('name', '=', 'Customer')])
+
+    User = proteus.Model.get('res.user')
+    sale_user, = User.find([('name', '=', 'Sale')])
     config.user = sale_user.id
+    
     Sale = proteus.Model.get('sale.sale')
     SaleLine = proteus.Model.get('sale.line')
     sale = Sale()
@@ -274,6 +184,10 @@ def step_impl(context):
 #@step('T/ASASDS Create Purchase from Request')
 #def step_impl(context):
 
+    User = proteus.Model.get('res.user')
+    sale_user, = User.find([('name', '=', 'Sale')])
+    purchase_user, = User.find([('name', '=', 'Purchase')])
+    
     config.user = purchase_user.id
     Purchase = proteus.Model.get('purchase.purchase')
     PurchaseRequest = proteus.Model.get('purchase.request')
@@ -291,6 +205,7 @@ def step_impl(context):
     Purchase.confirm([purchase.id], config.context)
     purchase.reload()
     assert purchase.state == u'confirmed'
+    
     config.user = sale_user.id
     sale.reload()
     assert sale.shipments == []
@@ -299,6 +214,9 @@ def step_impl(context):
 #@step('T/ASASDS Receive 50 products')
 #def step_impl(context):
 
+    User = proteus.Model.get('res.user')
+    stock_user, = User.find([('name', '=', 'Stock')])
+    
     config.user = stock_user.id
     ShipmentDrop = proteus.Model.get('stock.shipment.drop')
     ShipmentDrop.done([shipment.id], config.context)
@@ -319,11 +237,18 @@ def step_impl(context):
 #@step('T/ASASDS Open supplier invoice')
 #def step_impl(context):
 
+    User = proteus.Model.get('res.user')
     Invoice = proteus.Model.get('account.invoice')
+    purchase_user, = User.find([('name', '=', 'Purchase')])
+
+    payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
+    revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
+    
     config.user = purchase_user.id
     purchase.reload()
     invoice, = purchase.invoices
     
+    account_user, = User.find([('name', '=', 'Account')])
     config.user = account_user.id
     invoice.invoice_date = TODAY
     invoice.save()
@@ -346,28 +271,22 @@ def step_impl(context):
 #def step_impl(context):
 
     User = proteus.Model.get('res.user')
-
+    sale_user, = User.find([('name', '=', 'Sale')])
     config.user = sale_user.id
     sale.reload()
     invoice, = sale.invoices
     
-#?    account_user = User.find([('name', '=', 'Account')])
+    account_user, = User.find([('name', '=', 'Account')])
     config.user = account_user.id
     Invoice.post([invoice.id], config.context)
     assert invoice.state == u'posted'
     
-    receivable, = Account.find([
-                ('kind', '=', 'receivable'),
-                ('company', '=', company.id),
-                ])
+    payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     receivable.reload()
     assert receivable.debit == Decimal('500.00')
     assert receivable.credit == Decimal('0.00')
     
-    revenue, = Account.find([
-                ('kind', '=', 'revenue'),
-                ('company', '=', company.id),
-                ])
+    revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
     revenue.reload()
     assert revenue.debit == Decimal('0.00')
     assert revenue.credit == Decimal('500.00')

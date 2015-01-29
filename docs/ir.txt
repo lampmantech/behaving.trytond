@@ -11,9 +11,16 @@ From: ../features/steps/ir.py
    onto the admin user. Not working.
    FixMe:
 
+**Attach to an instance named "{uName}" of class "{uClass}" the content of this feature file**
+
 **Attach to an instance named "{uName}" of class "{uClass}" a link to an existing file with the following |filename| fields**
 
 **Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields**
    Attach to an existing instance with name "{uName}"
    of class "{uClass}", a link to
    to an existing file with the following |filename| fields
+
+**Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" the content of an existing file with the following |filename| fields**
+   Attach to an existing instance with name "{uName}"
+   of class "{uClass}", the content of
+   an existing file with the following |filename| fields

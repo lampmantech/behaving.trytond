@@ -11,11 +11,13 @@ From: ../features/steps/trytond_bank.py
    Which makes it pretty hard to figure out, especially as its classes
    have self-referential fields. Grr.
 
-**Create a bank associated to a party "{uParty}" with optional BIC "{uBic}"**
-   Create a named bank associated to a party, with optional BIC.
+**Create a bank associated to a party "{uParty}" with optional |bic| field**
+   Create a named bank associated to a party, with optional BIC
+   | bic    |
+   | THEBIC |
    Create the party first, with things like addresses, and
    then use this to create the bank.
-   The uBic field can be empty; if not it has 11 characters.
+   The uBic field can be missing; if not it has 11 characters.
 
 **Create a bank account with IBAN "{uIban}" at a bank associated to a party "{uParty}", with following optional number, owner or currency**
    Create a bank account with IBAN "{uBank}" associated with a party "{uParty}
@@ -44,7 +46,7 @@ From: ../features/steps/trytond_bank.py
    The accounts must be of domain: ('kind', '=', 'other')
    Idempotent.
 
-**Create a financial account under "{sTemplate}" for the bank account with IBAN "{uIban}"**
+**Create a financial account under "{uTemplate}" for the bank account with IBAN "{uIban}"**
    Create a new account into the chart of accounts for a bank account.
    It takes "{uTemplate}" as an argument which is the name an existing account
    in the chart where the new account will be created: if uTemplate is of

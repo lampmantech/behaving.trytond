@@ -37,10 +37,10 @@ Feature: Run the Trytond scenario_invoice_supplier doctests
 	  | account_revenue   | Main Revenue |
 	  | cost_price_method | fixed        |
 	and Create a product with description "Services Bought" from template "Service Product"
-	and Create an invoice on date "TODAY" with description "Buy the Services Bought" and a PaymentTerm named "Term" to supplier "Supplier" with following |description|quantity|unit_price|account| fields
+	and Create an invoice on date "TODAY" with description "Buy the Services Bought" and a PaymentTerm named "Term" to supplier "Supplier" with following |description|quantity|unit_price|account|currency| fields
 # Note that this uses the heading description rather than name
-	  | description       | quantity   | unit_price | account      |
-	  | Services Bought   | 5	   | 		|              |
-	  | Test     	      | 1	   | 10.00	| Main Expense |
+    | description       | quantity | unit_price | account      | currency |
+    | Services Bought   | 5	   | 	        |              |          |
+    | Test     	        | 1	   | 10.00      | Main Expense |          |
        Then TS/AIS Post the invoice with description "Buy the Services Bought" and assert the taxes named "10% Sales Tax" are right
         and TS/AIS Create a credit note for the invoice with description "Buy the Services Bought" and assert the amounts

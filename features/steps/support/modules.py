@@ -14,7 +14,7 @@ def lInstallModules(lMods, oProteusConfig):
         all_module_names = [x.name for x in Module.find()]
         assert modules, "modules %r not in available modules: %r" \
           % (lMods, all_module_names,)
-        
+
     modules = Module.find([
         ('name', 'in', lMods),
         ('state', '!=', 'installed'),

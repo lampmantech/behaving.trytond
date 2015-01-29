@@ -27,7 +27,8 @@ from decimal import Decimal
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support.stepfuns import vAssertContentTable
 from .support.stepfuns import gGetFeaturesPayRec, \
-    vSetNamedInstanceFields, vCreatePartyWithPayRec
+    vSetNamedInstanceFields
+from .support import stepfuns
 from .support import modules
 from .support.tools import *
 
@@ -163,25 +164,29 @@ def step_impl(context, uParty, uCode):
                                     digits=2,
                                     rounding=Decimal('0.01'),
                                     mon_grouping='[3, 3, 0]',
-                                    mon_decimal_point='.')
+                                    mon_decimal_point='.',
+                                    mon_thousands_sep=',')
             elif uCode == 'GBP':
                 currency = Currency(name='GBP', symbol=u'£', code='GBP',
                                     digits=2,
                                     rounding=Decimal('0.01'),
                                     mon_grouping='[3, 3, 0]',
-                                    mon_decimal_point='.')
+                                    mon_decimal_point='.',
+                                    mon_thousands_sep=',')
             elif uCode == 'USD':
                 currency = Currency(name='USD', symbol=u'$', code='USD',
                                     digits=2,
                                     rounding=Decimal('0.01'),
                                     mon_grouping='[3, 3, 0]',
-                                    mon_decimal_point='.')
+                                    mon_decimal_point='.',
+                                    mon_thousands_sep=',')
             elif uCode == 'CAD':
                 currency = Currency(name='CAD', symbol=u'$', code='CAD',
                                     digits=2,
                                     rounding=Decimal('0.01'),
                                     mon_grouping='[3, 3, 0]',
-                                    mon_decimal_point='.')
+                                    mon_decimal_point='.',
+                                    mon_thousands_sep=',')
             else:
                 assert code in ['EUR', 'GBP', 'USD', 'CAD'], \
                        "Unsupported currency code: %s" % (uCode,)
@@ -329,7 +334,7 @@ def step_impl(context, uName):
     party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
 
-    vCreatePartyWithPayRec(context, uName, company)
+    stepfuns.vCreatePartyWithPayRec(context, uName, company)
 
 @step('Create a party named "{uName}" with payable and receivable properties with fields')
 @step('Create a party named "{uName}" with payable and receivable properties with |name|value| fields')
@@ -349,10 +354,8 @@ def step_impl(context, uName):
     party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
 
-    vCreatePartyWithPayRec(context, uName, company)
+    stepfuns.vCreatePartyWithPayRec(context, uName, company)
     vSetNamedInstanceFields(context, uName, 'party.party')
-
-
 
 # Accountant, Account
 @step('Create a user named "{uName}" with the fields')
@@ -388,3 +391,102 @@ def step_impl(context, uName):
 
         assert User.find([('name', '=', uName)])
 
+@step('Create a grouped user named "{uName}" with |name|value| fields')
+def step_impl(context, uName):
+    """
+    Create a user named "{uName}" with |name|value| fields
+            | name   | value |
+            | login  | sale  |
+            | group  | Sales |
+    group can be repeated for list of groups.
+    """
+    Party = proteus.Model.get('party.party')
+    Company = proteus.Model.get('company.company')
+    uPartyName = sGetFeatureData(context, 'party,company_name')
+    oParty, = Party.find([('name', '=', uPartyName)])
+    company, = Company.find([('party.id', '=', oParty.id)])
+    
+    User = proteus.Model.get('res.user')
+    if not User.find([('name', '=', uName)]):
+        oUser = User(name=uName)
+        oUser.main_company = company
+        Group = proteus.Model.get('res.group')
+        for row in context.table:
+            if row['name'] == 'group':
+                oGroup, = Group.find([('name', '=', row['value'])])
+                oUser.groups.append(oGroup)
+                continue
+            setattr(oUser, row['name'],
+                    string_to_python(row['name'], row['value'], User))
+        oUser.save()
+    oUser, = User.find([('name', '=', uName)])
+    return oUser
+
+
+@step('Create a sale user')
+def step_impl(context):
+    """
+    Create a grouped user named "Sale" with |name|value| fields
+            | name   | value |
+            | login  | sale  |
+            | group  | Sales |
+    """
+    User = proteus.Model.get('res.user')
+    context.execute_steps(u'''
+    Given Create a grouped user named "%s" with |name|value| fields
+            | name   | value |
+            | login  | sale  |
+            | group  | Sales |
+    ''' % ('Sale',))
+
+@step('Create a purchase user')
+def step_impl(context):
+    """
+    Given Create a grouped user named "Purchase" with |name|value| fields
+            | name   | value            |
+            | login  | purchase         |
+            | group  | Purchase         |
+    """
+    User = proteus.Model.get('res.user')
+    context.execute_steps(u'''
+    Given Create a grouped user named "%s" with |name|value| fields
+            | name   | value            |
+            | login  | purchase         |
+            | group  | Purchase         |
+    ''' % ('Purchase',))
+
+@step('Create a stock user')
+def step_impl(context):
+    """
+    Given Create a grouped user named "Stock" with |name|value| fields
+            | name   | value |
+            | login  | stock |
+            | group  | Stock |
+    """
+    User = proteus.Model.get('res.user')
+    context.execute_steps(u'''
+    Given Create a grouped user named "%s" with |name|value| fields
+            | name   | value |
+            | login  | stock |
+            | group  | Stock |
+    ''' % ('Stock',))
+    stock_user, = User.find([('name', '=', 'Stock')])
+
+
+@step('Create a account user')
+def step_impl(context):
+    """
+    Create a grouped user named "Account" with |name|value| fields
+            | name   | value |
+            | login  | account |
+            | group  | Account |
+    """
+    User = proteus.Model.get('res.user')
+    context.execute_steps(u'''
+    Given Create a grouped user named "%s" with |name|value| fields
+            | name   | value |
+            | login  | account |
+            | group  | Account |
+    ''' % ('Account',))
+
+    

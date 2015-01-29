@@ -60,6 +60,8 @@ def gGetFeaturesStockAccs(context, company):
     """
     These are in by trytond_account_stock_continental/account.xml
     which is pulled in by trytond_account_stock_anglo_saxon
+    so the module "account_stock_anglo_saxon" is required
+    unless you create them yourself.
     """
     Account = proteus.Model.get('account.account')
     # Fixme:             ('kind', '=', 'stock'), should be flagged early
@@ -89,11 +91,33 @@ def gGetFeaturesStockAccs(context, company):
         ('company', '=', company.id),
         ])
     return stock, stock_customer, stock_lost_found, \
-        stock_production, stock_supplier, 
+        stock_production, stock_supplier,
 
 def oAttachLinkToFileToResource(oResource, uFile):
     sLink = 'file://' + uFile
     sDescription = uFile
+    # ToDo cannonicalize the filename
+    # Use a md5 of the filename to make it unique
+    # This is the filename that will be used by the
+    # Tryton server when it stores it on disk.
+    sName = hashlib.md5(uFile).hexdigest()
+    try:
+        oAttachment = oAttachLinkToResource (sName, sDescription, sLink, oResource)
+        return oAttachment
+    except Exception, e:
+        sys.__stderr__.write(">>> ERROR: creating link, %s,\n%s\n%s\n" % (
+            str(e), uFile, sName,))
+
+
+def oAttachFeatureFileContentToResource(oResource, context):
+    uFile = context.scenario.filename
+    return oAttachFileContentToResource(oResource, uFile)
+
+def oAttachFileContentToResource(oResource, uFile):
+    sLink = 'file://' + uFile
+    with open(uFile, 'rt') as oFd:
+        sDescription = oFd.read()
+        
     # ToDo cannonicalize the filename
     # Use a sha of the filename to make it unique
     sName = hashlib.sha1(uFile).hexdigest()
@@ -104,7 +128,7 @@ def oAttachLinkToFileToResource(oResource, uFile):
         sys.__stderr__.write(">>> ERROR: creating link, %s,\n%s\n%s\n" % (
             str(e), uFile, sName,))
 
-    
+
 def oAttachLinkToResource(sName, sDescription, sLink, oResource):
     """
     Attach to an existing instance "{uResource}" a link to
@@ -126,7 +150,7 @@ def oAttachLinkToResource(sName, sDescription, sLink, oResource):
     oAttachment.link = sLink
     oAttachment.resource = oResource
     oAttachment.save()
-    
+
     return oAttachment
 
 def vAssertContentTable(context, iMin=2):
@@ -148,7 +172,7 @@ def vCreatePartyWithPayRec(context, uName, company):
         customer.save()
 
     assert Party.find([('name', '=', uName)])
-        
+
 def vSetNamedInstanceFields(context, uName, uKlass):
     assert context.table, "Please supply a table of |name|value| fields"
     if hasattr(context.table, 'headings'):
@@ -162,4 +186,4 @@ def vSetNamedInstanceFields(context, uName, uKlass):
         setattr(oInstance, row['name'],
                 string_to_python(row['name'], row['value'], Klass))
     oInstance.save()
-        
+

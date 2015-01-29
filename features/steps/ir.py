@@ -9,10 +9,10 @@ Test the core trytond/ir/ functionalities.
 """
 from behave import *
 import proteus
+
 import random, os, sys
 
-from .support.stepfuns import oAttachLinkToResource, oAttachLinkToFileToResource
-from .support.stepfuns import vAssertContentTable
+from .support import stepfuns
 from .support.tools import *
 
 @step('ir/attachment test')
@@ -32,9 +32,21 @@ def step_impl(context):
     sDescription = 'Test Link to ' + sFile
     sName = 'Test Link %d' % int(random.random() * 1000000)
 
-    oAttachment = oAttachLinkToResource (sName, sDescription, sLink, oResource)
+    oAttachment = stepfuns.oAttachLinkToResource(sName, sDescription, sLink, oResource)
 
     assert oAttachment.resource == oUser
+
+@step('Attach to an instance named "{uName}" of class "{uClass}" the content of this feature file')
+def step_impl(context, uName, uClass):
+    uFile = context.feature.filename
+    # FixMe: this can be a relative filename; need to add
+    # os.path.dirname(__file__)
+    context.execute_steps(u'''
+    Given Attach to an instance named "%s" of class "%s" a link to an existing file with the following |filename| fields
+    | filename |
+    | %s |
+''' % (uName, uClass, uFile))
+                          
 
 # This wont work with a table and  context.execute_steps
 @step('Attach to an instance named "{uName}" of class "{uClass}" a link to an existing file with the following |filename| fields')
@@ -47,8 +59,9 @@ def step_impl(context, uName, uClass):
     for row in context.table:
         uFile = row['filename']
         assert os.path.exists(uFile)
-        oAttachLinkToFileToResource(oResource, uFile)
-
+        o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
+        assert o
+        
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
     """
@@ -63,5 +76,22 @@ def step_impl(context, uField, uValue, uClass):
     for row in context.table:
         uFile = row['filename']
         assert os.path.exists(uFile)
-        oAttachLinkToFileToResource(oResource, uFile)
-            
+        o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
+        assert o
+
+@step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" the content of an existing file with the following |filename| fields')
+def step_impl(context, uField, uValue, uClass):
+    """
+    Attach to an existing instance with name "{uName}"
+    of class "{uClass}", the content of
+    an existing file with the following |filename| fields
+    """
+    Class = proteus.Model.get(uClass)
+
+    oResource = Class.find([(uField, '=', uValue)])[0]
+    assert context.table
+    for row in context.table:
+        uFile = row['filename']
+        assert os.path.exists(uFile)
+        o = stepfuns.oAttachFileContentToResource(oResource, uFile)
+        assert o

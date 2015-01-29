@@ -20,6 +20,7 @@ from .support.stepfuns import vAssertContentTable
 TODAY = datetime.date.today()
 
 from .support.stepfuns import gGetFeaturesRevExp
+from .support import stepfuns
 
 # Category
 @step('Create a ProductCategory named "{uName}"')
@@ -35,8 +36,9 @@ def step_impl(context, uName):
 # product , Category
 @step('Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields')
 def step_impl(context, uName, uCatName):
-    """Create a ProductTemplate named "{uName}"
-    from a ProductCategory named "{uCatName}" with fields
+    """
+    Create a ProductTemplate named "{uName}"
+    from a ProductCategory named "{uCatName}" with |name|value| fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fifo  |
@@ -48,7 +50,8 @@ def step_impl(context, uName, uCatName):
 	  | default_uom	      | Unit  |
 	  | account_expense   | Main Expense |
 	  | account_revenue   | Main Revenue |
-	  | account_cogs      | Main Expense |
+	  | account_cogs      | COGS  |
+          | stock_journal     | STO   |
     This requires that anglo_saxon
     Idempotent.
     """
@@ -70,6 +73,9 @@ def step_impl(context, uName, uCatName):
         ProductUom = proteus.Model.get('product.uom')
 
         AccountJournal = proteus.Model.get('account.journal')
+        # This account jourmal is created by Tryton
+        # Tryton-3.2/trytond_stock-3.2.3/location.xml
+        stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
         Account = proteus.Model.get('account.account')
 
         template = ProductTemplate()
@@ -85,7 +91,9 @@ def step_impl(context, uName, uCatName):
         # template_average.cost_price_method = 'fixed'
         # type, cost_price_method, default_uom
         for row in context.table:
-            if row['name'] == 'account_expense':
+            if row['name'] == 'stock_journal':
+                stock_journal, = AccountJournal.find([('code', '=', row['value']),])
+            elif row['name'] == 'account_expense':
                 expense, = Account.find([
                     ('kind', '=', 'expense'),
                     ('name', '=', row['value']),
@@ -127,9 +135,6 @@ def step_impl(context, uName, uCatName):
         template.account_stock_production = stock_production
         template.account_stock_lost_found = stock_lost_found
 
-        # This account jourmal is created by Tryton
-        # Tryton-3.2/trytond_stock-3.2.3/location.xml
-        stock_journal, = AccountJournal.find([('code', '=', 'STO'),])
         template.account_journal_stock_supplier = stock_journal
         template.account_journal_stock_customer = stock_journal
         template.account_journal_stock_lost_found = stock_journal
@@ -162,9 +167,8 @@ def step_impl(context, uTemplateName, uTaxName):
 	  | account_expense   | Main Expense |
 	  | account_revenue   | Main Revenue |
 #	  | cost_price_method | fixed        |
-    You can try currency and see what happens!
-    We'll put a haack to work on systems without a CoTs:
-    just call the tax "0% Sales Tax".
+    We'll put a hack to work on systems without a CoTs:
+    just call the tax "NO Sales Tax".
     Idempotent.
     """
 
@@ -181,7 +185,7 @@ def step_impl(context, uTemplateName, uTaxName):
         template = ProductTemplate()
         template.name = uTemplateName
         # default these in case they are not provided
-        revenue, expense, = gGetFeaturesRevExp(context, company)
+        revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
 
         # type, cost_price_method, default_uom, list_price, cost_price
         # account_expense, account_revenue
@@ -207,8 +211,8 @@ def step_impl(context, uTemplateName, uTaxName):
         template.account_revenue = revenue
 
         # We'll put a hack to work on systems without a CoTs
-        # Just call the tax "0% Sales Tax" and the taxes will be ignored
-        if uTaxName != "0% Sales Tax":
+        # Just call the tax "NO Sales Tax" and the taxes will be ignored
+        if uTaxName != "NO Sales Tax":
             Tax = proteus.Model.get('account.tax')
             # FixMe: need to handle supplier_tax as an append in string_to_python
             tax, = Tax.find([('name', '=', uTaxName)])

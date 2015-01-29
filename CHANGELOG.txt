@@ -1,3 +1,12 @@
+commit 08c8c5e634ad3fc2f20988c6334a02c930c1844a
+Date:   Thu Jan 22 21:03:40 2015 +0200
+
+    Added docs/trytond_product.txt to break out reusable product features.
+    
+    Added features/steps/scenario_account_stock_anglo_saxon_with_drop
+    _shipment.txt but it's not finished. It has some good multi-user
+    tests that we want to bring into features.
+
 commit b5f8533d6565916e956b673c8d4250aa787494a0
 Date:   Tue Jan 20 05:31:47 2015 +0200
 

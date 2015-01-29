@@ -25,50 +25,33 @@ from .support.stepfuns import vAssertContentTable
 from .support import modules
 from .support import tools
 
-# Warning - these are hardwired from the Tryton code
-from .trytond_constants import *
-
 TODAY = datetime.date.today()
 
 # TODAY, Buy the Services Bought, Term 30 days, Supplier
-@step('Create an "{uKind}" invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account| fields')
-def step_impl(context, uKind, uDate, uDescription, uPaymentTerm, uSupplier):
-    sType = 'in_invoice'
-    assert context.table
-    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
-    
-# TODAY, Services Sold, Customer
-@step('Create an "{uKind}" invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account| fields')
-def step_impl(context, uKind, uDate, uDescription, uPaymentTerm, uCustomer):
-    sType = 'out_invoice'
-    assert context.table
-    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uCustomer, sType)
-
-# TODAY, Buy the Services Bought, Term 30 days, Supplier
-@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account| fields')
+@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
     """
 Create an invoice with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
 Note that this uses the heading description rather than name
-	  | description       | quantity   | unit_price | account      |
-	  | Services Bought   | 5	   | 		|              |
-	  | Test     	      | 1	   | 10.00	| Main Expense |
+  | description       | quantity   | unit_price | account      | currency |
+  | Services Bought   | 5	   | 		|              |          |
+  | Test     	      | 1	   | 10.00	| Main Expense | USD      |
     """
     sType = 'in_invoice'
     assert context.table
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
     
 # TODAY, Services Sold, Customer
-@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account| fields')
+@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
     """
 Create an invoice with description "{uDescription}" to customer
-"{uCustomer}" with following |description|quantity|unit_price|account| fields
+"{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
 Note that this uses the heading description rather than name
-	  | description       | quantity   | unit_price | account      |
-	  | Services Bought   | 5	   | 		|              |
-	  | Test     	      | 1	   | 10.00	| Main Revenue |
+  | description       | quantity   | unit_price | account      | currency |
+  | Services Bought   | 5	   | 		|              |          |
+  | Test     	      | 1	   | 10.00	| Main Revenue | USD      |
     """
     sType = 'out_invoice'
     assert context.table
@@ -131,6 +114,9 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
             invoice.lines.append(line)
             # Note that this uses the heading 'description' rather than 'name'
             lProducts = Product.find([('description', '=', row['description'])])
+            if row['currency']:
+                # FixMe: row['currency']
+                pass
             if lProducts:
                 line.product = lProducts[0]
                 # 'unit_price' is derived from the Product

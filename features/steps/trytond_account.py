@@ -13,8 +13,8 @@ from decimal import Decimal
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
-from .support.stepfuns import gGetFeaturesRevExp
-from .support.stepfuns import vAssertContentTable
+from .support.stepfuns import gGetFeaturesRevExp, gGetFeaturesPayRec
+from .support import stepfuns
 
 TODAY = datetime.date.today()
 
@@ -43,6 +43,7 @@ def step_impl(context, uYear):
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
+    
     if uYear.lower() == "now" or uYear.upper() == "TODAY":
         uYear=str(TODAY.year)
     if not FiscalYear.find([('name', '=', uYear),
@@ -94,6 +95,7 @@ def step_impl(context, uYear):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
+    
     if not FiscalYear.find([('name', '=', str(uYear)),
                             ('company', '=', company.id),]):
         oDate = datetime.date(int(uYear), 1, 1)
@@ -105,7 +107,8 @@ def step_impl(context, uYear):
 
         Sequence = proteus.Model.get('ir.sequence')
         post_move_sequence = Sequence(name='%s' % uYear,
-            code='account.move', company=company)
+                                      code='account.move',
+                                      company=company)
         post_move_sequence.save()
         fiscalyear.post_move_sequence = post_move_sequence
 
@@ -176,6 +179,17 @@ def step_impl(context, uYear):
 
     assert FiscalYear.find([('name', '=', uYear)])
 
+@step('Create a default Minimal Account Chart')
+def step_impl(context):
+    """
+    Create a default chart of accounts from template 
+    "Minimal Account Chart" with root "Minimal Account Chart"
+
+    """
+    context.execute_steps(u'''
+    Given Create a chart of accounts from template "%s" with root "%s"
+    ''' % ( 'Minimal Account Chart', 'Minimal Account Chart'))
+    
 # 'Minimal Account Chart', 'Minimal Account Chart'
 @step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
 def step_impl(context, uTem, uRoot):
@@ -206,7 +220,6 @@ def step_impl(context, uTem, uRoot):
         create_chart = proteus.Wizard('account.create_chart')
         create_chart.execute('account')
 
-        # MINIMAL_ACCOUNT_TEMPLATE
         AccountTemplate = proteus.Model.get('account.account.template')
         account_template, = AccountTemplate.find([('name', '=', uTem)])
         create_chart.form.account_template = account_template
@@ -218,39 +231,52 @@ def step_impl(context, uTem, uRoot):
                 ]))
         assert iLen >= 6
 
-        receivable = Account.find([
-                ('kind', '=', 'receivable'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_receivable')),
-                ('company', '=', company.id),
-                ])[0]
-        payable, = Account.find([
-                ('kind', '=', 'payable'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
-                ('company', '=', company.id),
-                ])
-        revenue, = Account.find([
-                ('kind', '=', 'revenue'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
-                ('company', '=', company.id),
-                ])
-        expense, = Account.find([
-                ('kind', '=', 'expense'),
-                ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-                ('company', '=', company.id),
-                ])
+        payable, receivable, = gGetFeaturesPayRec(context, company)
+        revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
+        create_chart.form.account_receivable = receivable
+        create_chart.form.account_payable = payable
+        create_chart.execute('create_properties')
+        
         cash, = Account.find([
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),
                 ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
                 ])
+        # This is only used if the bank module is loaded
+        #? check its an attribute first?
         cash.bank_reconcile = True
         cash.save()
-        create_chart.form.account_receivable = receivable
-        create_chart.form.account_payable = payable
-        create_chart.execute('create_properties')
 
     assert Account.find([('name', '=', uRoot)])
 
+@step('Set the default credit and debit accounts on the cash Journal')
+def step_impl(context):
+    """
+    """
+    Account = proteus.Model.get('account.account')
+    Journal = proteus.Model.get('account.journal')
+
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    Party = proteus.Model.get('party.party')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    cash, = Account.find([
+            ('kind', '=', 'other'),
+            ('company', '=', company.id),
+            ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
+            ])
+    #? where is the cash Journal defined?
+    #? Im assuming everyone wants this, but
+    #? maybe this should be its own step
+    #? its in scenario_purchase.rst
+    cash_journal, = Journal.find([('type', '=', 'cash')])
+    cash_journal.credit_account = cash
+    cash_journal.debit_account = cash
+    cash_journal.save()
+
+    
 # Direct, 0
 @step('Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder')
 def step_impl(context, uTermName, uNum):

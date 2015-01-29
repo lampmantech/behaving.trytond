@@ -25,10 +25,10 @@ from .support import modules
 from .support import tools
 from .support import stepfuns
 
-TODAY = datetime.date.today()
-
-# FixMe: move these over to FeatureData
+# Warning - these are hardwired from the Tryton code
 from .trytond_constants import *
+
+TODAY = datetime.date.today()
 
 # cost_price_method - one of
 dCacheCostPriceMethod={}
@@ -673,8 +673,8 @@ def step_impl(context, uSupplier, uPaymentTerm):
         assert purchase.state == u'confirmed'
 
         new_config = proteus.config.set_trytond(
-            user=ACCOUNTANT_USER,
-            password=ACCOUNTANT_PASSWORD,
+            user=sGetFeatureData(context, 'user,accountant,login'),
+            password=sGetFeatureData(context, 'user,accountant,password'),
             database_name=current_config.database_name)
         invoice_ids = [i.id for i in purchase.invoices]
         #? is this right? or does it matter?

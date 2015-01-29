@@ -1,0 +1,27 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/scenario_purchase.py
+
+
+   =================
+   Purchase Scenario
+   =================
+   Unfinished
+
+**T/PUR Create ProductTemplate**
+   Create a ProductTemplate named "product" from a ProductCategory named "Category" with |name|value| fields
+   | name              | value |
+   | type	      | goods |
+   | cost_price_method | fixed |
+   | default_uom       | Unit  |
+   | purchasable       | True  |
+   | salable 	      | True  |
+   | list_price 	      | 10    |
+   | cost_price 	      | 5     |
+   | delivery_time     | 0     |
+   | default_uom	      | Unit  |
+   | account_expense   | Main Expense |
+   | account_revenue   | Main Revenue |
+   | supply_on_sale    | True |
+
+**T/PUR Purchase Scenario**

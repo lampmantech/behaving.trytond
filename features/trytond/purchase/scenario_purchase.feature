@@ -1,21 +1,19 @@
 # -*- encoding: utf-8 -*-
 
 @works32
-Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
-    adapted from scenario_account_stock_anglo_saxon_with_drop_shipment.rst
-    in trytond_account_stock_anglo_saxon-3.2.1/tests/
+Feature: Run the Trytond scenario_purchase doctests
+    adapted from 
+    in 
     Works, but still UNFINISHED.
     
-    Scenario: Setup the tests of the module named "account_stock_anglo_saxon"
+    Scenario: Setup the tests of the purchase module
 
       Given Create database with pool.test set to True
-        and Ensure that the "account_stock_anglo_saxon" module is loaded
-        and Ensure that the "sale_supply_drop_shipment" module is loaded
+        and Ensure that the "account_invoice_stock" module is loaded
         and Ensure that the "sale" module is loaded
         and Ensure that the "purchase" module is loaded
+	and Create parties
 	and Set the default feature data
-# These are in by trytond_account_stock_continental/account.xml
-# which is pulled in by trytond_account_stock_anglo_saxon
 	and Set the feature data with values
 	     | name                                  | value                |
 	     | account.template,main_cogs            | COGS                 |
@@ -24,11 +22,10 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	     | account.template,stock_lost_found     | Stock Lost and Found |
 	     | account.template,stock_production     | Stock Production     |
 	     | account.template,stock_supplier       | Stock Supplier       |
-       then the "account_stock_anglo_saxon" module is in the list of loaded modules
 
-    Scenario: Create the company to test scenario_account_stock_anglo_saxon_with_drop_shipment
-      Given Create parties
-	and Create the company with default COMPANY_NAME and Currency code "USD"
+    Scenario: Create the company to test the module
+
+      Given Create the company with default COMPANY_NAME and Currency code "USD"
 	and Reload the default User preferences into the context
 	and Create this fiscal year with Invoicing
         and Create a sale user
@@ -39,24 +36,39 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	and Set the default credit and debit accounts on the cash Journal
 
     Scenario: Create the products that we will purchase
+    """
+    We'll put a hack to work on systems without a CoTs:
+    just call the tax "NO Sales Tax".
+    """
+    
       Given Create a saved instance of "product.category" named "Category"
-        and Create a ProductTemplate named "product" with stock accounts from features from a ProductCategory named "Category" with |name|value| fields
+#	and T/PUR Create ProductTemplate
+        and Create a ProductTemplate named "product" with supplier_tax named "NO Sales Tax" with |name|value| fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fixed |
+          | default_uom       | Unit  |
 	  | purchasable       | True  |
 	  | salable 	      | True  |
 	  | list_price 	      | 10    |
 	  | cost_price 	      | 5     |
 	  | delivery_time     | 0     |
-	  | default_uom	      | Unit  |
 	  | account_expense   | Main Expense |
 	  | account_revenue   | Main Revenue |
-	  | account_cogs      | COGS |
-          | stock_journal     | STO   |
-          | supply_on_sale    | True |
+        and Create a ProductTemplate named "service" with supplier_tax named "NO Sales Tax" with |name|value| fields
+	  | name              | value |
+	  | type	      | service |
+	  | cost_price_method | fixed |
+          | default_uom       | Unit  |
+	  | purchasable       | True  |
+	  | list_price 	      | 10    |
+	  | cost_price 	      | 10    |
+	  | delivery_time     | 0     |
+	  | account_expense   | Main Expense |
+	  | account_revenue   | Main Revenue |
+	and Create a PaymentTerm named "Direct" with "0" days remainder
     
     Scenario: Unfinished - the rest still needs breaking out
 
-      Given T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario
-  
+      Given T/PUR Purchase Scenario
+      

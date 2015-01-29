@@ -12,7 +12,7 @@ from proteus import config, Model, Wizard
 def sGetFeatureData(context, sKey):
     if sKey in context.dData['feature']:
         return context.dData['feature'][sKey]
-    
+
     # fall through to oEnvironmentCfg
     lKeys=sKey.split(',', 1)
     assert len(lKeys) == 2
@@ -20,14 +20,14 @@ def sGetFeatureData(context, sKey):
     if g: return g
 
     raise UserError("ERROR: Use 'Set the feature data with values' to set the value of "+sKey)
-    
+
 def vSetFeatureData(context, sKey, sValue):
     context.dData['feature'][sKey] = sValue
 
 def string_to_python (sField, uValue, Party=None):
     #? should replace this with DSL
-    
-    if Party is None: 
+
+    if Party is None:
         sType = ''
     else:
         dFields = Party._fields
@@ -65,7 +65,7 @@ def string_to_python (sField, uValue, Party=None):
 
     if sField in ['name',]:
         return uValue
-        
+
     # give up or error?
     if sType == '': return uValue
 
@@ -74,7 +74,7 @@ def string_to_python (sField, uValue, Party=None):
     #       "Sorry, dont know how to look in slots of %s " % (sField,)
     #assert dField['searchable']
 
-    
+
     # sType == 'many2one' or sType == 'many2many' uses relation
     assert 'relation' in dField.keys(), \
                "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)
@@ -84,12 +84,12 @@ def string_to_python (sField, uValue, Party=None):
     #? FixMe: assume name for now
     lElts = Klass.find([('name', '=', uValue)])
 
-    if len(lElts) == 0 and sField in ['country',]:
+    if len(lElts) == 0 and sField in ['country', 'subdivision']:
         # Im having trouble with country.country as of 3.2
         # .find([('name','=',gValue)]) returns []
         # .find([('rec_name','=',gValue)]) returns []
         # FixMe: Just junk the field value for now.
-        return None        
+        return None
 
     assert len(lElts) != 0, \
            "ERROR: No instance of %s found named '%s'" % (sRelation, uValue,)

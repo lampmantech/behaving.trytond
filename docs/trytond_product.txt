@@ -9,7 +9,8 @@ From: ../features/steps/trytond_product.py
    Idempotent.
 
 **Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields**
-   from a ProductCategory named "{uCatName}" with fields
+   Create a ProductTemplate named "{uName}"
+   from a ProductCategory named "{uCatName}" with |name|value| fields
    | name              | value |
    | type	      | goods |
    | cost_price_method | fifo  |
@@ -21,7 +22,7 @@ From: ../features/steps/trytond_product.py
    | default_uom	      | Unit  |
    | account_expense   | Main Expense |
    | account_revenue   | Main Revenue |
-   | account_cogs      | Main Expense |
+   | account_cogs      | COGS  |
    This requires that anglo_saxon
    Idempotent.
 
@@ -41,7 +42,7 @@ From: ../features/steps/trytond_product.py
    | account_revenue   | Main Revenue |
    #	  | cost_price_method | fixed        |
    You can try currency and see what happens!
-   We'll put a haack to work on systems without a CoTs:
+   We'll put a hack to work on systems without a CoTs:
    just call the tax "0% Sales Tax".
    Idempotent.
 

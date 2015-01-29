@@ -107,3 +107,34 @@ From: ../features/steps/scenario_doctests.py
    It also loads the values into the feature data under the  keys
    'user,'+uName+","+row['name']
    Idempotent.
+
+**Create a grouped user named "{uName}" with |name|value| fields**
+   Create a user named "{uName}" with |name|value| fields
+   | name   | value |
+   | login  | sale  |
+   | group  | Sales |
+   group can be repeated for list of groups.
+
+**Create a sale user**
+   Create a grouped user named "Sale" with |name|value| fields
+   | name   | value |
+   | login  | sale  |
+   | group  | Sales |
+
+**Create a purchase user**
+   Given Create a grouped user named "Purchase" with |name|value| fields
+   | name   | value            |
+   | login  | purchase         |
+   | group  | Purchase         |
+
+**Create a stock user**
+   Given Create a grouped user named "Stock" with |name|value| fields
+   | name   | value |
+   | login  | stock |
+   | group  | Stock |
+
+**Create a account user**
+   Create a grouped user named "Account" with |name|value| fields
+   | name   | value |
+   | login  | account |
+   | group  | Account |

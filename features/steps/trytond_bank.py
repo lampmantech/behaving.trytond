@@ -17,13 +17,15 @@ import proteus
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support.stepfuns import vAssertContentTable
 
-@step('Create a bank associated to a party "{uParty}" with optional BIC "{uBic}"')
-def step_impl(context, uParty, uBic):
+@step('Create a bank associated to a party "{uParty}" with optional |bic| field')
+def step_impl(context, uParty):
     """
-    Create a named bank associated to a party, with optional BIC.
+    Create a named bank associated to a party, with optional BIC
+     | bic    |
+     | THEBIC |
     Create the party first, with things like addresses, and
     then use this to create the bank.
-    The uBic field can be empty; if not it has 11 characters.
+    The uBic field can be missing; if not it has 11 characters.
     """
     Party = proteus.Model.get('party.party')
     oParty, = Party.find([('name', '=', uParty)])
@@ -31,9 +33,13 @@ def step_impl(context, uParty, uBic):
     Bank = proteus.Model.get('bank')
     if not Bank.find([('party.id', '=', oParty.id)]):
         oBank = Bank(party=oParty)
-        if uBic:
-            assert len(uBic) <= 11
-            oBank.bic=uBic
+        if hasattr(context, 'table') and context.table:
+            for row in context.table:
+                if row['bic']:
+                    uBic = row['bic']
+                    assert len(uBic) <= 11
+                    oBank.bic=uBic
+                    break
         oBank.save()
 
     assert Bank.find([('party.id', '=', oParty.id)])
@@ -213,7 +219,7 @@ def step_impl(context, uName, uBankSequenceName):
     assert AccountJournal.find([('name', '=', uName),
                                 ('type', '=', 'cash')])
 
-@step('Create a financial account under "{sTemplate}" for the bank account with IBAN "{uIban}"')
+@step('Create a financial account under "{uTemplate}" for the bank account with IBAN "{uIban}"')
 def step_impl(context, uTemplate, uIban):
     """
     Create a new account into the chart of accounts for a bank account.
@@ -277,6 +283,7 @@ def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
             if not gValue: continue
             # gValue = string_to_python(row, value, Account)
             if row == 'kind' and gValue == 'view':
+                # FixMe: is it kind other or kind cash?
                 gValue = 'other'
                 oParent = oTemplate
             setattr(oNewAccount, row, gValue)
@@ -284,7 +291,6 @@ def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
         oNewAccount.parent = oParent
         #? is this right? are bank accounts always reconcile = True
         oNewAccount.reconcile = True
-        oNewAccount.bank_reconcile = True
         oNewAccount.save()
 
     l = Account.find([('name', '=', sNewName),

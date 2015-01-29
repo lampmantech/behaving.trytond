@@ -8,7 +8,7 @@ import sys
 import traceback
 import pdb
 
-__all__ = ['puts', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr']    # + 20 'assert_*' 
+__all__ = ['puts', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr']    # + 20 'assert_*'
 
 
 # Expose assert* from unittest.TestCase with pep8 style names
@@ -78,12 +78,12 @@ def vRestoreStdoutErr ():
 
 def set_trace_with_pydbgr():
     """Call pdb.set_trace in the caller's frame.
-    
+
     First restore sys.stdout and sys.stderr.  Note that the streams are
     NOT reset to whatever they were before the call once pydbgr is done!
     """
     exc, tb = sys.exc_info()[1:]
-    vRestoreStdoutErr()    
+    vRestoreStdoutErr()
     output=sys.__stdout__
     output.flush()
     try:
@@ -103,12 +103,12 @@ def set_trace_with_pydbgr():
 
 def set_trace_with_pdb():
     """Call pdb.set_trace in the caller's frame.
-    
+
     First restore sys.stdout and sys.stderr.  Note that the streams are
     NOT reset to whatever they were before the call once pdb is done!
     """
     exc, tb = sys.exc_info()[1:]
-    vRestoreStdoutErr()    
+    vRestoreStdoutErr()
     output=sys.__stdout__
     output.flush()
     try:
@@ -174,7 +174,7 @@ class Pdb(pdb.Pdb):
             return Cmd.onecmd(self, line)
         else:
             return self.handle_command_def(line)
-    
+
 def post_mortem(t=None):
     # handling the default
     if t is None:

@@ -28,6 +28,10 @@ From: ../features/steps/trytond_account.py
    Creates a fiscal year 'uYear' with a non-Strict post_move_seq.
    Create the company first.
 
+**Create a default Minimal Account Chart**
+   Create a default chart of accounts from template
+   "Minimal Account Chart" with root "Minimal Account Chart"
+
 **Create a chart of accounts from template "{uTem}" with root "{uRoot}"**
    Create a chart of accounts from template "{uTem}"
    with root account "{uRoot}".
@@ -39,6 +43,8 @@ From: ../features/steps/trytond_account.py
    * account.template,main_revenue
    * account.template,main_expense
    * account.template,main_cash
+
+**Set the default credit and debit accounts on the cash Journal**
 
 **Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder**
    Create a account.invoice.payment_term with name 'uTermName'
