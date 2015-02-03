@@ -155,7 +155,19 @@ def step_impl(context, uName, uCatName):
                                  ('category.name', '=', uCatName),
                              ])
 
+# Service Product
+@step('Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}"')
+def step_impl(context, uTemplateName, uTaxName):
+    """
+    Create a ProductTemplate named "{uTemplateName}"
+    with a supplier_tax named "{uTaxName}"
+    """
+    context.execute_steps(u"""
+    Given Create a ProductTemplate named "%(uTemplateName)s" with a supplier_tax named "%(uTaxName)s" with |name|value| fields
+    | name | value |
+""" % {'uTemplateName': uTemplateName, 'uTaxName': uTaxName})
 
+                                            
 # Service Product
 @step('Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields')
 def step_impl(context, uTemplateName, uTaxName):
@@ -241,7 +253,8 @@ def step_impl(context, uDescription, uTemplateName):
     template, = ProductTemplate.find([('name', '=', uTemplateName)])
 
     Product = proteus.Model.get('product.product')
-    if not Product.find([('description', '=', uDescription)]):
+    if not Product.find([('template.name', '=', uTemplateName),
+                         ('description', '=', uDescription)]):
         product = Product()
         product.template = template
         product.description = uDescription

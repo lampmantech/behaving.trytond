@@ -27,6 +27,10 @@ From: ../features/steps/trytond_product.py
    This requires that anglo_saxon
    Idempotent.
 
+**Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}"**
+   Create a ProductTemplate named "{uTemplateName}"
+   with a supplier_tax named "{uTaxName}"
+
 **Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields**
    Create a ProductTemplate named "{uTemplateName}"
    with a supplier_tax named "{uTaxName}"

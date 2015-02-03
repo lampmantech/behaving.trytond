@@ -39,8 +39,9 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	and Set the default credit and debit accounts on the cash Journal
 
     Scenario: Create the products that we will purchase
+    
       Given Create a saved instance of "product.category" named "Category"
-        and Create a ProductTemplate named "product" with stock accounts from features from a ProductCategory named "Category" with |name|value| fields
+        and Create a ProductTemplate named "Product Template" with stock accounts from features from a ProductCategory named "Category" with |name|value| fields
 	  | name              | value |
 	  | type	      | goods |
 	  | cost_price_method | fixed |
@@ -55,8 +56,14 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 	  | account_cogs      | COGS |
           | stock_journal     | STO   |
           | supply_on_sale    | True |
-    
+	and Create a product with description "T/ASASDS Product Description" from template "Product Template"   
+#        and Create a ProductSupplier with description "T/ASASDS Product Description" from a ProductTemplate named "Product Template" with supplier named "Supplier" with |name|value| fields
+#	  | name              | value   |
+#	  | drop_shipment     | True    |
+#          | delivery_time     | 0       |
+	and Create a PaymentTerm named "Direct" with "0" days remainder
+	
     Scenario: Unfinished - the rest still needs breaking out
 
       Given T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario
-  
+ 

@@ -1,3 +1,9 @@
+commit 6a521ad3ddd60587cbe387301a7a311405b7456f
+Date:   Tue Feb 3 07:40:11 2015 +0200
+
+    Improved trytond_purchase.py and generalized more
+    purchase steps over from scenario_purchase.py
+
 commit 484705e2f6dfe7159237bd7da8124f8ad7cf0dee
 Date:   Thu Jan 29 19:54:32 2015 +0200
 
