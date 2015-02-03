@@ -41,7 +41,7 @@ Note that this uses the heading description rather than name
     sType = 'in_invoice'
     assert context.table
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
-    
+
 # TODAY, Services Sold, Customer
 @step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
@@ -99,7 +99,7 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
             ('company', '=', company.id),
         ])
         invoice.account = oMain
-        
+
         oLineDefault, = Account.find([
             ('kind', '=', uKind),
             ('name', '=', sGetFeatureData(context, 'account.template,main_'+uKind)),

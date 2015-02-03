@@ -405,7 +405,7 @@ def step_impl(context, uName):
     uPartyName = sGetFeatureData(context, 'party,company_name')
     oParty, = Party.find([('name', '=', uPartyName)])
     company, = Company.find([('party.id', '=', oParty.id)])
-    
+
     User = proteus.Model.get('res.user')
     if not User.find([('name', '=', uName)]):
         oUser = User(name=uName)
@@ -489,4 +489,4 @@ def step_impl(context):
             | group  | Account |
     ''' % ('Account',))
 
-    
+

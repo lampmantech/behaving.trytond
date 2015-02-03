@@ -21,57 +21,97 @@ from .support import stepfuns
 
 TODAY = datetime.date.today()
 
-@step('T/PUR Create ProductTemplate')
-def step_impl(context):
-    """
-    Create a ProductTemplate named "product" from a ProductCategory named "Category" with |name|value| fields
-	  | name              | value |
-	  | type	      | goods |
-	  | cost_price_method | fixed |
-          | default_uom       | Unit  |
-	  | purchasable       | True  |
-	  | salable 	      | True  |
-	  | list_price 	      | 10    |
-	  | cost_price 	      | 5     |
-	  | delivery_time     | 0     |
-	  | default_uom	      | Unit  |
-	  | account_expense   | Main Expense |
-	  | account_revenue   | Main Revenue |
-    """
-    config = context.oProteusConfig
+#@step('T/PUR Create chart of accounts')
+#def step_impl(context):
 
+@step('T/PUR Assert the Purchase lines in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+def step_impl(context, uDescription, uSupplier):
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
-    payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
-    revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
+    supplier, = Party.find([('name', '=', uSupplier),])
+    Purchase = proteus.Model.get('purchase.purchase')
+    purchase, = Purchase.find([('party.id',  '=', supplier.id),
+                               ('company.id',  '=', company.id),
+                               ('description', '=', uDescription)])
     
-    Account = proteus.Model.get('account.account')
+    assert len(purchase.moves) == 2
+    assert len(purchase.shipment_returns) == 0
+    assert len(purchase.invoices) == 1
+    invoice, = purchase.invoices
+    assert invoice.origins == purchase.rec_name
+
+@step('T/PUR Assert the Invoice lines are linked to stock move in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+def step_impl(context, uDescription, uSupplier):
+    config = context.oProteusConfig
     
-    ProductTemplate = proteus.Model.get('product.template')
-    template = ProductTemplate()
-    uName = 'product'
-    if not ProductTemplate.find([('name','=', uName)]):
-        ProductUom = proteus.Model.get('product.uom')
-        unit, = ProductUom.find([('name', '=', 'Unit')])
-        
-        template = ProductTemplate()
-        template.name = uName
-        template.default_uom = unit
-        template.type = 'goods'
-        template.purchasable = True
-        template.salable = True
-        template.list_price = Decimal('10')
-        template.cost_price = Decimal('5')
-        template.cost_price_method = 'fixed'
-        template.account_expense = expense
-        template.account_revenue = revenue
-        template.save()
-    template, = ProductTemplate.find([('name','=', uName)])
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    supplier, = Party.find([('name', '=', uSupplier),])
+    Purchase = proteus.Model.get('purchase.purchase')
+    purchase, = Purchase.find([('party.id',  '=', supplier.id),
+                               ('company.id',  '=', company.id),
+                               ('description', '=', uDescription)])
     
+    invoice, = purchase.invoices
+    _, invoice_line1, invoice_line2 = sorted(invoice.lines,
+            key=lambda l: l.quantity)
+    stock_move1, stock_move2 = sorted(purchase.moves,
+            key=lambda m: m.quantity)
+    assert invoice_line1.stock_moves == [stock_move1]
+    assert stock_move1.invoice_lines == [invoice_line1]
+    assert invoice_line2.stock_moves == [stock_move2]
+    assert stock_move2.invoice_lines == [invoice_line2]
+
+@step('T/PUR Check no new invoices in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+def step_impl(context, uDescription, uSupplier):
+    config = context.oProteusConfig
+    
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    supplier, = Party.find([('name', '=', uSupplier),])
+    Purchase = proteus.Model.get('purchase.purchase')
+    purchase, = Purchase.find([('party.id',  '=', supplier.id),
+                               ('company.id',  '=', company.id),
+                               ('description', '=', uDescription)])
+
+#?    purchase_user, = User.find([('name', '=', 'Purchase')])
+#?    proteus.config.user = purchase_user.id
+    assert len(purchase.moves) == 2
+    assert len(purchase.shipment_returns) == 0
+    assert len(purchase.invoices) == 1
+
+@step('T/PUR Assert not yet linked to invoice lines P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+def step_impl(context, uDescription, uSupplier):
+    config = context.oProteusConfig
+    
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    supplier, = Party.find([('name', '=', uSupplier),])
+    Purchase = proteus.Model.get('purchase.purchase')
+    purchase, = Purchase.find([('party.id',  '=', supplier.id),
+                               ('company.id',  '=', company.id),
+                               ('description', '=', uDescription)])
+
+    stock_move1, stock_move2 = sorted(purchase.moves,
+            key=lambda m: m.quantity)
+    assert len(stock_move1.invoice_lines) == 0
+    assert len(stock_move2.invoice_lines) == 0
 
 @step('T/PUR Purchase Scenario')
 def step_impl(context):
@@ -86,214 +126,35 @@ def step_impl(context):
     User = proteus.Model.get('res.user')
     Group = proteus.Model.get('res.group')
 
-#@step('T/PUR Create chart of accounts')
-#def step_impl(context):
-
     AccountTemplate = proteus.Model.get('account.account.template')
     Account = proteus.Model.get('account.account')
     Journal = proteus.Model.get('account.journal')
-    
 
-#@step('T/PUR Create product')
-#def step_impl(context):
     payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
 
-    ProductUom = proteus.Model.get('product.uom')
-    unit, = ProductUom.find([('name', '=', 'Unit')])
-    ProductTemplate = proteus.Model.get('product.template')
     Product = proteus.Model.get('product.product')
-    
-    product = Product()
-    uName = 'product'
-    template, = ProductTemplate.find([('name','=', uName)])
-    product.template = template
-    product.save()    
+    product, = Product.find([('name','=', 'product')])
+    service, = Product.find([('name','=', 'service')])
 
-    service = Product()
-    uName = 'service'
-    l = ProductTemplate.find([('name','=', uName)])
-    if l:
-        template = l[0]
-    else:
-        template = ProductTemplate()
-        template.name = 'service'
-        template.default_uom = unit
-        template.type = 'service'
-        template.purchasable = True
-        template.list_price = Decimal('10')
-        template.cost_price = Decimal('10')
-        template.cost_price_method = 'fixed'
-        template.account_expense = expense
-        template.account_revenue = revenue
-        template.save()
-    service.template = template
-    service.save()
-
-#@step('T/PUR Create payment term')
-#def step_impl(context):
-
-    PaymentTerm = proteus.Model.get('account.invoice.payment_term')
-    l = PaymentTerm.find([('name', '=', 'Direct')])
-    if l:
-        payment_term = l[0]
-    else:
-        PaymentTermLine = proteus.Model.get('account.invoice.payment_term.line')
-        payment_term = PaymentTerm(name='Direct')
-        payment_term_line = PaymentTermLine(type='remainder', days=0)
-        payment_term.lines.append(payment_term_line)
-        payment_term.save()
-
-#@step('T/PUR Create an Inventory')
-#def step_impl(context):
-
-    stock_user, = User.find([('name', '=', 'Stock')])
-    proteus.config.user = stock_user.id
-    Inventory = proteus.Model.get('stock.inventory')
-    Location = proteus.Model.get('stock.location')
-    storage, = Location.find([
-                ('code', '=', 'STO'),
-                ])
-    inventory = Inventory()
-    inventory.location = storage
-    inventory.save()
-    
-    InventoryLine = proteus.Model.get('stock.inventory.line')
-    inventory_line = InventoryLine(product=product, inventory=inventory)
-    inventory_line.quantity = 100.0
-    inventory_line.expected_quantity = 0.0
-    inventory.save()
-    inventory_line.save()
-    Inventory.confirm([inventory.id], config.context)
-    assert inventory.state == u'done'
-
-#@step('T/PUR Purchase 5 products')
-#def step_impl(context):
     uSupplier = u'Supplier'
     supplier, = Party.find([('name', '=', uSupplier),])
 
-    purchase_user, = User.find([('name', '=', 'Purchase')])
-    proteus.config.user = purchase_user.id
     Purchase = proteus.Model.get('purchase.purchase')
-    PurchaseLine = proteus.Model.get('purchase.line')
-    purchase = Purchase()
-    purchase.party = supplier
-    purchase.payment_term = payment_term
-    purchase.invoice_method = 'order'
-    purchase_line = PurchaseLine()
-    purchase.lines.append(purchase_line)
-    purchase_line.product = product
-    purchase_line.quantity = 2.0
-    purchase_line = PurchaseLine()
-    purchase.lines.append(purchase_line)
-    purchase_line.type = 'comment'
-    purchase_line.description = 'Comment'
-    purchase_line = PurchaseLine()
-    purchase.lines.append(purchase_line)
-    purchase_line.product = product
-    purchase_line.quantity = 3.0
-    purchase.save()
-    Purchase.quote([purchase.id], config.context)
-    Purchase.confirm([purchase.id], config.context)
-    assert purchase.state == u'confirmed'
-    purchase.reload()
-    assert len(purchase.moves) == 2
-    assert len(purchase.shipment_returns) == 0
-    assert len(purchase.invoices) == 1
-    invoice, = purchase.invoices
-    assert invoice.origins == purchase.rec_name
+    purchase1, = Purchase.find([('party.id',  '=', supplier.id),
+                               ('company.id',  '=', company.id),
+                               ('description', '=', "P. O. #1")])
 
-#@step('T/PUR Invoice line must be linked to stock move')
+    Purchase = proteus.Model.get('purchase.purchase')
+    purchase2, = Purchase.find([('party.id',  '=', supplier.id),
+                               ('company.id',  '=', company.id),
+                               ('description', '=', "P. O. #2")])
+    purchase = purchase2
+
+#@step('T/PUR Create an open supplier invoice')
 #def step_impl(context):
 
-    _, invoice_line1, invoice_line2 = sorted(invoice.lines,
-            key=lambda l: l.quantity)
-    stock_move1, stock_move2 = sorted(purchase.moves,
-            key=lambda m: m.quantity)
-    assert invoice_line1.stock_moves == [stock_move1]
-    assert stock_move1.invoice_lines == [invoice_line1]
-    assert invoice_line2.stock_moves == [stock_move2]
-    assert stock_move2.invoice_lines == [invoice_line2]
-
-#@step('T/PUR Post invoice and check no new invoices')
-#def step_impl(context):
-
-    account_user, = User.find([('name', '=', 'Account')])
-    proteus.config.user = account_user.id
     Invoice = proteus.Model.get('account.invoice')
-    invoice = Invoice(purchase.invoices[0].id)
-    invoice.invoice_date = TODAY
-    invoice.click('post')
-    
-    purchase_user, = User.find([('name', '=', 'Purchase')])
-    proteus.config.user = purchase_user.id
-    purchase.reload()
-    assert len(purchase.moves) == 2
-    assert len(purchase.shipment_returns) == 0
-    assert len(purchase.invoices) == 1
-
-#@step('T/PUR Purchase 5 products with an invoice method 'on shipment'')
-#def step_impl(context):
-
-    purchase_user, = User.find([('name', '=', 'Purchase')])
-    proteus.config.user = purchase_user.id
-    purchase = Purchase()
-    purchase.party = supplier
-    purchase.payment_term = payment_term
-    purchase.invoice_method = 'shipment'
-    purchase_line = PurchaseLine()
-    purchase.lines.append(purchase_line)
-    purchase_line.product = product
-    purchase_line.quantity = 2.0
-    purchase_line = PurchaseLine()
-    purchase.lines.append(purchase_line)
-    purchase_line.type = 'comment'
-    purchase_line.description = 'Comment'
-    purchase_line = PurchaseLine()
-    purchase.lines.append(purchase_line)
-    purchase_line.product = product
-    purchase_line.quantity = 3.0
-    purchase.save()
-    Purchase.quote([purchase.id], config.context)
-    Purchase.confirm([purchase.id], config.context)
-    assert purchase.state == u'confirmed'
-    purchase.reload()
-    
-    assert len(purchase.moves) == 2
-    assert len(purchase.shipment_returns) == 0
-    assert len(purchase.invoices) == 0
-
-#@step('T/PUR Not yet linked to invoice lines')
-#def step_impl(context):
-
-    stock_move1, stock_move2 = sorted(purchase.moves,
-            key=lambda m: m.quantity)
-    assert len(stock_move1.invoice_lines) == 0
-    assert len(stock_move2.invoice_lines) == 0
-
-#@step('T/PUR Validate Shipments')
-#def step_impl(context):
-
-    stock_user, = User.find([('name', '=', 'Stock')])
-    proteus.config.user = stock_user.id
-    Move = proteus.Model.get('stock.move')
-    ShipmentIn = proteus.Model.get('stock.shipment.in')
-    shipment = ShipmentIn()
-    shipment.supplier = supplier
-    for move in purchase.moves:
-        incoming_move = Move(id=move.id)
-        shipment.incoming_moves.append(incoming_move)
-    shipment.save()
-    assert shipment.origins == purchase.rec_name
-    ShipmentIn.receive([shipment.id], config.context)
-    ShipmentIn.done([shipment.id], config.context)
-    purchase.reload()
-    assert len(purchase.shipments) == 1
-    assert len(purchase.shipment_returns) == 0
-
-#@step('T/PUR Open supplier invoice')
-#def step_impl(context):
-
     purchase_user, = User.find([('name', '=', 'Purchase')])
     proteus.config.user = purchase_user.id
     invoice, = purchase.invoices
@@ -313,6 +174,8 @@ def step_impl(context):
 #@step('T/PUR Invoice lines must be linked to each stock moves')
 #def step_impl(context):
 
+    stock_move1, stock_move2 = sorted(purchase.moves,
+            key=lambda m: m.quantity)
     assert invoice_line1.stock_moves == [stock_move1]
     assert invoice_line2.stock_moves == [stock_move2]
 
@@ -328,8 +191,14 @@ def step_impl(context):
 #@step('T/PUR Create a Return')
 #def step_impl(context):
 
+    PurchaseLine = proteus.Model.get('purchase.line')
+
+    PaymentTerm = proteus.Model.get('account.invoice.payment_term')
+    payment_term, = PaymentTerm.find([('name', '=', 'Direct')])
+    
     purchase_user, = User.find([('name', '=', 'Purchase')])
     proteus.config.user = purchase_user.id
+    
     return_ = Purchase()
     return_.party = supplier
     return_.payment_term = payment_term
@@ -417,6 +286,9 @@ def step_impl(context):
 #@step('T/PUR Checking Shipments')
 #def step_impl(context):
 
+    ShipmentIn = proteus.Model.get('stock.shipment.in')
+    Move = proteus.Model.get('stock.move')
+
     mix_returns, = mix.shipment_returns
     stock_user, = User.find([('name', '=', 'Stock')])
     proteus.config.user = stock_user.id
@@ -458,7 +330,7 @@ def step_impl(context):
         (1, 1)
     assert sum(l.quantity for l in mix_invoice.lines) == 7.0
     assert sum(l.quantity for l in mix_credit_note.lines) == 2.0
-    
+
     mix_invoice.invoice_date = TODAY
     mix_invoice.save()
     Invoice.post([mix_invoice.id], config.context)
@@ -475,7 +347,7 @@ def step_impl(context):
     mix.party = supplier
     mix.payment_term = payment_term
     mix.invoice_method = 'shipment'
-    
+
     mixline = PurchaseLine()
     mix.lines.append(mixline)
     mixline.product = product
@@ -496,7 +368,7 @@ def step_impl(context):
     assert len(mix.moves) == 2
     assert len(mix.shipment_returns) == 1
     assert len(mix.invoices) == 0
-    
+
 #@step('T/PUR Checking Shipments')
 #def step_impl(context):
 

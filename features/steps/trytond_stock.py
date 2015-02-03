@@ -67,3 +67,64 @@ def step_impl(context, uName, uType, uParent):
         provisioning_loc.save()
 
     assert Location.find([('name', '=', uName)])
+
+@step('Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" with |product|quantity|expected_quantity| fields')
+def step_impl(context, uUser, uCode):
+    """
+    Create an Inventory as user named "{uUser}"
+    with storage at the location with code "{uCode}"
+    The following fields are the name of the product and the
+    quantity and expected_quantity as floats.
+    | product | quantity | expected_quantity |
+    | product | 100.0    | 0.0               |
+    """
+    config = context.oProteusConfig
+
+    User = proteus.Model.get('res.user')
+    Inventory = proteus.Model.get('stock.inventory')
+    Location = proteus.Model.get('stock.location')
+    Product = proteus.Model.get('product.product')
+
+    stock_user, = User.find([('name', '=', uUser)])
+    proteus.config.user = stock_user.id
+    inventory, = Inventory.find([('location.code', '=', uCode)])
+
+    InventoryLine = proteus.Model.get('stock.inventory.line')
+    for row in context.table:
+        product, = Product.find([('name','=', row['product'])])
+        inventory_line = InventoryLine(product=product, inventory=inventory)
+        inventory_line.quantity = float(row['quantity'])
+        inventory_line.expected_quantity = float(row['expected_quantity'])
+        inventory.save()
+        inventory_line.save()
+
+    Inventory.confirm([inventory.id], config.context)
+    assert inventory.state == u'done'
+    admin_user = User(0)
+    proteus.config.user = admin_user.id
+
+@step('Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"')
+def step_impl(context, uUser, uCode):
+    """
+    Create an Inventory as user named "{uUser}"
+    with storage at the location with code "{uCode}"
+    """
+    config = context.oProteusConfig
+
+    User = proteus.Model.get('res.user')
+    Inventory = proteus.Model.get('stock.inventory')
+    Location = proteus.Model.get('stock.location')
+
+    stock_user, = User.find([('name', '=', uUser)])
+    proteus.config.user = stock_user.id
+    if not Inventory.find([('location.code', '=', uCode)]):
+        storage, = Location.find([
+                    ('code', '=', uCode),
+                    ])
+        inventory = Inventory()
+        inventory.location = storage
+        inventory.save()
+    inventory, = Inventory.find([('location.code', '=', uCode)])
+    admin_user = User(0)
+    proteus.config.user = admin_user.id
+

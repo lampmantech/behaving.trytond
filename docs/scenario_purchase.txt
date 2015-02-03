@@ -8,20 +8,12 @@ From: ../features/steps/scenario_purchase.py
    =================
    Unfinished
 
-**T/PUR Create ProductTemplate**
-   Create a ProductTemplate named "product" from a ProductCategory named "Category" with |name|value| fields
-   | name              | value |
-   | type	      | goods |
-   | cost_price_method | fixed |
-   | default_uom       | Unit  |
-   | purchasable       | True  |
-   | salable 	      | True  |
-   | list_price 	      | 10    |
-   | cost_price 	      | 5     |
-   | delivery_time     | 0     |
-   | default_uom	      | Unit  |
-   | account_expense   | Main Expense |
-   | account_revenue   | Main Revenue |
-   | supply_on_sale    | True |
+**T/PUR Assert the Purchase lines in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+
+**T/PUR Assert the Invoice lines are linked to stock move in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+
+**T/PUR Check no new invoices in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+
+**T/PUR Assert not yet linked to invoice lines P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
 
 **T/PUR Purchase Scenario**

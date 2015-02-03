@@ -55,6 +55,7 @@ def step_impl(context, uName, uCatName):
     This requires that anglo_saxon
     Idempotent.
     """
+    # FixMe: with supllier tax "{uTax}"
 
     current_config = context.oProteusConfig
     ProductTemplate = proteus.Model.get('product.template')
@@ -82,6 +83,11 @@ def step_impl(context, uName, uCatName):
         template.name = uName
         # default these in case they are not provided
         revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
+        # These are in by trytond_account_stock_continental/account.xml
+        # which is pulled in by trytond_account_stock_anglo_saxon
+        stock, stock_customer, stock_lost_found, stock_production, \
+            stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
+
         cogs, = Account.find([
 # what kind is cogs and why is it not in the default accounts?
 #?            ('kind', '=', 'other'),
@@ -105,10 +111,16 @@ def step_impl(context, uName, uCatName):
                     ('name', '=', row['value']),
                     ('company', '=', company.id),
                 ])
+            elif row['name'] == 'account_stock':
+                stock, = Account.find([
+                    ('kind', '=', 'stock'),
+                    ('name', '=', row['value']),
+                    ('company', '=', company.id),
+                ])
             elif row['name'] == 'account_cogs':
                 cogs, = Account.find([
-# Fixme - what is the right kind for COGS? goods? other?
-#?                    ('kind', '=', 'other'),
+# Fixme - what is the right kind for COGS? goods? other? expense?
+#                    ('kind', '=', 'other'),
                     ('name', '=', row['value']),
                     ('company', '=', company.id),
                 ])
@@ -123,11 +135,6 @@ def step_impl(context, uName, uCatName):
 
         category, = ProductCategory.find([('name', '=', uCatName)])
         template.category = category
-
-        # These are in by trytond_account_stock_continental/account.xml
-        # which is pulled in by trytond_account_stock_anglo_saxon
-        stock, stock_customer, stock_lost_found, stock_production, \
-            stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
 
         template.account_stock = stock
         template.account_stock_supplier = stock_supplier
@@ -184,6 +191,8 @@ def step_impl(context, uTemplateName, uTaxName):
     if not ProductTemplate.find([('name', '=', uTemplateName)]):
         template = ProductTemplate()
         template.name = uTemplateName
+        # consumable
+        # NOT currency
         # default these in case they are not provided
         revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
 

@@ -224,12 +224,12 @@ def step_impl(context, uTemplate, uIban):
     """
     Create a new account into the chart of accounts for a bank account.
     It takes "{uTemplate}" as an argument which is the name an existing account
-    in the chart where the new account will be created: if uTemplate is of 
+    in the chart where the new account will be created: if uTemplate is of
     kind view, the new chart will have it as its parent; if not,
     the new chart will be the next available sibling, with code += 1.
     The step assumes that the sTemplate account has an integer code, <= 9999;
     it just adds 1 until it finds the next available account, so you can
-    have many calls to this step with different IBANS. 
+    have many calls to this step with different IBANS.
     The name of the new account is the IBAN.
 
     The account_bank_statement module has to be loaded

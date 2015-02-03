@@ -146,7 +146,7 @@ def step_impl(context, uDescription, uSupplier):
     purchase, = Purchase.find([('description', '=', uDescription),
                                ('party.id', '=', supplier.id)])
     if not len(purchase.lines):
-
+        PurchaseLine = proteus.Model.get('purchase.line')
         for row in context.table:
             uPDescription = row['description']
             quantity = float(row['quantity'])
@@ -156,7 +156,6 @@ def step_impl(context, uDescription, uSupplier):
 
             product = Product.find([('description', '=', uPDescription)])[0]
 
-            PurchaseLine = proteus.Model.get('purchase.line')
             purchase_line = PurchaseLine()
             purchase.lines.append(purchase_line)
             purchase_line.product = product
@@ -679,7 +678,7 @@ def step_impl(context, uSupplier, uPaymentTerm):
         invoice_ids = [i.id for i in purchase.invoices]
         #? is this right? or does it matter?
         #? current_config.user = accountant.id
-        
+
         Invoice = proteus.Model.get('account.invoice')
         Invoice.write(invoice_ids, {
             'invoice_date': TODAY,

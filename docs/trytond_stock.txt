@@ -9,3 +9,15 @@ From: ../features/steps/trytond_stock.py
 
 **Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"**
    Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"
+
+**Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" with |product|quantity|expected_quantity| fields**
+   Create an Inventory as user named "{uUser}"
+   with storage at the location with code "{uCode}"
+   The following fields are the name of the product and the
+   quantity and expected_quantity as floats.
+   | product | quantity | expected_quantity |
+   | product | 100.0    | 0.0               |
+
+**Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"**
+   Create an Inventory as user named "{uUser}"
+   with storage at the location with code "{uCode}"

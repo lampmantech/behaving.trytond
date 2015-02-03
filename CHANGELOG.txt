@@ -1,3 +1,13 @@
+commit 484705e2f6dfe7159237bd7da8124f8ad7cf0dee
+Date:   Thu Jan 29 19:54:32 2015 +0200
+
+    Added features/trytond/purchase/scenario_purchase.feature
+    It's still unfinished but the boilerplate company and accounts
+    are done.
+    
+    Refactored scenario_account_stock_anglo_saxon_with_drop_shipment
+    to reuse more steps, and share them with scenario_purchase
+
 commit 08c8c5e634ad3fc2f20988c6334a02c930c1844a
 Date:   Thu Jan 22 21:03:40 2015 +0200
 

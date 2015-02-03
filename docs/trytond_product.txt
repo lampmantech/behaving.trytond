@@ -23,6 +23,7 @@ From: ../features/steps/trytond_product.py
    | account_expense   | Main Expense |
    | account_revenue   | Main Revenue |
    | account_cogs      | COGS  |
+   | stock_journal     | STO   |
    This requires that anglo_saxon
    Idempotent.
 
@@ -41,9 +42,8 @@ From: ../features/steps/trytond_product.py
    | account_expense   | Main Expense |
    | account_revenue   | Main Revenue |
    #	  | cost_price_method | fixed        |
-   You can try currency and see what happens!
    We'll put a hack to work on systems without a CoTs:
-   just call the tax "0% Sales Tax".
+   just call the tax "NO Sales Tax".
    Idempotent.
 
 **Create a product with description "{uDescription}" from template "{uTemplateName}"**

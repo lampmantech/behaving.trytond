@@ -43,7 +43,7 @@ def step_impl(context, uYear):
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     if uYear.lower() == "now" or uYear.upper() == "TODAY":
         uYear=str(TODAY.year)
     if not FiscalYear.find([('name', '=', uYear),
@@ -95,7 +95,7 @@ def step_impl(context, uYear):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     if not FiscalYear.find([('name', '=', str(uYear)),
                             ('company', '=', company.id),]):
         oDate = datetime.date(int(uYear), 1, 1)
@@ -182,14 +182,14 @@ def step_impl(context, uYear):
 @step('Create a default Minimal Account Chart')
 def step_impl(context):
     """
-    Create a default chart of accounts from template 
+    Create a default chart of accounts from template
     "Minimal Account Chart" with root "Minimal Account Chart"
 
     """
     context.execute_steps(u'''
     Given Create a chart of accounts from template "%s" with root "%s"
     ''' % ( 'Minimal Account Chart', 'Minimal Account Chart'))
-    
+
 # 'Minimal Account Chart', 'Minimal Account Chart'
 @step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
 def step_impl(context, uTem, uRoot):
@@ -236,7 +236,7 @@ def step_impl(context, uTem, uRoot):
         create_chart.form.account_receivable = receivable
         create_chart.form.account_payable = payable
         create_chart.execute('create_properties')
-        
+
         cash, = Account.find([
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),
@@ -276,7 +276,7 @@ def step_impl(context):
     cash_journal.debit_account = cash
     cash_journal.save()
 
-    
+
 # Direct, 0
 @step('Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder')
 def step_impl(context, uTermName, uNum):

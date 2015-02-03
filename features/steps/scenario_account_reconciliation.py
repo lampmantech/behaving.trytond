@@ -34,7 +34,7 @@ def step_impl(context):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     Journal = proteus.Model.get('account.journal')
     journal_revenue, = Journal.find([('code', '=', 'REV'),])
     journal_cash, = Journal.find([('code', '=', 'CASH'),])

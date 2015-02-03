@@ -20,6 +20,7 @@ from .support import stepfuns
 
 TODAY = datetime.date.today()
 
+# FixMe: merge
 @step('T/ASASDS Create ProductTemplate')
 def step_impl(context):
     """
@@ -38,6 +39,7 @@ def step_impl(context):
 	  | account_cogs      | COGS |
           | supply_on_sale    | True |
     """
+
     config = context.oProteusConfig
 
     Party = proteus.Model.get('party.party')
@@ -47,10 +49,10 @@ def step_impl(context):
     company, = Company.find([('party.id', '=', party.id)])
 
     Account = proteus.Model.get('account.account')
-    
+
     payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
-    
+
     # These are in by trytond_account_stock_continental/account.xml
     # which is pulled in by trytond_account_stock_anglo_saxon
     stock, stock_customer, stock_lost_found, stock_production, \
@@ -61,7 +63,7 @@ def step_impl(context):
         ('name', '=', sGetFeatureData(context, 'account.template,main_cogs')),
         ('company', '=', company.id),
     ])
-    
+
     ProductTemplate = proteus.Model.get('product.template')
     template = ProductTemplate()
     uName = 'product'
@@ -81,13 +83,13 @@ def step_impl(context):
         template.account_revenue = revenue
         template.account_cogs = cogs
         template.supply_on_sale = True
-        
+
         template.account_stock = stock
         template.account_stock_supplier = stock_supplier
         template.account_stock_customer = stock_customer
         template.account_stock_production = stock_production
         template.account_stock_lost_found = stock_lost_found
-        
+
         AccountJournal = proteus.Model.get('account.journal')
         stock_journal, = AccountJournal.find([('code', '=', 'STO')])
         template.account_journal_stock_supplier = stock_journal
@@ -95,7 +97,7 @@ def step_impl(context):
         template.account_journal_stock_lost_found = stock_journal
         template.save()
     template, = ProductTemplate.find([('name','=', uName)])
-    
+
 @step('T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario')
 def step_impl(context):
 
@@ -108,16 +110,16 @@ def step_impl(context):
 
     User = proteus.Model.get('res.user')
     Group = proteus.Model.get('res.group')
-    
+
     Account = proteus.Model.get('account.account')
     AccountJournal = proteus.Model.get('account.journal')
-    
+
     ProductSupplier = proteus.Model.get('purchase.product_supplier')
     Product = proteus.Model.get('product.product')
 
     payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
-    
+
     # These are in by trytond_account_stock_continental/account.xml
     # which is pulled in by trytond_account_stock_anglo_saxon
     stock, stock_customer, stock_lost_found, stock_production, \
@@ -138,7 +140,7 @@ def step_impl(context):
     template, = ProductTemplate.find([('name','=', uName)])
     product.template = template
     product.save()
-    
+
     product_supplier = ProductSupplier()
     product_supplier.product = template
     product_supplier.party = supplier
@@ -164,7 +166,7 @@ def step_impl(context):
     User = proteus.Model.get('res.user')
     sale_user, = User.find([('name', '=', 'Sale')])
     config.user = sale_user.id
-    
+
     Sale = proteus.Model.get('sale.sale')
     SaleLine = proteus.Model.get('sale.line')
     sale = Sale()
@@ -175,7 +177,7 @@ def step_impl(context):
     sale_line.product = product
     sale_line.quantity = 50
     sale.save()
-    
+
     Sale.quote([sale.id], config.context)
     Sale.confirm([sale.id], config.context)
     Sale.process([sale.id], config.context)
@@ -187,7 +189,7 @@ def step_impl(context):
     User = proteus.Model.get('res.user')
     sale_user, = User.find([('name', '=', 'Sale')])
     purchase_user, = User.find([('name', '=', 'Purchase')])
-    
+
     config.user = purchase_user.id
     Purchase = proteus.Model.get('purchase.purchase')
     PurchaseRequest = proteus.Model.get('purchase.request')
@@ -196,7 +198,7 @@ def step_impl(context):
             [purchase_request])
     create_purchase.form.payment_term = payment_term
     create_purchase.execute('start')
-    
+
     purchase, = Purchase.find()
     purchase_line, = purchase.lines
     purchase_line.unit_price = Decimal('3')
@@ -205,7 +207,7 @@ def step_impl(context):
     Purchase.confirm([purchase.id], config.context)
     purchase.reload()
     assert purchase.state == u'confirmed'
-    
+
     config.user = sale_user.id
     sale.reload()
     assert sale.shipments == []
@@ -216,20 +218,20 @@ def step_impl(context):
 
     User = proteus.Model.get('res.user')
     stock_user, = User.find([('name', '=', 'Stock')])
-    
+
     config.user = stock_user.id
     ShipmentDrop = proteus.Model.get('stock.shipment.drop')
     ShipmentDrop.done([shipment.id], config.context)
     assert shipment.state == u'done'
-    
+
     stock_supplier.reload()
     assert stock_supplier.debit == Decimal('0.00')
     assert stock_supplier.credit == Decimal('150.00')
-    
+
     stock_customer.reload()
     assert stock_customer.debit == Decimal('150.00')
     assert stock_customer.credit == Decimal('0.00')
-    
+
     stock.reload()
     assert stock.debit == Decimal('0.00')
     assert stock.credit == Decimal('0.00')
@@ -243,26 +245,26 @@ def step_impl(context):
 
     payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
-    
+
     config.user = purchase_user.id
     purchase.reload()
     invoice, = purchase.invoices
-    
+
     account_user, = User.find([('name', '=', 'Account')])
     config.user = account_user.id
     invoice.invoice_date = TODAY
     invoice.save()
     Invoice.post([invoice.id], config.context)
     assert invoice.state == u'posted'
-    
+
     payable.reload()
     assert payable.debit == Decimal('0.00')
     assert payable.credit == Decimal('150.00')
-    
+
     expense.reload()
     assert expense.debit == Decimal('150.00')
     assert expense.credit == Decimal('150.00')
-    
+
     stock_supplier.reload()
     assert stock_supplier.debit == Decimal('150.00')
     assert stock_supplier.credit == Decimal('150.00')
@@ -275,22 +277,22 @@ def step_impl(context):
     config.user = sale_user.id
     sale.reload()
     invoice, = sale.invoices
-    
+
     account_user, = User.find([('name', '=', 'Account')])
     config.user = account_user.id
     Invoice.post([invoice.id], config.context)
     assert invoice.state == u'posted'
-    
+
     payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     receivable.reload()
     assert receivable.debit == Decimal('500.00')
     assert receivable.credit == Decimal('0.00')
-    
+
     revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
     revenue.reload()
     assert revenue.debit == Decimal('0.00')
     assert revenue.credit == Decimal('500.00')
-    
+
     (stock, stock_customer, stock_lost_found, stock_production,
             stock_supplier) = Account.find([
                 ('kind', '=', 'stock'),
@@ -300,7 +302,7 @@ def step_impl(context):
     stock_customer.reload()
     assert stock_customer.debit == Decimal('150.00')
     assert stock_customer.credit == Decimal('150.00')
-    
+
     cogs, = Account.find([
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),

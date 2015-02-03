@@ -3,6 +3,7 @@
 This is the advanced syntax for behave testing.
 
 This is from OpenERPScenario and may fail, as is not properly ported to Tryton yet.
+
 It could be that there's a lot in here that is unused and cleaned out.
 Or, it just needs some TLC by someone who knows Tryton+oDooDoo internals
 to port missing features over to trytond_scenari.
@@ -123,8 +124,6 @@ def parse_table_values(ctx, obj, table):
             value = time.strftime(value)
             value = datetime.date(*map(int,value.split('-')))
         elif field_type == 'datetime':
-            # maybe Tryton wants a datetime object?
-            value = time.strftime(value)
             # FixMe: is this good enough
             value = datetime.datetime(*map(int,value.split('-')))
         res[key] = value

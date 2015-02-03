@@ -46,7 +46,7 @@ def step_impl(context, uName, uClass):
     | filename |
     | %s |
 ''' % (uName, uClass, uFile))
-                          
+
 
 # This wont work with a table and  context.execute_steps
 @step('Attach to an instance named "{uName}" of class "{uClass}" a link to an existing file with the following |filename| fields')
@@ -61,7 +61,7 @@ def step_impl(context, uName, uClass):
         assert os.path.exists(uFile)
         o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
         assert o
-        
+
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
     """
