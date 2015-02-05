@@ -25,12 +25,12 @@ From: ../features/steps/trytond_purchase.py
    | product | comment  | Comment     |
    | product | 3.0      |             |
 
-**Purchase "{uAct}" on date "{uDate}" the P.O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"**
-   Purchase "quote" on date "TODAY" the P.O. with description "P. O #1"
+**Purchase "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"**
+   Purchase "quote" on date "TODAY" the P. O. with description "P. O #1"
    as user named "Purchase" products from supplier "Supplier"
 
-**Invoice "{uAct}" on date "{uDate}" the P.O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"**
-   Invoice "post" on date "TODAY" the P.O. with description "P. O #1"
+**Invoice "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"**
+   Invoice "post" on date "TODAY" the P. O. with description "P. O #1"
    as user named "Account" products from supplier "Supplier"
 
-**Validate shipments for P.O. with description "{uDescription}" as user named "{uUser}" for products from supplier "{uSupplier}"**
+**Validate shipments for P. O. with description "{uDescription}" as user named "{uUser}" for products from supplier "{uSupplier}"**

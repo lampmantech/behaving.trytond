@@ -70,9 +70,7 @@ def step_impl(context, uName, uCatName):
                                  ('category.name', '=', uCatName),
                              ]):
         ProductCategory = proteus.Model.get('product.category')
-
         ProductUom = proteus.Model.get('product.uom')
-
         AccountJournal = proteus.Model.get('account.journal')
         # This account jourmal is created by Tryton
         # Tryton-3.2/trytond_stock-3.2.3/location.xml
@@ -173,8 +171,9 @@ def step_impl(context, uTemplateName, uTaxName):
 def step_impl(context, uTemplateName, uTaxName):
     """
     Create a ProductTemplate named "{uTemplateName}"
-    with a supplier_tax named "{uTaxName}"
-    with |name|value| fields such as:
+    with supplier_tax named "{uTaxName}"
+    with |name|value| fields
+    such as:
       type, cost_price_method, default_uom, list_price, cost_price.
     The fields account_expense, account_revenue become the related accounts.
     E. g.
@@ -260,4 +259,3 @@ def step_impl(context, uDescription, uTemplateName):
         product.description = uDescription
         product.save()
     assert Product.find([('description', '=', uDescription)])
-

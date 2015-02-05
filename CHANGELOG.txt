@@ -1,3 +1,9 @@
+commit ad1b48c9d8af68e877568c3821e48ffb3abb9d14
+Date:   Wed Feb 4 01:07:05 2015 +0200
+
+    Created trytond_sale.py to refactor
+    features/trytond/sale_supply_drop_shipment/
+
 commit 6a521ad3ddd60587cbe387301a7a311405b7456f
 Date:   Tue Feb 3 07:40:11 2015 +0200
 

@@ -82,12 +82,12 @@ Feature: Run the Trytond scenario_purchase doctests
             | product | 2.0      |             |
             | product | comment  | Comment     |
             | product | 3.0      |             |
-        and Purchase "quote" on date "TODAY" the P.O. with description "P. O. #1" as user named "Purchase" products from supplier "Supplier"
-        and Purchase "confirm" on date "TODAY" the P.O. with description "P. O. #1" as user named "Purchase" products from supplier "Supplier"
-	and T/PUR Assert the Purchase lines in the P.O. with description "P. O. #1" for products from supplier "Supplier"
-	and T/PUR Assert the Invoice lines are linked to stock move in the P.O. with description "P. O. #1" for products from supplier "Supplier"
-        and Invoice "post" on date "TODAY" the P.O. with description "P. O. #1" as user named "Account" products from supplier "Supplier"
-	and T/PUR Check no new invoices in the P.O. with description "P. O. #1" for products from supplier "Supplier"
+        and Purchase "quote" on date "TODAY" the P. O. with description "P. O. #1" as user named "Purchase" products from supplier "Supplier"
+        and Purchase "confirm" on date "TODAY" the P. O. with description "P. O. #1" as user named "Purchase" products from supplier "Supplier"
+	and T/PUR Assert the Purchase lines in the P. O. with description "P. O. #1" for products from supplier "Supplier"
+	and T/PUR Assert the Invoice lines are linked to stock move in the P. O. with description "P. O. #1" for products from supplier "Supplier"
+        and Invoice "post" on date "TODAY" the invoice with description "P. O. #1" as user named "Account" products from supplier "Supplier"
+	and T/PUR Check no new invoices in the P. O. with description "P. O. #1" for products from supplier "Supplier"
     
     Scenario: Create the second purchase order
 
@@ -96,10 +96,10 @@ Feature: Run the Trytond scenario_purchase doctests
             | product | 2.0      |             |
             | product | comment  | Comment     |
             | product | 3.0      |             |
-        and Purchase "quote" on date "TODAY" the P.O. with description "P. O. #2" as user named "Purchase" products from supplier "Supplier"
-        and Purchase "confirm" on date "TODAY" the P.O. with description "P. O. #2" as user named "Purchase" products from supplier "Supplier"
-        and T/PUR Assert not yet linked to invoice lines P.O. with description "P. O. #2" for products from supplier "Supplier"
-	and Validate shipments for P.O. with description "P. O. #2" as user named "Stock" for products from supplier "Supplier"
+        and Purchase "quote" on date "TODAY" the P. O. with description "P. O. #2" as user named "Purchase" products from supplier "Supplier"
+        and Purchase "confirm" on date "TODAY" the P. O. with description "P. O. #2" as user named "Purchase" products from supplier "Supplier"
+        and T/PUR Assert not yet linked to invoice lines P. O. with description "P. O. #2" for products from supplier "Supplier"
+	and Validate shipments for P. O. with description "P. O. #2" as user named "Stock" for products from supplier "Supplier"
 	
     Scenario: Unfinished - the rest still needs breaking out
 

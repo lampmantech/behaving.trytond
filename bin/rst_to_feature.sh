@@ -18,7 +18,7 @@ in the current directory.
     exit 0
 }
 
-base=`basename $1 .rst`
+base=`basename $1 .py`
 tofile="$base.feature"
 
 cp -i "$1" "$tofile"
@@ -27,3 +27,4 @@ emacs -l rst_to_feature.el \
       --file "$tofile" \
       -f rst_to_feature \
       -f save-buffer -f save-buffers-kill-terminal
+# FiXMe: create the feature file with grep

@@ -41,6 +41,10 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    NOT idempotent
 
 **T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields**
+   T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
+   | name              | value    |
+   | invoice_method    | shipment |
+   | payment_term      | Direct   |
    Idempotent.
 
 **T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities**
@@ -51,7 +55,7 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    | product_average | 3.0      |
    Idempotent.
 
-**T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+**T/ASAS/SASAS Ship the products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
    NOT idempotent
 
 **T/ASAS/SASAS After shipping to customer assert the account credits and debits**

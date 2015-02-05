@@ -21,10 +21,7 @@ from .support import stepfuns
 
 TODAY = datetime.date.today()
 
-#@step('T/PUR Create chart of accounts')
-#def step_impl(context):
-
-@step('T/PUR Assert the Purchase lines in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+@step('T/PUR Assert the Purchase lines in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
@@ -44,7 +41,7 @@ def step_impl(context, uDescription, uSupplier):
     invoice, = purchase.invoices
     assert invoice.origins == purchase.rec_name
 
-@step('T/PUR Assert the Invoice lines are linked to stock move in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+@step('T/PUR Assert the Invoice lines are linked to stock move in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     config = context.oProteusConfig
     
@@ -70,7 +67,7 @@ def step_impl(context, uDescription, uSupplier):
     assert invoice_line2.stock_moves == [stock_move2]
     assert stock_move2.invoice_lines == [invoice_line2]
 
-@step('T/PUR Check no new invoices in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+@step('T/PUR Check no new invoices in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     config = context.oProteusConfig
     
@@ -92,7 +89,7 @@ def step_impl(context, uDescription, uSupplier):
     assert len(purchase.shipment_returns) == 0
     assert len(purchase.invoices) == 1
 
-@step('T/PUR Assert not yet linked to invoice lines P.O. with description "{uDescription}" for products from supplier "{uSupplier}"')
+@step('T/PUR Assert not yet linked to invoice lines P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     config = context.oProteusConfig
     

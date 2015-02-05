@@ -374,6 +374,10 @@ def step_impl(context):
 @step('T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields')
 def step_impl(context, uDescription, uCustomer):
     """
+    T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
+	  | name              | value    |
+	  | invoice_method    | shipment |
+	  | payment_term      | Direct   |
     Idempotent.
     """
     current_config = context.oProteusConfig
@@ -427,7 +431,7 @@ def step_impl(context, uDescription, uCustomer):
     company, = Company.find([('party.id', '=', party.id)])
 
     sale, = Sale.find([('description', '=', uDescription),
-#?                       ('company', '=', company.id),
+                       ('company', '=', company.id),
                        ('party.id', '=', customer.id)])
     if len(sale.lines) <= 0:
         SaleLine = proteus.Model.get('sale.line')
@@ -455,7 +459,7 @@ def step_impl(context, uDescription, uCustomer):
 
         assert sale.state == u'processing'
 
-@step('T/ASAS/SASAS Send 5 products on the S. O. with description "{uDescription}" to customer "{uCustomer}"')
+@step('T/ASAS/SASAS Ship the products on the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDescription, uCustomer):
     """
     NOT idempotent
@@ -475,7 +479,7 @@ def step_impl(context, uDescription, uCustomer):
     company, = Company.find([('party.id', '=', party.id)])
 
     sale, = Sale.find([('description', '=', uDescription),
-#?                       ('company', '=', company.id),
+                       ('company', '=', company.id),
                        ('party.id', '=', customer.id)])
 
     shipment, = sale.shipments

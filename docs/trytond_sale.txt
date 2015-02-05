@@ -15,6 +15,15 @@ From: ../features/steps/trytond_sale.py
    | product | comment  | Comment     |
    | product | 3.0      |             |
 
-**Sale "{uAct}" on date "{uDate}" the S.O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
+**Sale "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
    Sale "quote" on date "TODAY" the S.O. with description "P. O #1"
    as user named "Sale" products from customer "Customer"
+
+**Invoice "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
+   Invoice "post" on date "TODAY" the S. O. with description "S. O #1"
+   as user named "Account" products from customer "Customer"
+
+**Validate shipments for S. O. with description "{uDescription}" as user named "{uUser}" for products to customer "{uCustomer}"**
+   Thia ia a cut-and-paste from the Purchase Validate shipments
+   will purchase -> sale etc.
+   Not sure if its right it assumes the shipment already has been made

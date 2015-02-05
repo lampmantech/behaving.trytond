@@ -10,22 +10,6 @@ From: ../features/steps/scenario_invoice_supplier.py
    trytond_account_invoice-3.0.0/tests/scenario_invoice_supplier.rst
    It should be improved to be more like a Behave BDD.
 
-**Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields**
-   Create an invoice with description "{uDescription}" to supplier
-   "{uSupplier}" with following |description|quantity|unit_price|account| fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      | currency |
-   | Services Bought   | 5	   | 		|              |          |
-   | Test     	      | 1	   | 10.00	| Main Expense | USD      |
-
-**Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields**
-   Create an invoice with description "{uDescription}" to customer
-   "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      | currency |
-   | Services Bought   | 5	   | 		|              |          |
-   | Test     	      | 1	   | 10.00	| Main Revenue | USD      |
-
 **TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
 
 **TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**

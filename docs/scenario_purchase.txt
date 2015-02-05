@@ -8,12 +8,12 @@ From: ../features/steps/scenario_purchase.py
    =================
    Unfinished
 
-**T/PUR Assert the Purchase lines in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+**T/PUR Assert the Purchase lines in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"**
 
-**T/PUR Assert the Invoice lines are linked to stock move in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+**T/PUR Assert the Invoice lines are linked to stock move in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"**
 
-**T/PUR Check no new invoices in the P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+**T/PUR Check no new invoices in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"**
 
-**T/PUR Assert not yet linked to invoice lines P.O. with description "{uDescription}" for products from supplier "{uSupplier}"**
+**T/PUR Assert not yet linked to invoice lines P. O. with description "{uDescription}" for products from supplier "{uSupplier}"**
 
 **T/PUR Purchase Scenario**

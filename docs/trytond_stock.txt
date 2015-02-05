@@ -21,3 +21,15 @@ From: ../features/steps/trytond_stock.py
 **Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"**
    Create an Inventory as user named "{uUser}"
    with storage at the location with code "{uCode}"
+
+**Stock Move of product of ProductTemplate "{uProductTemplate}" between locations with |name|value| fields**
+   Stock Move of product of ProductTemplate "uProductTemplate" between locations with |name|value| fields
+   | name              | value |
+   | uom 	        | unit  |
+   | quantity 	        | 1     |
+   | from_location 	| SUP |
+   | to_location 	| STO |
+   | planned_date 	| TODAY |
+   | effective_date 	| TODAY |
+   | unit_price 	| 100 |
+   | currency 		| USD |

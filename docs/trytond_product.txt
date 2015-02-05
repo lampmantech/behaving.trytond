@@ -33,8 +33,9 @@ From: ../features/steps/trytond_product.py
 
 **Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields**
    Create a ProductTemplate named "{uTemplateName}"
-   with a supplier_tax named "{uTaxName}"
-   with |name|value| fields such as:
+   with supplier_tax named "{uTaxName}"
+   with |name|value| fields
+   such as:
    type, cost_price_method, default_uom, list_price, cost_price.
    The fields account_expense, account_revenue become the related accounts.
    E. g.

@@ -128,3 +128,62 @@ def step_impl(context, uUser, uCode):
     admin_user = User(0)
     proteus.config.user = admin_user.id
 
+@step('Stock Move of product of ProductTemplate "{uProductTemplate}" between locations with |name|value| fields')
+def step_impl(context, uProductTemplate):
+    """
+    Stock Move of product of ProductTemplate "uProductTemplate" between locations with |name|value| fields
+    | name              | value |
+    | uom 	        | unit  |
+    | quantity 	        | 1     |
+    | from_location 	| SUP |
+    | to_location 	| STO |
+    | planned_date 	| TODAY |
+    | effective_date 	| TODAY |
+    | unit_price 	| 100 |
+    | currency 		| USD |
+    """
+    config = context.oProteusConfig
+    StockMove = proteus.Model.get('stock.move')
+
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    Location = proteus.Model.get('stock.location')
+
+    Product = proteus.Model.get('product.product')
+    product, = Product.find([('name', '=', uProductTemplate)])
+    
+    incoming_move = StockMove()
+    incoming_move.product = product
+    incoming_move.company = company
+
+    for row in context.table:
+        if row['name'] == 'from_location':
+            loc, = Location.find([('code', '=', row['value'])])
+            incoming_move.from_location = loc
+        elif row['name'] == 'to_location':
+            loc, = Location.find([('code', '=', row['value'])])
+            incoming_move.to_location = loc
+        elif row['name'] == 'planned_date':
+            uDate = row['value']
+            if uDate.lower() == 'today' or uDate.lower() == 'now':
+                oDate = TODAY
+            else:
+                oDate = datetime.date(*map(int, uDate.split('-')))
+            incoming_move.planned_date = oDate
+        elif row['name'] == 'effective_date':
+            uDate = row['value']
+            if uDate.lower() == 'today' or uDate.lower() == 'now':
+                oDate = TODAY
+            else:
+                oDate = datetime.date(*map(int, uDate.split('-')))
+            incoming_move.effective_date = oDate
+        else:
+            gValue = string_to_python(row['name'], row['value'], StockMove)
+            # setattr(incoming_move, row['name'], gValue )
+
+    incoming_move.save()
+    StockMove.do([incoming_move.id], config.context)

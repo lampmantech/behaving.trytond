@@ -263,17 +263,6 @@ def step_impl(context, uKlass, uName):
         instance = oKlass(name=uName)
         instance.save()
 
-@step('Create a party named "{uName}"')
-def step_impl(context, uName):
-#    context.execute_steps(u'''
-#    Given Create a saved instance of "party.party" named "%s"
-#    ''' % (uName,))
-    Party = proteus.Model.get('party.party')
-    if not Party.find([('name', '=', uName)]):
-        oParty = Party(name=uName)
-        oParty.save()
-
-
 @step('Create an instance of "{uKlass}" named "{uName}" with fields')
 @step('Create an instance of "{uKlass}" named "{uName}" with |name|value| fields')
 def step_impl(context, uKlass, uName):
@@ -295,7 +284,8 @@ def step_impl(context, uKlass, uName):
         gValue = string_to_python(row['name'], row['value'], Klass)
         setattr(oInstance, row['name'], gValue )
     oInstance.save()
-
+    oInstance, = Klass.find([('name', '=', uName)])
+    
 @step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
 @step('Set the instance named "{uName}" of model "{uKlass}" with fields')
 def step_impl(context, uName, uKlass):
@@ -314,6 +304,17 @@ def step_impl(context):
     """
     context.execute_steps(u'''Given Create a party named "Supplier"''')
     context.execute_steps(u'''Given Create a party named "Customer"''')
+
+@step('Create a party named "{uName}"')
+def step_impl(context, uName):
+#    context.execute_steps(u'''
+#    Given Create a saved instance of "party.party" named "%s"
+#    ''' % (uName,))
+    Party = proteus.Model.get('party.party')
+    if not Party.find([('name', '=', uName)]):
+        oParty = Party(name=uName)
+        oParty.save()
+
 
 # Customer
 @step('Create a party named "{uName}" with Payable and Receivable')
@@ -474,6 +475,7 @@ def step_impl(context):
 
 
 @step('Create a account user')
+@step('Create an account user')
 def step_impl(context):
     """
     Create a grouped user named "Account" with |name|value| fields
@@ -489,4 +491,62 @@ def step_impl(context):
             | group  | Account |
     ''' % ('Account',))
 
+
+@step('Create a product user')
+def step_impl(context):
+    """
+    Create a grouped user named "Product" with |name|value| fields
+            | name   | value                  |
+            | login  | product                |
+            | group  | Product Administration |
+    """
+
+    User = proteus.Model.get('res.user')
+    Group = proteus.Model.get('res.group')
+    
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    product_admin_user = User()    
+    product_admin_user.name = 'Product'
+    product_admin_user.login = 'product'
+    product_admin_user.main_company = company
+    product_admin_group, = Group.find([
+        ('name', '=', 'Product Administration')
+    ])
+    product_admin_user.groups.append(product_admin_group)
+    product_admin_user.save()
+    
+    product_admin_user, = User.find([('name', '=', 'Product')])
+
+@step('Create a stock_admin user')
+def step_impl(context):
+    """
+    Create a grouped user named "Stock Admin" with |name|value| fields
+            | name   | value                |
+            | login  | stock_admin          |
+            | group  | Stock Administration |
+    """
+
+    User = proteus.Model.get('res.user')
+    Group = proteus.Model.get('res.group')
+    
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    stock_admin_user = User()
+    stock_admin_user.name = 'Stock Admin'
+    stock_admin_user.login = 'stock_admin'
+    stock_admin_user.main_company = company
+    stock_admin_group, = Group.find([('name', '=', 'Stock Administration')])
+    stock_admin_user.groups.append(stock_admin_group)
+    stock_admin_user.save()
+    
+    stock_admin_user, = User.find([('name', '=', 'Stock Admin')])
 

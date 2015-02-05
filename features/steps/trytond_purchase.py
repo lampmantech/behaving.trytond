@@ -43,16 +43,18 @@ def step_impl(context, uDescription, uSupplier):
     if not Purchase.find([('description', '=', uDescription),
                           ('company.id',  '=', company.id),
                           ('party.id', '=', supplier.id)]):
-        if uDate.lower() == 'today' or uDate.lower() == 'now':
-            oDate = TODAY
-        else:
-            oDate = datetime.date(*map(int, uDate.split('-')))
         purchase = Purchase()
         purchase.party = supplier
         purchase.description = uDescription
-        purchase.purchase_date = oDate
-
         for row in context.table:
+            if row['name'] == u'purchase_date':
+                uDate = row['value']
+                if uDate.lower() == 'today' or uDate.lower() == 'now':
+                    oDate = TODAY
+                else:
+                    oDate = datetime.date(*map(int, uDate.split('-')))
+                purchase.purchase_date = oDate
+                continue
             setattr(purchase, row['name'],
                     string_to_python(row['name'], row['value'], Purchase))
 
@@ -135,10 +137,10 @@ def step_impl(context, uDate, uDescription, uUser, uSupplier, uTerm, uMethod):
                           ('company.id',  '=', company.id),
                           ('party.id', '=', supplier.id)])
 
-@step('Purchase "{uAct}" on date "{uDate}" the P.O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
+@step('Purchase "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     """
-    Purchase "quote" on date "TODAY" the P.O. with description "P. O #1" 
+    Purchase "quote" on date "TODAY" the P. O. with description "P. O #1" 
     as user named "Purchase" products from supplier "Supplier"
     """
     config = context.oProteusConfig
@@ -171,10 +173,10 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
 
-@step('Invoice "{uAct}" on date "{uDate}" the P.O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
+@step('Invoice "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     """
-    Invoice "post" on date "TODAY" the P.O. with description "P. O #1" 
+    Invoice "post" on date "TODAY" the P. O. with description "P. O #1" 
     as user named "Account" products from supplier "Supplier"
     """
     config = context.oProteusConfig
@@ -211,7 +213,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
 
-@step('Validate shipments for P.O. with description "{uDescription}" as user named "{uUser}" for products from supplier "{uSupplier}"')
+@step('Validate shipments for P. O. with description "{uDescription}" as user named "{uUser}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uUser, uSupplier):
     config = context.oProteusConfig
     

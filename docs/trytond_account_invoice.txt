@@ -1,0 +1,25 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/trytond_account_invoice.py
+
+
+
+**Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields**
+   Create an invoice with description "{uDescription}" to supplier
+   "{uSupplier}" with following |description|quantity|unit_price|account| fields
+   Note that this uses the heading description rather than name
+   | description       | quantity   | unit_price | account      | currency |
+   | Services Bought   | 5	   | 		|              |          |
+   | Test     	      | 1	   | 10.00	| Main Expense | USD      |
+
+**Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields**
+   Create an invoice with description "{uDescription}" to customer
+   "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
+   Note that this uses the heading description rather than name
+   | description       | quantity   | unit_price | account      | currency |
+   | Services Bought   | 5	   | 		|              |          |
+   | Test     	      | 1	   | 10.00	| Main Revenue | USD      |
+
+**Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"**
+   Action "post" on date "TODAY" the Invoice with description "Invoice #1"
+   as user named "Account" products from party "Supplier"

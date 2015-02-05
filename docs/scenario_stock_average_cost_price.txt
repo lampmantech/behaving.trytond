@@ -1,0 +1,10 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/scenario_stock_average_cost_price.py
+
+
+   Stock Average Cost Price Scenario
+   from
+   trytond_stock-3.2.3/tests/scenario_stock_average_cost_price.rst
+
+**T/SACP Stock Average Cost Price Scenario**

@@ -95,7 +95,7 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	  | description     | quantity |
 	  | Product Fixed   | 2.0      |
 	  | Product Average | 3.0      |
-	and T/ASAS/SASAS Send 5 products on the S. O. with description "Sell 5 products" to customer "Customer"
+	and T/ASAS/SASAS Ship the products on the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After shipping to customer assert the account credits and debits
 	and T/ASAS/SASAS Open customer invoice for the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits
