@@ -14,8 +14,7 @@ from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
 
-
-today = datetime.date.today()
+TODAY = datetime.date.today()
 
 # TODAY, Buy the Services Bought, Term 30 days, Supplier
 @step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
@@ -144,9 +143,23 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     
     supplier, = Party.find([('name', '=', uSupplier),])
     Invoice = proteus.Model.get('account.invoice')
-    invoice, = Invoice.find([('party.id',  '=', supplier.id),
-                             ('company.id',  '=', company.id),
-                             ('description', '=', uDescription)])
+    # Groddy but Tryton doesnt pass the Pruchase description
+    # to the invoive that it generates
+    l = Invoice.find([('party.id',  '=', supplier.id),
+                      ('company.id',  '=', company.id),
+                      ('description', '=', uDescription)])
+    if l:
+        invoice = l[0]
+    else:
+        l = Invoice.find([('party.id',  '=', supplier.id),
+                          ('company.id',  '=', company.id),])
+        if l:
+            invoice = l[0]
+            #? maybe set the description here?
+            invoice.description = uDescription
+        else:
+            raise UserError('Invoice not found with description "%s"' % (
+                uDescription,))
     
     account_user, = User.find([('name', '=', uUser)])
     proteus.config.user = account_user.id

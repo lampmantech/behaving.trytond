@@ -4,7 +4,7 @@
 # trytond_stock-3.2.3/tests/scenario_stock_average_cost_price.rst
 
 
-@wip
+@works32
 Feature: Stock Average Cost Price Scenario
 
     Scenario: test stock
@@ -49,8 +49,15 @@ Feature: Stock Average Cost Price Scenario
     	  | effective_date 	| TODAY |
 	  | unit_price 		| 100 	|
 	  | currency 		| USD 	|
-
-    Scenario: Unfinished
-    
-      Given T/SACP Stock Average Cost Price Scenario
-    
+       and T/SACP Check Cost Price is 100
+       and Stock Move of product of ProductTemplate "T/SACP Product Template" between locations with |name|value| fields
+	  | name                | value |
+	  | uom 	        | Unit  |
+	  | quantity 	        | 1     |
+	  | from_location 	| SUP 	|
+    	  | to_location 	| STO 	|
+	  | planned_date 	| TODAY |
+    	  | effective_date 	| TODAY |
+	  | unit_price 		| 200 	|
+	  | currency 		| USD 	|
+       and T/SACP Check Cost Price is 150

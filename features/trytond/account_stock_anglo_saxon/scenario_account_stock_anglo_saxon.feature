@@ -83,17 +83,17 @@ Feature: Run the Trytond scenario_account_stock_anglo_saxon doctests
 
     Scenario: Sell the products to the customer, testing the module named "account_stock_anglo_saxon"
 
-      Given T/ASAS/SASAS Create a sales order with description "Sell 5 products" to customer "Customer" with fields
+      Given Create a sales order with description "Sell 5 products" to customer "Customer" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct   |
-	and T/ASAS/SASAS Sell products on the S. O. with description "Sell 5 products" to customer "Customer" with quantities
+	and Sell Products on the S. O. with description "Sell 5 products" to customer "Customer" with |description|quantity| fields 
 	  | description     | quantity |
 	  | Product Fixed   | 2.0      |
 	  | Product Average | 3.0      |
-	and T/ASAS/SASAS Ship the products on the S. O. with description "Sell 5 products" to customer "Customer"
+	and Ship the products on the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After shipping to customer assert the account credits and debits
-	and T/ASAS/SASAS Open customer invoice for the S. O. with description "Sell 5 products" to customer "Customer"
+	and Post customer Invoice for the S. O. with description "Sell 5 products" to customer "Customer"
 	and T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits
 	and T/ASAS/SASAS Create an invoice to supplier "Supplier" with PaymentTerm "Direct" by an accountant with quantities
 	  | description     | quantity	| unit_price |

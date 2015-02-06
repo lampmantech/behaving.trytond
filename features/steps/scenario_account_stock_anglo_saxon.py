@@ -8,7 +8,7 @@ Account Stock Continental Scenario
 This is a straight cut-and-paste from
 trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
 
-It should be improved to be more like a Behave BDD.
+Unfinished.
 """
 
 from behave import *
@@ -38,7 +38,7 @@ dCacheCostPriceMethod={}
 # FixMe: actually creates 2 different Product and ProductTemplates
 def step_impl(context, uType, uName):
     """
-    Create two products of type "{uType}" from the ProductTemplate named
+    Create products of type "{uType}" from the ProductTemplate named
     "{uName}" with fields
 	  | name                | cost_price_method | description         |
 	  | product_fixed	| fixed   	    | Product Fixed       |
@@ -78,15 +78,12 @@ def step_impl(context, uType, uName):
             product_fixed.save()
 
         elif uCostPriceMethod == u'average':
-            if 'template_average' not in dCacheCostPriceMethod:
-                template_average = ProductTemplate(
-                    ProductTemplate.copy([oTemplate.id],
-                                         current_config.context)[0])
-                template_average.cost_price_method = 'average'
-                template_average.save()
-                dCacheCostPriceMethod['template_average'] = template_average
-            else:
-                template_average = dCacheCostPriceMethod['template_average']
+            template_average = ProductTemplate(
+                ProductTemplate.copy([oTemplate.id],
+                                     current_config.context)[0])
+            template_average.cost_price_method = 'average'
+            template_average.cost_price_method = 'average'
+            template_average.save()
             # FixMe: I dont understand this logic here
             # hardcoded this would be ('description', '=', 'product_fixed')
             #?product_fixed = Product.find([])[0]
@@ -101,22 +98,6 @@ def step_impl(context, uType, uName):
             product_average.description = uRowDescription
             product_average.save()
 
-        elif uCostPriceMethod == u'fifo':
-            if 'template_fifo' not in dCacheCostPriceMethod:
-                template_fifo = ProductTemplate(
-                    ProductTemplate.copy([oTemplate.id],
-                                         current_config.context)[0])
-                template_fifo.cost_price_method = 'fifo'
-                template_fifo.save()
-                dCacheCostPriceMethod['template_fifo'] = template_fifo
-            else:
-                template_fifo = dCacheCostPriceMethod['template_fifo']
-            product_fifo = Product(
-                Product.copy([product_fixed.id], {
-                    'template': template_fifo.id,
-                    }, current_config.context)[0])
-            product_fifo.description = uRowDescription
-            product_fifo.save()
 
 # 12 products, Supplier
 @step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities')
@@ -370,132 +351,6 @@ def step_impl(context):
         (Decimal('46.00'), Decimal('46.00')), \
         "Expected 46.00,46.00 but got %.2f,%.2f" % (stock_supplier.debit, stock_supplier.credit,)
 
-# Customer, Sell 5 products
-@step('T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields')
-def step_impl(context, uDescription, uCustomer):
-    """
-    T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
-	  | name              | value    |
-	  | invoice_method    | shipment |
-	  | payment_term      | Direct   |
-    Idempotent.
-    """
-    current_config = context.oProteusConfig
-
-    Sale = proteus.Model.get('sale.sale')
-
-    Party = proteus.Model.get('party.party')
-    customer, = Party.find([('name', '=', uCustomer)])
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    if not Sale.find([('description', '=', uDescription),
-#?                      ('company', '=', company.id),
-                      ('party.id', '=', customer.id)]):
-        sale = Sale()
-        sale.party = customer
-        sale.description = uDescription
-
-        # 'payment_term', 'invoice_method'
-        for row in context.table:
-            setattr(sale, row['name'],
-                    string_to_python(row['name'], row['value'], Sale))
-        sale.save()
-
-    assert Sale.find([('description', '=', uDescription),
-#?                      ('company', '=', company.id),
-                      ('party.id', '=', customer.id)])
-
-@step('T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities')
-def step_impl(context, uDescription, uCustomer):
-    """
-    Sell products on the S. O. with description "uDescription"
-    to customer "uCustomer" with quantities
-	  | description     | quantity |
-	  | product_fixed   | 2.0      |
-	  | product_average | 3.0      |
-
-    Idempotent.
-    """
-    current_config = context.oProteusConfig
-
-    Sale = proteus.Model.get('sale.sale')
-
-    Party = proteus.Model.get('party.party')
-    customer, = Party.find([('name', '=', uCustomer)])
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    sale, = Sale.find([('description', '=', uDescription),
-                       ('company', '=', company.id),
-                       ('party.id', '=', customer.id)])
-    if len(sale.lines) <= 0:
-        SaleLine = proteus.Model.get('sale.line')
-
-        Product = proteus.Model.get('product.product')
-        # purchase.moves[0].product.description == u'product_fixed'
-        # purchase.moves[1].product.description == u'product_average' 5.0
-        for row in context.table:
-            uDescription = row['description']
-            fQuantity = float(row['quantity'])
-            # allow 0 (<0.0001) quantity - just skip them
-            if fQuantity < 0.0001: continue
-            product = Product.find([('description', '=', uDescription)])[0]
-
-            sale_line = SaleLine()
-            sale.lines.append(sale_line)
-            sale_line.product = product
-            sale_line.quantity = fQuantity
-
-        sale.save()
-
-        Sale.quote([sale.id], current_config.context)
-        Sale.confirm([sale.id], current_config.context)
-        Sale.process([sale.id], current_config.context)
-
-        assert sale.state == u'processing'
-
-@step('T/ASAS/SASAS Ship the products on the S. O. with description "{uDescription}" to customer "{uCustomer}"')
-def step_impl(context, uDescription, uCustomer):
-    """
-    NOT idempotent
-    """
-    current_config = context.oProteusConfig
-
-    ShipmentOut = proteus.Model.get('stock.shipment.out')
-
-    Sale = proteus.Model.get('sale.sale')
-    SaleLine = proteus.Model.get('sale.line')
-
-    Party = proteus.Model.get('party.party')
-    customer, = Party.find([('name', '=', uCustomer)])
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    sale, = Sale.find([('description', '=', uDescription),
-                       ('company', '=', company.id),
-                       ('party.id', '=', customer.id)])
-
-    shipment, = sale.shipments
-    assert ShipmentOut.assign_try([shipment.id], current_config.context)
-    # not idempotent
-    assert shipment.state == u'assigned'
-
-    shipment.reload()
-    # not idempotent
-    ShipmentOut.pack([shipment.id], current_config.context)
-    assert shipment.state == u'packed'
-
-    shipment.reload()
-    # not idempotent
-    ShipmentOut.done([shipment.id], current_config.context)
-    assert shipment.state == u'done'
 
 @step('T/ASAS/SASAS After shipping to customer assert the account credits and debits')
 def step_impl(context):
@@ -533,38 +388,6 @@ def step_impl(context):
     assert (stock.debit, stock.credit) == \
         (Decimal('50.00'), Decimal('28.00')), \
         "Expected 50.00,28.00 but got %.2f,%.2f" % (stock.debit, stock.credit,)
-
-# Customer
-@step('T/ASAS/SASAS Open customer invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
-def step_impl(context, uDescription, uCustomer):
-    """
-    Open customer invoice for the Sales Order with description "uDescription"
-    to customer "uCustomer"
-
-    Not idempotent.
-    """
-    current_config = context.oProteusConfig
-
-    Sale = proteus.Model.get('sale.sale')
-
-    Party = proteus.Model.get('party.party')
-    customer, = Party.find([('name', '=', uCustomer)])
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    sale, = Sale.find([('invoice_method', '=', 'shipment'),
-#?                       ('company', '=', company.id),
-                       ('party.id', '=', customer.id)])
-    # not idempotent
-    sale.reload()
-
-    Invoice = proteus.Model.get('account.invoice')
-    invoice, = sale.invoices
-    # not idempotent
-    Invoice.post([invoice.id], current_config.context)
-    assert invoice.state == u'posted'
 
 @step('T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits')
 def step_impl(context):
@@ -705,14 +528,11 @@ def step_impl(context, uSupplier, uPaymentTerm):
     >>> invoice_line.quantity = -1
     >>> invoice.save()
     >>> Invoice.post([invoice.id], config.context)
-    >>> invoice.state
-    u'posted'
+    >>> assert invoice.state == u'posted'
     >>> move = invoice.move
     >>> line_cogs, = (l for l in move.lines if l.account == cogs)
-    >>> line_cogs.credit
-    Decimal('5.00')
+    >>> assert line_cogs.credit == Decimal('5.00')
     >>> line_stock, = (l for l in move.lines if l.account == stock_customer)
-    >>> line_stock.debit
-    Decimal('5.00')
+    >>> assert line_stock.debit == Decimal('5.00')
     """
     pass

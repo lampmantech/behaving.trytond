@@ -16,6 +16,7 @@ from .support.stepfuns import vAssertContentTable
 
 TODAY = datetime.date.today()
 
+#features/trytond/account_stock_anglo_saxon/?
 #? shipment_method
 @step('Sale on date "{uDate}" with description "{uDescription}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields')
 def step_impl(context, uDate, uDescription, uUser, uCustomer, uTerm, uMethod):
@@ -25,7 +26,7 @@ def step_impl(context, uDate, uDescription, uUser, uCustomer, uTerm, uMethod):
     with PaymentTerm "Direct" and InvoiceMethod "order"
     If the quantity is the word comment, the line type is set to comment.
     with |product|quantity|description| fields
-      | product | quantity | description |
+      | description | quantity | line_description |
       | product | 2.0      |             |
       | product | comment  | Comment     |
       | product | 3.0      |             |
@@ -71,7 +72,7 @@ def step_impl(context, uDate, uDescription, uUser, uCustomer, uTerm, uMethod):
 
         SaleLine = proteus.Model.get('sale.line')
         for row in context.table:
-            product, = Product.find([('name', '=', row['product'])])
+            product, = Product.find([('description', '=', row['description'])])
             sale_line = SaleLine()
             sale.lines.append(sale_line)
             sale_line.product = product
@@ -80,8 +81,8 @@ def step_impl(context, uDate, uDescription, uUser, uCustomer, uTerm, uMethod):
             else:
                 # type == 'line'
                 sale_line.quantity = float(row['quantity'])
-            if row['description']:
-                sale_line.description = row['description'] or ''
+            if row['line_description']:
+                sale_line.description = row['line_description'] or ''
             #? why no sale_line.save()
         sale.save()
         
@@ -168,66 +169,180 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
     if uAct == u'post':
         invoice.click('post')
     else:
-        raise ValueError("uAct must be one of quote or confirm: " + uAct)
+        raise ValueError("uAct must be one of post: " + uAct)
     invoice.reload()
     
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
 
 
-@step('Validate shipments for S. O. with description "{uDescription}" as user named "{uUser}" for products to customer "{uCustomer}"')
-def step_impl(context, uDescription, uUser, uCustomer):
-    """
-    Thia ia a cut-and-paste from the Purchase Validate shipments
-    will purchase -> sale etc.
-    Not sure if its right it assumes the shipment already has been made
 
+# Customer, Sell 5 products
+@step('Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields')
+def step_impl(context, uDescription, uCustomer):
     """
-    config = context.oProteusConfig
-    
-    ShipmentOut = proteus.Model.get('stock.shipment.out')
+    T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
+	  | name              | value    |
+	  | invoice_method    | shipment |
+	  | payment_term      | Direct   |
+    Idempotent.
+    """
+    current_config = context.oProteusConfig
+
+    Sale = proteus.Model.get('sale.sale')
 
     Party = proteus.Model.get('party.party')
+    customer, = Party.find([('name', '=', uCustomer)])
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
-    customer, = Party.find([('name', '=', uCustomer),])
+    if not Sale.find([('description', '=', uDescription),
+                      ('company', '=', company.id),
+                      ('party.id', '=', customer.id)]):
+        sale = Sale()
+        sale.party = customer
+        sale.description = uDescription
+
+        # 'payment_term', 'invoice_method'
+        for row in context.table:
+            setattr(sale, row['name'],
+                    string_to_python(row['name'], row['value'], Sale))
+        sale.save()
+
+    assert Sale.find([('description', '=', uDescription),
+                      ('company', '=', company.id),
+                      ('party.id', '=', customer.id)])
+
+    
+@step('Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity| fields')
+def step_impl(context, uDescription, uCustomer):
+    """
+    Sell products on the S. O. with description "uDescription"
+    to customer "uCustomer" with quantities
+	  | description     | quantity |
+	  | Product Fixed   | 2.0      |
+	  | Product Average | 3.0      |
+
+    Idempotent.
+    """
+    current_config = context.oProteusConfig
+
     Sale = proteus.Model.get('sale.sale')
-    sale, = Sale.find([('party.id',  '=', customer.id),
-                               ('company.id',  '=', company.id),
-                               ('description', '=', uDescription)])
 
-    User = proteus.Model.get('res.user')
-    stock_user, = User.find([('name', '=', uUser)])
-    proteus.config.user = stock_user.id
-    
-    Move = proteus.Model.get('stock.move')
-    shipment = ShipmentOut()
-    shipment.customer = customer
-    for move in sale.moves:
-        outgoing_move = Move(id=move.id)
-        shipment.outgoing_moves.append(outgoing_move)
-    shipment.save()
-    
-    assert shipment.origins == sale.rec_name
-    ShipmentOut.wait([shipment.id], config.context)
-    assert shipment.state == u'waiting'
+    Party = proteus.Model.get('party.party')
+    customer, = Party.find([('name', '=', uCustomer)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
 
-    assert shipment.origins == sale.rec_name
-    ShipmentOut.assign_try([shipment.id], config.context)
+    sale, = Sale.find([('description', '=', uDescription),
+                       ('company', '=', company.id),
+                       ('party.id', '=', customer.id)])
+    if len(sale.lines) <= 0:
+        SaleLine = proteus.Model.get('sale.line')
+
+        Product = proteus.Model.get('product.product')
+        # purchase.moves[0].product.description == u'product_fixed'
+        # purchase.moves[1].product.description == u'product_average' 5.0
+        for row in context.table:
+            uDescription = row['description']
+            fQuantity = float(row['quantity'])
+            # allow 0 (<0.0001) quantity - just skip them
+            if fQuantity < 0.0001: continue
+            product = Product.find([('description', '=', uDescription)])[0]
+
+            sale_line = SaleLine()
+            sale.lines.append(sale_line)
+            sale_line.product = product
+            sale_line.quantity = fQuantity
+            sale_line.description = uDescription
+            #? sale_line.save()
+        sale.save()
+
+        Sale.quote([sale.id], current_config.context)
+        Sale.confirm([sale.id], current_config.context)
+        Sale.process([sale.id], current_config.context)
+
+        assert sale.state == u'processing'
+
+@step('Ship the products on the S. O. with description "{uDescription}" to customer "{uCustomer}"')
+def step_impl(context, uDescription, uCustomer):
+    """
+    From: T/ASAS/SASAS 
+    Ship the products on the S. O. with description "{uDescription}" 
+    to customer "{uCustomer}"
+    NOT idempotent
+    """
+    current_config = context.oProteusConfig
+
+    ShipmentOut = proteus.Model.get('stock.shipment.out')
+
+    Sale = proteus.Model.get('sale.sale')
+    SaleLine = proteus.Model.get('sale.line')
+
+    Party = proteus.Model.get('party.party')
+    customer, = Party.find([('name', '=', uCustomer)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    sale, = Sale.find([('description', '=', uDescription),
+                       ('company', '=', company.id),
+                       ('party.id', '=', customer.id)])
+
+    shipment, = sale.shipments
+    ShipmentOut.assign_try([shipment.id], current_config.context)
+    # not idempotent
     assert shipment.state == u'assigned'
 
     shipment.reload()
-    ShipmentOut.pack([shipment.id], config.context)
+    # not idempotent
+    ShipmentOut.pack([shipment.id], current_config.context)
     assert shipment.state == u'packed'
 
     shipment.reload()
-    ShipmentOut.done([shipment.id], config.context)
+    # not idempotent
+    ShipmentOut.done([shipment.id], current_config.context)
     assert shipment.state == u'done'
-    sale.reload()
-    
-    assert len(sale.shipments) >= 1
 
-    
+# Customer
+@step('Post customer Invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
+def step_impl(context, uDescription, uCustomer):
+    """
+    From T/ASAS/SASAS
+    Post customer Invoice for the Sales Order with description "uDescription"
+    to customer "uCustomer"
+
+    Not idempotent.
+    """
+    current_config = context.oProteusConfig
+
+    Sale = proteus.Model.get('sale.sale')
+
+    Party = proteus.Model.get('party.party')
+    customer, = Party.find([('name', '=', uCustomer)])
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    sale, = Sale.find([('invoice_method', '=', 'shipment'),
+                       ('description', '=', uDescription),
+                       ('company', '=', company.id),
+                       ('party.id', '=', customer.id)])
+    # not idempotent
+    sale.reload()
+
+    Invoice = proteus.Model.get('account.invoice')
+    invoice, = sale.invoices
+    #? Surprised Tryton doesnt do this
+    invoice.description =  uDescription
+    # not idempotent
+    Invoice.post([invoice.id], current_config.context)
+    invoice.reload()
+    assert invoice.state == u'posted'
+

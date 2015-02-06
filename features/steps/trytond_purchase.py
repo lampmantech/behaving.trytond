@@ -64,15 +64,15 @@ def step_impl(context, uDescription, uSupplier):
                           ('party.id', '=', supplier.id)])
 
 
-@step('Purchase on date "{uDate}" with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields')
+@step('Purchase on date "{uDate}" with description "{uDescription}" as user named "{uUser}" ProductTemplates from supplier "{uSupplier}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |name|quantity|description| fields')
 def step_impl(context, uDate, uDescription, uUser, uSupplier, uTerm, uMethod):
     """
     Purchase on date "TODAY" with description "Description"
-    as user named "Purchase" products from supplier "Supplier" 
+    as user named "Purchase" ProductTemplates from supplier "Supplier" 
     with PaymentTerm "Direct" and InvoiceMethod "order"
     If the quantity is the word comment, the line type is set to comment.
-    with |product|quantity|description| fields
-      | product | quantity | description |
+    with |name|quantity|description| fields
+      | name | quantity | line_description |
       | product | 2.0      |             |
       | product | comment  | Comment     |
       | product | 3.0      |             |
@@ -116,7 +116,8 @@ def step_impl(context, uDate, uDescription, uUser, uSupplier, uTerm, uMethod):
 
         PurchaseLine = proteus.Model.get('purchase.line')
         for row in context.table:
-            product, = Product.find([('name', '=', row['product'])])
+            # BUG? Product.find([('name' should FAIL
+            product, = Product.find([('name', '=', row['name'])])
             purchase_line = PurchaseLine()
             purchase.lines.append(purchase_line)
             purchase_line.product = product
@@ -125,8 +126,82 @@ def step_impl(context, uDate, uDescription, uUser, uSupplier, uTerm, uMethod):
             else:
                 # type == 'line'
                 purchase_line.quantity = float(row['quantity'])
-            if row['description']:
-                purchase_line.description = row['description'] or ''
+            if row['line_description']:
+                purchase_line.description = row['line_description']
+            #? why no purchase_line.save()
+        purchase.save()
+        
+    user, = User.find([('login', '=', 'admin')])
+    proteus.config.user = user.id
+    
+    assert Purchase.find([('description', '=', uDescription),
+                          ('company.id',  '=', company.id),
+                          ('party.id', '=', supplier.id)])
+
+@step('Purchase on date "{uDate}" with description "{uDescription}" as user named "{uUser}" Products from supplier "{uSupplier}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields')
+def step_impl(context, uDate, uDescription, uUser, uSupplier, uTerm, uMethod):
+    """
+    Purchase on date "TODAY" with description "Description"
+    as user named "Purchase" Products from supplier "Supplier" 
+    with PaymentTerm "Direct" and InvoiceMethod "order"
+    If the quantity is the word comment, the line type is set to comment.
+    with |description|quantity|line_description| fields
+      | description | quantity | line_description |
+      | product | 2.0      |             |
+      | product | comment  | Comment     |
+      | product | 3.0      |             |
+    """
+    # shouls we make quantity == 'comment'
+    config = context.oProteusConfig
+
+    Purchase = proteus.Model.get('purchase.purchase')
+
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
+    Product = proteus.Model.get('product.product')
+    supplier, = Party.find([('name', '=', uSupplier),])
+
+    User = proteus.Model.get('res.user')
+    purchase_user, = User.find([('name', '=', uUser)])
+    proteus.config.user = purchase_user.id
+
+    PaymentTerm = proteus.Model.get('account.invoice.payment_term')
+    payment_term, = PaymentTerm.find([('name', '=', uTerm)])
+
+    if not Purchase.find([('description', '=', uDescription),
+                          ('company.id',  '=', company.id),
+                          ('party.id', '=', supplier.id)]):
+        purchase = Purchase()
+        purchase.party = supplier
+        purchase.payment_term = payment_term
+        purchase.invoice_method = uMethod
+        purchase.description = uDescription
+        if uDate.lower() == 'today' or uDate.lower() == 'now':
+            oDate = TODAY
+        else:
+            oDate = datetime.date(*map(int, uDate.split('-')))
+        purchase.purchase_date = oDate
+        # purchases also have warehouse, currency
+        purchase.save()
+
+        PurchaseLine = proteus.Model.get('purchase.line')
+        for row in context.table:
+            # BUG? Product.find([('name' should FAIL
+            product, = Product.find([('description', '=', row['description'])])
+            purchase_line = PurchaseLine()
+            purchase.lines.append(purchase_line)
+            purchase_line.product = product
+            if row['quantity'] == 'comment':
+                purchase_line.type = 'comment'
+            else:
+                # type == 'line'
+                purchase_line.quantity = float(row['quantity'])
+            if row['line_description']:
+                purchase_line.description = row['line_description']
             #? why no purchase_line.save()
         purchase.save()
         
@@ -204,10 +279,12 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     else:
         oDate = datetime.date(*map(int, uDate.split('-')))
     invoice.invoice_date = oDate
+    #? Surprised Tryton doesnt do this
+    invoice.description = uDescription
     if uAct == u'post':
         invoice.click('post')
     else:
-        raise ValueError("uAct must be one of quote or confirm: " + uAct)
+        raise ValueError("uAct must be one of post: " + uAct)
     invoice.reload()
     
     user, = User.find([('login', '=', 'admin')])
@@ -248,6 +325,6 @@ def step_impl(context, uDescription, uUser, uSupplier):
     ShipmentIn.done([shipment.id], config.context)
     purchase.reload()
     
-    assert len(purchase.shipments) == 1
+    assert len(purchase.shipments) >= 1
     assert len(purchase.shipment_returns) == 0
 

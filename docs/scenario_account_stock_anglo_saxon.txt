@@ -8,10 +8,10 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    ==================================
    This is a straight cut-and-paste from
    trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
-   It should be improved to be more like a Behave BDD.
+   Unfinished.
 
 **T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields**
-   Create two products of type "{uType}" from the ProductTemplate named
+   Create products of type "{uType}" from the ProductTemplate named
    "{uName}" with fields
    | name                | cost_price_method | description         |
    | product_fixed	| fixed   	    | Product Fixed       |
@@ -40,32 +40,9 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
 **T/ASAS/SASAS After paying for what we received assert the account credits and debits**
    NOT idempotent
 
-**T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields**
-   T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
-   | name              | value    |
-   | invoice_method    | shipment |
-   | payment_term      | Direct   |
-   Idempotent.
-
-**T/ASAS/SASAS Sell products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with quantities**
-   Sell products on the S. O. with description "uDescription"
-   to customer "uCustomer" with quantities
-   | description     | quantity |
-   | product_fixed   | 2.0      |
-   | product_average | 3.0      |
-   Idempotent.
-
-**T/ASAS/SASAS Ship the products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
-   NOT idempotent
-
 **T/ASAS/SASAS After shipping to customer assert the account credits and debits**
    T/ASAS/SASAS After shipping to customer assert the account credits and debits
    NOT idempotent.
-
-**T/ASAS/SASAS Open customer invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
-   Open customer invoice for the Sales Order with description "uDescription"
-   to customer "uCustomer"
-   Not idempotent.
 
 **T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
 
@@ -86,12 +63,9 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    >>> invoice_line.quantity = -1
    >>> invoice.save()
    >>> Invoice.post([invoice.id], config.context)
-   >>> invoice.state
-   u'posted'
+   >>> assert invoice.state == u'posted'
    >>> move = invoice.move
    >>> line_cogs, = (l for l in move.lines if l.account == cogs)
-   >>> line_cogs.credit
-   Decimal('5.00')
+   >>> assert line_cogs.credit == Decimal('5.00')
    >>> line_stock, = (l for l in move.lines if l.account == stock_customer)
-   >>> line_stock.debit
-   Decimal('5.00')
+   >>> assert line_stock.debit == Decimal('5.00')

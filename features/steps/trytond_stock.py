@@ -68,14 +68,14 @@ def step_impl(context, uName, uType, uParent):
 
     assert Location.find([('name', '=', uName)])
 
-@step('Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" with |product|quantity|expected_quantity| fields')
+@step('Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" ProductTemplates with |product|quantity|expected_quantity| fields')
 def step_impl(context, uUser, uCode):
     """
     Create an Inventory as user named "{uUser}"
     with storage at the location with code "{uCode}"
     The following fields are the name of the product and the
     quantity and expected_quantity as floats.
-    | product | quantity | expected_quantity |
+    | name | quantity | expected_quantity |
     | product | 100.0    | 0.0               |
     """
     config = context.oProteusConfig
@@ -91,7 +91,7 @@ def step_impl(context, uUser, uCode):
 
     InventoryLine = proteus.Model.get('stock.inventory.line')
     for row in context.table:
-        product, = Product.find([('name','=', row['product'])])
+        product, = Product.find([('name','=', row['name'])])
         inventory_line = InventoryLine(product=product, inventory=inventory)
         inventory_line.quantity = float(row['quantity'])
         inventory_line.expected_quantity = float(row['expected_quantity'])
@@ -183,7 +183,7 @@ def step_impl(context, uProductTemplate):
             incoming_move.effective_date = oDate
         else:
             gValue = string_to_python(row['name'], row['value'], StockMove)
-            # setattr(incoming_move, row['name'], gValue )
+            setattr(incoming_move, row['name'], gValue )
 
     incoming_move.save()
     StockMove.do([incoming_move.id], config.context)

@@ -67,7 +67,7 @@ def step_impl(context, uDescription, uTaxName):
     expense.reload()
     assert (expense.debit, expense.credit) == \
         (Decimal(110), Decimal(0))
-
+    # failing here expense.debit, expense.credit
     account_tax, = Account.find([
         ('kind', '=', 'other'),
         ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),

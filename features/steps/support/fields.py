@@ -74,7 +74,6 @@ def string_to_python (sField, uValue, Party=None):
     #       "Sorry, dont know how to look in slots of %s " % (sField,)
     #assert dField['searchable']
 
-
     # sType == 'many2one' or sType == 'many2many' uses relation
     assert 'relation' in dField.keys(), \
                "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)

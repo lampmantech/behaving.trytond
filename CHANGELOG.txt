@@ -1,3 +1,10 @@
+commit b92375bc33479148b5d1d1d916c42fb590349e16
+Date:   Thu Feb 5 03:44:42 2015 +0200
+
+    Added scenario_stock_internal_supply.txt
+    
+    Refactored into trytond_invoice.py
+
 commit ad1b48c9d8af68e877568c3821e48ffb3abb9d14
 Date:   Wed Feb 4 01:07:05 2015 +0200
 

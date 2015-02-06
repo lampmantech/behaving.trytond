@@ -22,8 +22,8 @@ TODAY = datetime.date.today()
 
 # unused
 # product, Supplier
-@step('Create a ProductSupplier with description "T/ASASDS Product Description" from a ProductTemplate named "{uTemplateName}" with supplier named "{uSupplier}" with |name|value| fields')
-def step_impl(context, uTemplateName, uSupplier):
+@step('Create a ProductSupplier with description "{uDescription}" from a ProductTemplate named "{uTemplateName}" with supplier named "{uSupplier}" with |name|value| fields')
+def step_impl(context, uDescription, uTemplateName, uSupplier):
     """
     Create a ProductSupplier from a Template named "product"
     with a supplier named "Supplier"
@@ -249,7 +249,7 @@ def step_impl(context):
     assert stock_supplier.debit == Decimal('150.00')
     assert stock_supplier.credit == Decimal('150.00')
 
-#@step('T/ASASDS Open customer invoice')
+#@step('T/ASASDS Post customer Invoice')
 #def step_impl(context):
 
     User = proteus.Model.get('res.user')

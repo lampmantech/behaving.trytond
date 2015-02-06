@@ -71,14 +71,14 @@ Feature: Run the Trytond scenario_purchase doctests
     Scenario: Create the stock and inventory
 
       Given Create an Inventory as user named "Stock" with storage at the location coded "STO"
-       Then Add to inventory as user named "Stock" with storage at the location coded "STO" with |product|quantity|expected_quantity| fields
-	    | product | quantity | expected_quantity |
+       Then Add to inventory as user named "Stock" with storage at the location coded "STO" ProductTemplates with |product|quantity|expected_quantity| fields
+	    | name | quantity | expected_quantity |
 	    | product | 100.0    | 0.0               |
 
     Scenario: Create the first purchase order
 
-      Given Purchase on date "TODAY" with description "P. O. #1" as user named "Purchase" products from supplier "Supplier" with PaymentTerm "Direct" and InvoiceMethod "order" with |product|quantity|description| fields
-            | product | quantity | description |
+      Given Purchase on date "TODAY" with description "P. O. #1" as user named "Purchase" ProductTemplates from supplier "Supplier" with PaymentTerm "Direct" and InvoiceMethod "order" with |name|quantity|description| fields
+            | name    | quantity | line_description |
             | product | 2.0      |             |
             | product | comment  | Comment     |
             | product | 3.0      |             |
@@ -86,13 +86,13 @@ Feature: Run the Trytond scenario_purchase doctests
         and Purchase "confirm" on date "TODAY" the P. O. with description "P. O. #1" as user named "Purchase" products from supplier "Supplier"
 	and T/PUR Assert the Purchase lines in the P. O. with description "P. O. #1" for products from supplier "Supplier"
 	and T/PUR Assert the Invoice lines are linked to stock move in the P. O. with description "P. O. #1" for products from supplier "Supplier"
-        and Invoice "post" on date "TODAY" the invoice with description "P. O. #1" as user named "Account" products from supplier "Supplier"
+        and Action "post" on date "TODAY" the Invoice with description "P. O. #1" as user named "Account" products from party "Supplier"
 	and T/PUR Check no new invoices in the P. O. with description "P. O. #1" for products from supplier "Supplier"
     
     Scenario: Create the second purchase order
 
-      Given Purchase on date "TODAY" with description "P. O. #2" as user named "Purchase" products from supplier "Supplier" with PaymentTerm "Direct" and InvoiceMethod "shipment" with |product|quantity|description| fields
-            | product | quantity | description |
+      Given Purchase on date "TODAY" with description "P. O. #2" as user named "Purchase" ProductTemplates from supplier "Supplier" with PaymentTerm "Direct" and InvoiceMethod "shipment" with |name|quantity|description| fields
+            | name | quantity | line_description |
             | product | 2.0      |             |
             | product | comment  | Comment     |
             | product | 3.0      |             |

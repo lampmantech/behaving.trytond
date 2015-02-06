@@ -7,4 +7,8 @@ From: ../features/steps/scenario_stock_average_cost_price.py
    from
    trytond_stock-3.2.3/tests/scenario_stock_average_cost_price.rst
 
+**T/SACP Check Cost Price is 100**
+
+**T/SACP Check Cost Price is 150**
+
 **T/SACP Stock Average Cost Price Scenario**
