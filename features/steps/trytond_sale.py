@@ -6,7 +6,7 @@
 from behave import *
 import proteus
 
-import datetime
+import os, sys, datetime
 from decimal import Decimal
 
 from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
@@ -178,8 +178,8 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
 
 
 # Customer, Sell 5 products
-@step('Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields')
-def step_impl(context, uDescription, uCustomer):
+@step('Create a sales order with description "{uDescription}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields')
+def step_impl(context, uDescription, uCustomer, uDate):
     """
     T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
 	  | name              | value    |
@@ -204,14 +204,19 @@ def step_impl(context, uDescription, uCustomer):
         sale = Sale()
         sale.party = customer
         sale.description = uDescription
-
+        if uDate.lower() == 'today' or uDate.lower() == 'now':
+            oDate = TODAY
+        else:
+            oDate = datetime.date(*map(int, uDate.split('-')))
+        sale.sale_date = oDate
+        
         # 'payment_term', 'invoice_method'
         for row in context.table:
             setattr(sale, row['name'],
                     string_to_python(row['name'], row['value'], Sale))
         sale.save()
 
-    assert Sale.find([('description', '=', uDescription),
+    oSale, = Sale.find([('description', '=', uDescription),
                       ('company', '=', company.id),
                       ('party.id', '=', customer.id)])
 
@@ -295,18 +300,32 @@ def step_impl(context, uDescription, uCustomer):
                        ('party.id', '=', customer.id)])
 
     shipment, = sale.shipments
-    ShipmentOut.assign_try([shipment.id], current_config.context)
+    #? Pass the dates in?
+    if sale.sale_date and not shipment.planned_date:
+        shipment.planned_date = sale.sale_date
+    #? effective_date
+    if not ShipmentOut.assign_try([shipment.id], current_config.context):
+        sys.__stderr__.write('>>> WARN: forcing shipment for sale with description: '+uDescription+'\n')
+        assert ShipmentOut.assign_force([shipment.id], current_config.context)
+    #? why did this become necessary when it wasnt before?
+    shipment.reload()
     # not idempotent
     assert shipment.state == u'assigned'
 
     shipment.reload()
     # not idempotent
     ShipmentOut.pack([shipment.id], current_config.context)
+    #? why did this reload() become necessary when it wasnt before?
+    #? all we did was add:
+    #?    shipment.planned_date = sale.sale_date
+    shipment.reload()
     assert shipment.state == u'packed'
 
     shipment.reload()
     # not idempotent
     ShipmentOut.done([shipment.id], current_config.context)
+    #? why did this become necessary when it wasnt before?
+    shipment.reload()
     assert shipment.state == u'done'
 
 # Customer

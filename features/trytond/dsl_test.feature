@@ -1,15 +1,16 @@
 # -*- encoding: utf-8 -*-
-
-# This is the advanced syntax behave test of trytond.
-# This test  is not properly finished yet.
-
+    
 @works32
-Feature: showing off trytond dsl from OpenERPScenario
+Feature:    showing off trytond dsl from OpenERPScenario
+This is the monkey-patched syntax of behave The change is to change
+a trailing line backslash and space both sides of it into a space.
+This make it prettier to use long steps.
 
-   Scenario: run a simple test with the party module and an instance with a full_name
+  Scenario: run a test of our behave monkey-patching for backslashes
       Given Ensure that the "party" module is loaded
-        and I need a "party.party" with name: MyParty
-        and having
-	    | name	| value		|
-	    | full_name | My Party 	|
-       then there are some instances of "party.party"
+        And I need a "party.party" \
+	    with name: MyParty
+        And having
+            | name	| value			|
+            | full_name | My Party 		|
+       Then there are some instances of "party.party"

@@ -8,8 +8,11 @@ from optparse import OptionParser
 
 import proteus
 from proteus import Model, Wizard
-
 from .steps.support import tools
+
+from .steps.support import behave_better
+# Some monkey patches to enhance Behave
+behave_better.patch_all()
 
 ETC_TRYTOND_CONF='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'
 

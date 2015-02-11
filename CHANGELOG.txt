@@ -1,3 +1,14 @@
+commit e918c9db2b25ec1ca4004592ec1938ecd4fd5ef3
+Date:   Fri Feb 6 21:54:16 2015 +0200
+
+    Added stock_supply/scenario_stock_internal_supply.feature
+    
+    Refactored to distinguish between Product and ProductTemplate:
+    a lot of the scenarios use Product.find([('name',...
+    but (perhaps I dont understand) but it should fail
+    as Products don't have a name slot. This behaviour is not
+    documented as far as I can see in the product module.
+
 commit b92375bc33479148b5d1d1d916c42fb590349e16
 Date:   Thu Feb 5 03:44:42 2015 +0200
 
