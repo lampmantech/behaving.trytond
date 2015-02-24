@@ -1,0 +1,11 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/scenario_account_payment.py
+
+
+   Payment Scenario
+
+**T/AP Create a PaymentJournal named "{uName}" of type "{uType}"**
+   T/AP Create a PaymentJournal named "Manual" of type "manual"
+
+**T/AP Unfinished**
