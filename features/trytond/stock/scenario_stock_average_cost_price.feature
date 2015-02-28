@@ -40,7 +40,7 @@ Feature:    Stock Average Cost Price Scenario
             | cost_price 	      | 80      	|
             | default_uom	      | Unit    	|
             | cost_price_method | average 	|
-        And Stock Move of product of ProductTemplate "T/SACP Product Template"\
+        And Stock Move of product of ProductTemplate named "T/SACP Product Template"\
 	    between locations with |name|value| fields
             | name                | value 	|
             | uom 	        | Unit  	|
@@ -52,7 +52,7 @@ Feature:    Stock Average Cost Price Scenario
             | unit_price 		| 100 		|
             | currency 		| USD 		|
         And T/SACP Check Cost Price is 100
-        And Stock Move of product of ProductTemplate "T/SACP Product Template"\
+        And Stock Move of product of ProductTemplate named "T/SACP Product Template"\
 	    between locations with |name|value| fields
             | name                | value 	|
             | uom 	        | Unit  	|

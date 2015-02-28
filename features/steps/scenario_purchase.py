@@ -34,7 +34,7 @@ def step_impl(context, uDescription, uSupplier):
     purchase, = Purchase.find([('party.id',  '=', supplier.id),
                                ('company.id',  '=', company.id),
                                ('description', '=', uDescription)])
-    
+
     assert len(purchase.moves) == 2
     assert len(purchase.shipment_returns) == 0
     assert len(purchase.invoices) == 1
@@ -44,7 +44,7 @@ def step_impl(context, uDescription, uSupplier):
 @step('T/PUR Assert the Invoice lines are linked to stock move in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     config = context.oProteusConfig
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
@@ -56,7 +56,7 @@ def step_impl(context, uDescription, uSupplier):
     purchase, = Purchase.find([('party.id',  '=', supplier.id),
                                ('company.id',  '=', company.id),
                                ('description', '=', uDescription)])
-    
+
     invoice, = purchase.invoices
     _, invoice_line1, invoice_line2 = sorted(invoice.lines,
             key=lambda l: l.quantity)
@@ -70,7 +70,7 @@ def step_impl(context, uDescription, uSupplier):
 @step('T/PUR Check no new invoices in the P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     config = context.oProteusConfig
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
@@ -92,7 +92,7 @@ def step_impl(context, uDescription, uSupplier):
 @step('T/PUR Assert not yet linked to invoice lines P. O. with description "{uDescription}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     config = context.oProteusConfig
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
@@ -165,6 +165,8 @@ def step_impl(context):
         line.quantity = 1
         line.save()
     invoice.invoice_date = TODAY
+    # this was missing
+    invoice.accounting_date = invoice.invoice_date
     invoice.save()
     Invoice.post([invoice.id], config.context)
 
@@ -192,10 +194,10 @@ def step_impl(context):
 
     PaymentTerm = proteus.Model.get('account.invoice.payment_term')
     payment_term, = PaymentTerm.find([('name', '=', 'Direct')])
-    
+
     purchase_user, = User.find([('name', '=', 'Purchase')])
     proteus.config.user = purchase_user.id
-    
+
     return_ = Purchase()
     return_.party = supplier
     return_.payment_term = payment_term
@@ -247,6 +249,9 @@ def step_impl(context):
     assert len(credit_note.lines) == 1
     assert sum(l.quantity for l in credit_note.lines) == 4.0
     credit_note.invoice_date = TODAY
+    # this was missing
+    credit_note.accounting_date = credit_note.invoice_date
+
     credit_note.save()
     Invoice.post([credit_note.id], config.context)
 
@@ -329,6 +334,9 @@ def step_impl(context):
     assert sum(l.quantity for l in mix_credit_note.lines) == 2.0
 
     mix_invoice.invoice_date = TODAY
+    #? this was missing
+    mix_invoice.accounting_date = mix_invoice.invoice_date
+
     mix_invoice.save()
     Invoice.post([mix_invoice.id], config.context)
     mix_credit_note.invoice_date = TODAY
@@ -417,6 +425,10 @@ def step_impl(context):
     account_user, = User.find([('name', '=', 'Account')])
     proteus.config.user = account_user.id
     service_invoice.invoice_date = TODAY
+    #? this was missing
+    service_invoice.accounting_date = service_invoice.invoice_date
+    #? this was missing
+    service_invoice.save()
     service_invoice.click('post')
     pay = proteus.Wizard('account.invoice.pay', [service_invoice])
     pay.form.journal = cash_journal

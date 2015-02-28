@@ -156,7 +156,6 @@ def impl_having(ctx):
         self._proxy.write([self.id], table_values, config.context)
         self.reload()
 
-
 def create_new_obj(ctx, model_name, values):
     config = ctx.oProteusConfig
 
@@ -180,7 +179,7 @@ def create_new_obj(ctx, model_name, values):
         _model_data.save()
     return record
 
-
+@step(u'I set the search_model_name to a "{model_name}" with {domain}')
 @step(u'I find a "{model_name}" with {domain}')
 def impl(ctx, model_name, domain):
     ModelKlass = proteus.Model.get(model_name)

@@ -83,7 +83,8 @@ Feature:    Run the Trytond scenario_purchase doctests
   Scenario: Create the first purchase order
 
       Given Purchase on date "TODAY" with description "P. O. #1" \
-      	    as user named "Purchase" ProductTemplates from supplier "Supplier"\
+      	    with their reference "Ref1" as user named "Purchase" \
+	    in Currency coded "USD" ProductTemplates from supplier "Supplier" \
 	    with PaymentTerm "Direct" and InvoiceMethod "order" \
 	    with |name|quantity|description| fields
             | name    | quantity | line_description 	|
@@ -109,7 +110,8 @@ Feature:    Run the Trytond scenario_purchase doctests
   Scenario: Create the second purchase order
 
       Given Purchase on date "TODAY" with description "P. O. #2" \
-      	    as user named "Purchase" ProductTemplates from supplier "Supplier"\
+      	    with their reference "Ref2" as user named "Purchase" \
+	    in Currency coded "USD" ProductTemplates from supplier "Supplier" \
 	    with PaymentTerm "Direct" and InvoiceMethod "shipment" \
 	    with |name|quantity|description| fields
             | name | quantity | line_description 	|
@@ -124,7 +126,7 @@ Feature:    Run the Trytond scenario_purchase doctests
 	    products from supplier "Supplier"
         And T/PUR Assert not yet linked to invoice lines P. O. \
 	    with description "P. O. #2" for products from supplier "Supplier"
-        And Validate shipments for P. O. with description "P. O. #2" \
+        And Validate shipments on "TODAY" for P. O. with description "P. O. #2" \
 	    as user named "Stock" for products from supplier "Supplier"
 	
   Scenario: Unfinished - the rest still needs breaking out

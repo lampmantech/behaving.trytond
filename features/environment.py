@@ -37,10 +37,9 @@ def oReadConfigFile():
     oEnvironmentCfg = ConfigParser.RawConfigParser()
 
     sFile = os.path.splitext(__file__)[0]+'.cfg'
-    if os.path.exists(sFile):
-        oEnvironmentCfg.read(sFile)
-    else:
+    if not os.path.exists(sFile):
         vCreateConfigFile(oEnvironmentCfg, sFile)
+    oEnvironmentCfg.read(sFile)
     return oEnvironmentCfg
 
 

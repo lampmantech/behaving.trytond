@@ -100,6 +100,65 @@ def step_impl(context, uIban, uParty):
         if lOwners:
             oBankAccount.owners.append(oOwner)
         oBankAccount.save()
+        
+# IBAN is NOT international: Canada and the US dont use them
+@step('Create a bank account with number "{uNum}" at a bank associated to a party "{uParty}" with optional owner or currency following |name|value|')
+def step_impl(context, uNum, uParty):
+    r"""
+    Create a bank account with number "{uNum}" \
+    at a bank associated to a party "{uParty}" \
+    with optional owner or currency following |name|value|
+    Each name is one of: owner or currency.
+    Owner is a party name, and currency is a currency code.
+    """
+    config = context.oProteusConfig
+
+    BankAccountNumber = proteus.Model.get('bank.account.number')
+    BankAccount = proteus.Model.get('bank.account')
+    Bank = proteus.Model.get('bank')
+    Currency = proteus.Model.get('currency.currency')
+
+    Party = proteus.Model.get('party.party')
+    oParty, = Party.find([('name', '=', uParty)])
+    oBank, = Bank.find([('party.id', '=', oParty.id)])
+    # FixMe should be looking for the account with number? self.numbers[0].number
+    lAccs = BankAccount.find([('bank.party.id', '=', oBank.id)])
+    if True or not lAccs:
+        # FixMe: cant search BankAccount Numbers 'numbers'
+        uNum = uNum.replace(' ','')
+        dBankAccount = {
+            'bank': oBank.id,
+            }
+        # FixMe: the order of the numbers determines the record name
+        # return self.numbers[0].number
+        lNumbers  = [{
+            'type': 'other',
+            'number': uNum,
+        }]
+
+        lOwners  = []
+        for row in context.table:
+            if row['name'] == u'currency':
+                currency, = Currency.find([('code', '=', row['value'])])
+                dBankAccount['currency'] = currency.id
+            elif row['name'] == u'iban':
+                # unused
+                pass
+            elif row['name'] == u'owner':
+                #  FixMe: Party or Bank Party?
+                oOwner, = Party.find([('name', '=', row['value'])])
+                # lOwners.append({'code': oOwner.code})
+                lOwners.append({'name': oOwner.name})
+            elif row['name'] == u'number':
+                pass
+            
+        assert lNumbers
+        dBankAccount['numbers'] = [('create', lNumbers)]
+        iBankAccount, = BankAccount.create([dBankAccount], config.context)
+        oBankAccount = BankAccount(iBankAccount)
+        if lOwners:
+            oBankAccount.owners.append(oOwner)
+        oBankAccount.save()
 
 # Bank
 @step('Create a sequence on account.journal named "{uBankSequenceName}"')
@@ -187,7 +246,6 @@ def step_impl(context, uName, uBankSequenceName):
     Sequence = proteus.Model.get('ir.sequence')
     oSequence, = Sequence.find([('name', '=', uBankSequenceName,)])
 
-
     if not AccountJournal.find([('name', '=', uName),
                                 ('type', '=', 'cash')]):
             oDefaultCash, = Account.find([
@@ -216,10 +274,11 @@ def step_impl(context, uName, uBankSequenceName):
                                              sequence=oSequence)
             oAccountJournal.save()
 
-    assert AccountJournal.find([('name', '=', uName),
-                                ('type', '=', 'cash')])
+    oAccountJournal, = AccountJournal.find([('name', '=', uName),
+                                            ('type', '=', 'cash')])
 
 @step('Create a financial account under "{uTemplate}" for the bank account with IBAN "{uIban}"')
+@step('Create a financial account under "{uTemplate}" for the bank account with number "{uIban}"')
 def step_impl(context, uTemplate, uIban):
     """
     Create a new account into the chart of accounts for a bank account.

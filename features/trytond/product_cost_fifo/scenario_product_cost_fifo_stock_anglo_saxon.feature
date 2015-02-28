@@ -96,7 +96,8 @@ Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests with the
   Scenario: Sell the products to the customer, testing the module named "product_cost_fifo"
 
       Given Create a sales order with description "Sell 5 products" \
-      	    to customer "Customer" on date "NOW" with |name|value| fields
+      	    in Currency coded "EUR" to customer "Customer" \
+	    on date "NOW" with |name|value| fields
             | name              | value    	|
             | invoice_method    | shipment 	|
             | payment_term      | Direct   	|
@@ -104,11 +105,16 @@ Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests with the
             | description     | quantity 	|
             | Product Fixed   | 2.0      	|
             | Product Average | 3.0      	|
-        And Ship the products on the S. O. with description "Sell 5 products" to customer "Customer"
-        And T/ASAS/SASAS After shipping to customer assert the account credits and debits
-        And Post customer Invoice for the S. O. with description "Sell 5 products" to customer "Customer"
-        And T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits
-        And T/ASAS/SASAS Create an invoice to supplier "Supplier" with PaymentTerm "Direct" by an accountant with quantities
+        And Ship the products on "TODAY" of the S. O. \
+	    with description "Sell 5 products" to customer "Customer"
+        And T/ASAS/SASAS After shipping to customer \
+	    assert the account credits and debits
+        And Post customer Invoice for the S. O. \
+	    with description "Sell 5 products" to customer "Customer"
+        And T/ASAS/SASAS After posting the invoice to customer \
+	    assert the account credits and debits
+        And T/ASAS/SASAS Create an invoice to supplier "Supplier" \
+	    with PaymentTerm "Direct" by an accountant with quantities
             | description     | quantity	| unit_price 	|
             | Product Fixed   | 5.0      	| 4.00	     	|
 

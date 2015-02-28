@@ -4,8 +4,9 @@ From: ../features/steps/trytond_sale.py
 
 
 
-**Sale on date "{uDate}" with description "{uDescription}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields**
+**Sale on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields**
    Sale on date "TODAY" with description "Description"
+   with their reference "uRef"
    as user named "Sale" products to customer "Customer"
    with PaymentTerm "Direct" and InvoiceMethod "order"
    If the quantity is the word comment, the line type is set to comment.
@@ -23,11 +24,21 @@ From: ../features/steps/trytond_sale.py
    Invoice "post" on date "TODAY" the S. O. with description "S. O #1"
    as user named "Account" products from customer "Customer"
 
-**Create a sales order with description "{uDescription}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields**
-   T/ASAS/SASAS Create a sales order with description "{uDescription}" to customer "{uCustomer}" with fields
+**Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields**
+
+**Create a sales order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields**
+   Create a sales order with description "{uDescription}" in Currency coded "%(sCur)s" to customer "{uCustomer}" on Date "{uDate}" with fields
    | name              | value    |
    | invoice_method    | shipment |
    | payment_term      | Direct   |
+   Idempotent.
+
+**Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity|unit_price| fields**
+   Sell products on the S. O. with description "uDescription"
+   to customer "uCustomer" with quantities
+   | description     | quantity | unit_price |
+   | Product Fixed   | 2.0      | 10.00      |
+   | Product Average | 3.0      | 10.00      |
    Idempotent.
 
 **Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity| fields**
@@ -38,11 +49,15 @@ From: ../features/steps/trytond_sale.py
    | Product Average | 3.0      |
    Idempotent.
 
-**Ship the products on the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+**Validate shipments on "{uDate}" for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**Ship the products on "{uDate}" of the S. O. with description "{uDescription}" to customer "{uCustomer}"**
    From: T/ASAS/SASAS
    Ship the products on the S. O. with description "{uDescription}"
    to customer "{uCustomer}"
    NOT idempotent
+
+**Invoice act "post" for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
 
 **Post customer Invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
    From T/ASAS/SASAS

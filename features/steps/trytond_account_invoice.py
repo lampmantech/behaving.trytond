@@ -16,11 +16,39 @@ from .support.tools import *
 
 TODAY = datetime.date.today()
 
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to suppliers with following |description|quantity|unit_price|account|party|currency| fields')
+def step_impl(context, uDate, uDescription, uPaymentTerm):
+    r"""
+    Create an Invoice on date "NOW" \
+    with description "{uDescription}" to suppliers \
+    with following |description|quantity|unit_price|account|party|currency| fields
+    | description    | quantity   | unit_price | account      | party | currency |
+    | Test     	     | 1	  | 10.00      | Main Revenue | Fred  | USD      |
+    """
+    sType = 'in_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, u'', sType)
+
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customers with following |description|quantity|unit_price|account|party|currency| fields')
+def step_impl(context, uDate, uDescription, uPaymentTerm):
+    r"""
+    Create an Invoice on date "NOW" \
+    with description "{uDescription}" to customers \
+    with following |description|quantity|unit_price|account|party|currency| fields
+    | description    | quantity   | unit_price | account      | party | currency |
+    | Test     	     | 1	  | 10.00      | Main Revenue | Fred  | USD      |
+    """
+    sType = 'out_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, u'', sType)
+
+
 # TODAY, Buy the Services Bought, Term 30 days, Supplier
-@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|VAT|currency| fields')
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
     """
-Create an invoice with description "{uDescription}" to supplier
+Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
 Note that this uses the heading description rather than name
   | description       | quantity   | unit_price | account      | currency |
@@ -32,10 +60,10 @@ Note that this uses the heading description rather than name
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
 
 # TODAY, Services Sold, Customer
-@step('Create an invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
     """
-Create an invoice with description "{uDescription}" to customer
+Create an Invoice with description "{uDescription}" to customer
 "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
 Note that this uses the heading description rather than name
   | description       | quantity   | unit_price | account      | currency |
@@ -68,8 +96,9 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
         invoice.accounting_date = invoice.invoice_date
         invoice.description = uDescription
 
-        party, = Party.find([('name', '=', uParty)])
-        invoice.party = party
+        if uParty:
+            party, = Party.find([('name', '=', uParty)])
+            invoice.party = party
 
         PaymentTerm = proteus.Model.get('account.invoice.payment_term')
         payment_term, = PaymentTerm.find([('name', '=', uPaymentTerm)])
@@ -97,15 +126,19 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
 
         InvoiceLine = proteus.Model.get('account.invoice.line')
         Product = proteus.Model.get('product.product')
+        Currency = proteus.Model.get('currency.currency')
         for row in context.table:
-            # lines can have currency
+            # FixMe: lines can have currency
             line = InvoiceLine()
             invoice.lines.append(line)
             # Note that this uses the heading 'description' rather than 'name'
             lProducts = Product.find([('description', '=', row['description'])])
-            if row['currency']:
-                # FixMe: row['currency']
-                pass
+            if u'currency' in context.table.headings and row['currency']:
+                oCurrency, = Currency.find([('code', '=', row['currency'])])
+                line.currency = oCurrency
+            if u'party' in context.table.headings and row['party']:
+                oLineParty, = Party.find([('name', '=', row['party'])])
+                line.party = oLineParty
             if lProducts:
                 line.product = lProducts[0]
                 # 'unit_price' is derived from the Product
@@ -115,9 +148,10 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
                 #? need this if line.product too? No it's derived
                 if row['account']:
                     # FixMe: domain for line.account is ['kind', '=', 'expense']
-                    line.account, = Account.find([('kind', '=', uKind),
-                                                 ('name', '=', row['account']),
-                                                 ('company.id', '=', company.id)])
+                    line.account, = Account.find([
+                        ('kind', '=', uKind),
+                        ('name', '=', row['account']),
+                        ('company.id', '=', company.id)])
                 else:
                     line.account = oLineDefault
             line.quantity = \
@@ -128,11 +162,12 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
 @step('Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     """
-    Action "post" on date "TODAY" the Invoice with description "Invoice #1" 
+    Action "post" on date "TODAY" the Invoice with description "Invoice #1"
     as user named "Account" products from party "Supplier"
+
     """
     config = context.oProteusConfig
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
@@ -140,27 +175,15 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     company, = Company.find([('party.id', '=', party.id)])
 
     User = proteus.Model.get('res.user')
-    
-    supplier, = Party.find([('name', '=', uSupplier),])
+
     Invoice = proteus.Model.get('account.invoice')
-    # Groddy but Tryton doesnt pass the Pruchase description
+    # FixMe: Tryton doesnt pass the Purchase description
     # to the invoive that it generates
-    l = Invoice.find([('party.id',  '=', supplier.id),
-                      ('company.id',  '=', company.id),
-                      ('description', '=', uDescription)])
-    if l:
-        invoice = l[0]
-    else:
-        l = Invoice.find([('party.id',  '=', supplier.id),
-                          ('company.id',  '=', company.id),])
-        if l:
-            invoice = l[0]
-            #? maybe set the description here?
-            invoice.description = uDescription
-        else:
-            raise UserError('Invoice not found with description "%s"' % (
-                uDescription,))
-    
+    supplier, = Party.find([('name', '=', uSupplier),])
+    invoice, = Invoice.find([('party.id',  '=', supplier.id),
+                             ('company.id',  '=', company.id),
+                             ('description', '=', uDescription)])
+
     account_user, = User.find([('name', '=', uUser)])
     proteus.config.user = account_user.id
     if uDate.lower() == 'today' or uDate.lower() == 'now':
@@ -168,7 +191,9 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     else:
         oDate = datetime.date(*map(int, uDate.split('-')))
     invoice.invoice_date = oDate
-
+    invoice.accounting_date = invoice.invoice_date
+    invoice.save()
+    
     cls_transitions = (
         ('draft', 'validated'),
         ('validated', 'posted'),
@@ -189,7 +214,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     else:
         raise ValueError("uAct must be one of validate_invoice or post: " + uAct)
     invoice.reload()
-    
+
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
 

@@ -1,3 +1,15 @@
+commit f48056e2c474cc720fdf275e5eef993b63a6f12b
+Date:   Tue Feb 24 16:04:24 2015 +0200
+
+    Added features/steps/scenario_account_payment.py
+    to start working on payments.
+
+commit 17ad000d738cd59a683f22d184e07e0e7c7c3bce
+Date:   Wed Feb 11 08:12:10 2015 +0200
+
+    Monkey-patched behave to allow for backslash at the end of lines
+    in feature files to break up long steps.
+
 commit e918c9db2b25ec1ca4004592ec1938ecd4fd5ef3
 Date:   Fri Feb 6 21:54:16 2015 +0200
 

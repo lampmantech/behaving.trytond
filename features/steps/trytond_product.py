@@ -165,7 +165,7 @@ def step_impl(context, uTemplateName, uTaxName):
     | name | value |
 """ % {'uTemplateName': uTemplateName, 'uTaxName': uTaxName})
 
-                                            
+
 # Service Product
 @step('Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields')
 def step_impl(context, uTemplateName, uTaxName):

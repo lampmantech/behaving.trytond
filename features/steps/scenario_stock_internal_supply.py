@@ -72,7 +72,7 @@ if False:
     template.type = 'goods'
     template.list_price = Decimal('20')
     template.cost_price = Decimal('8')
-    template.save()    
+    template.save()
     template, = ProductTemplate.find([('name', '=', 'T/SSIS Product Template')])
     template, = ProductTemplate.find([('name', '=', 'T/SSIS Product Template')])
     product = Product()
@@ -80,13 +80,13 @@ if False:
     product.description = 'Product Description'
     product.save()
     product, = Product.find([('description', '=', 'Product Description')])
-    
+
 @step('T/SSOS Stock Shipment Out Scenario')
 def step_impl(context):
     """
     Notice: no chart of accounts or fiscal year
     """
-    
+
     config = context.oProteusConfig
 
     Currency = proteus.Model.get('currency.currency')
@@ -94,7 +94,7 @@ def step_impl(context):
 
     User = proteus.Model.get('res.user')
     Group = proteus.Model.get('res.group')
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
@@ -112,7 +112,7 @@ def step_impl(context):
     config.user = product_admin_user.id
     ProductTemplate = proteus.Model.get('product.template')
     Product = proteus.Model.get('product.product')
-    
+
     product, = Product.find([('description', '=', 'Product Description')])
 
 #@step('Get stock locations')

@@ -34,10 +34,14 @@ if su postgres -c "psql -l" | grep -q $TUSER ; then
 	    [ -n "$a" ] || continue
 	    echo "INFO: $TUSER database, have: $a looking for: ${db}"
 	    [ "$a" = "${db}" ] || continue
-	    if /etc/init.d/trytond-$TRYTOND_VER status ; then
+	    /etc/init.d/trytond-$TRYTOND_VER status > /dev/null
+	    retval=$?
+	    # under Gentoo: 0=running 8=starting 3=stopped
+	    if [ $retval -eq 0 -o $retval -eq 8 ]  ; then
+		echo "INFO: dropdb.sh, stopping trytond-$TRYTOND"
 		if /etc/init.d/trytond-$TRYTOND_VER stop 2>&1| \
 		  grep ERROR: ; then
-		    echo "ERROR: dropdb, failed to stop $?"
+		    echo "ERROR: dropdb.sh, failed to stop $?"
 		    exit 12
 		fi
 		sleep 10
@@ -45,7 +49,8 @@ if su postgres -c "psql -l" | grep -q $TUSER ; then
 	    echo "INFO: psql -c 'DROP DATABASE \"$a\";'"
 	    if su $PG_USER -c "psql -c 'DROP DATABASE \"$a\";'" \
 		  2>&1| grep ERROR: ; then
-		echo "ERROR: dropdb failed to drop $a $?"
+		# psql returns 0 even on a failure
+		echo "ERROR: dropdb.sh failed to drop $a"
 		exit 13
 	      fi
 	  done

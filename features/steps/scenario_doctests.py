@@ -285,7 +285,7 @@ def step_impl(context, uKlass, uName):
         setattr(oInstance, row['name'], gValue )
     oInstance.save()
     oInstance, = Klass.find([('name', '=', uName)])
-    
+
 @step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
 @step('Set the instance named "{uName}" of model "{uKlass}" with fields')
 def step_impl(context, uName, uKlass):
@@ -503,14 +503,14 @@ def step_impl(context):
 
     User = proteus.Model.get('res.user')
     Group = proteus.Model.get('res.group')
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
-    product_admin_user = User()    
+
+    product_admin_user = User()
     product_admin_user.name = 'Product'
     product_admin_user.login = 'product'
     product_admin_user.main_company = company
@@ -519,7 +519,7 @@ def step_impl(context):
     ])
     product_admin_user.groups.append(product_admin_group)
     product_admin_user.save()
-    
+
     product_admin_user, = User.find([('name', '=', 'Product')])
 
 @step('Create a stock_admin user')
@@ -533,13 +533,13 @@ def step_impl(context):
 
     User = proteus.Model.get('res.user')
     Group = proteus.Model.get('res.group')
-    
+
     Party = proteus.Model.get('party.party')
     sCompanyName = sGetFeatureData(context, 'party,company_name')
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     stock_admin_user = User()
     stock_admin_user.name = 'Stock Admin'
     stock_admin_user.login = 'stock_admin'
@@ -547,6 +547,6 @@ def step_impl(context):
     stock_admin_group, = Group.find([('name', '=', 'Stock Administration')])
     stock_admin_user.groups.append(stock_admin_group)
     stock_admin_user.save()
-    
+
     stock_admin_user, = User.find([('name', '=', 'Stock Admin')])
 

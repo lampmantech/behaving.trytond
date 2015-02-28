@@ -7,6 +7,9 @@ From: ../features/steps/trytond_stock.py
 **Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"**
    Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"
 
+**Create a new stock.location named "{uName}" of type warehouse**
+   Create a new stock.location named "{uName}" of type warehouse"
+
 **Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"**
    Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"
 
@@ -22,8 +25,10 @@ From: ../features/steps/trytond_stock.py
    Create an Inventory as user named "{uUser}"
    with storage at the location with code "{uCode}"
 
-**Stock Move of product of ProductTemplate "{uProductTemplate}" between locations with |name|value| fields**
-   Stock Move of product of ProductTemplate "uProductTemplate" between locations with |name|value| fields
+**Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+
+**Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+   Stock Move of product of ProductTemplate "uProductTemplate"     between locations with |name|value| fields
    | name              | value |
    | uom 	        | unit  |
    | quantity 	        | 1     |
@@ -33,3 +38,39 @@ From: ../features/steps/trytond_stock.py
    | effective_date 	| TODAY |
    | unit_price 	| 100 |
    | currency 		| USD |
+
+**Stock Move of Product with description "{uProductDescription}" between locations with |name|value| fields**
+   Stock Move of Product with description "uProductDescription"     between locations with |name|value| fields
+   | name              | value |
+   | uom 	        | unit  |
+   | quantity 	        | 1     |
+   | from_location 	| SUP   |
+   | to_location 	| STO   |
+   | planned_date 	| TODAY |
+   | effective_date 	| TODAY |
+   | unit_price 	| 100   |
+   | currency 		| USD   |
+
+**Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description|unit_price| fields**
+   Purchase on date "TODAY" stock with description "Description"
+   as user named "Purchase" Products from supplier "Supplier"
+   to warehouse "WH"
+   with PaymentTerm "Direct" and InvoiceMethod "order"
+   If the quantity is the word comment, the line type is set to comment.
+   with |description|quantity|line_description| fields
+   | description | quantity | line_description | unit_price |
+   | product | 2.0      |             | 10.00 |
+   | product | comment  | Comment     |       |
+   | product | 3.0      |             | 10.00 |
+
+**Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields**
+   Purchase on date "TODAY" stock with description "Description"
+   as user named "Purchase" in Currency coded "uCur"
+   Products from supplier "Supplier" to warehouse "WH"
+   with PaymentTerm "Direct" and InvoiceMethod "order"
+   If the quantity is the word comment, the line type is set to comment.
+   with |description|quantity|line_description| fields
+   | description | quantity | line_description |
+   | product | 2.0      |             |
+   | product | comment  | Comment     |
+   | product | 3.0      |             |

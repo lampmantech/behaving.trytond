@@ -18,8 +18,8 @@ in the current directory.
     exit 0
 }
 
-base=`basename $1 .py`
-tofile="$base.feature"
+base=`basename $1 .rst`
+tofile="$base.py"
 
 cp -i "$1" "$tofile"
 

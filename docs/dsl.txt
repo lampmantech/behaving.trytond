@@ -11,6 +11,8 @@ From: ../features/steps/dsl.py
 
 **having**
 
+**I set the search_model_name to a "{model_name}" with {domain}**
+
 **I find a "{model_name}" with {domain}**
 
 **I need a "{model_name}" with {domain}**

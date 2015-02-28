@@ -46,14 +46,14 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
 
 **T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
 
-**T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities**
-   Create an invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm"
+**T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities**
+   Create an Invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm"
    by an accountant with quantities
    | description     | quantity	| unit_price |
    | product_fixed   | 5.0      	| 4.00	     |
    Idempotent.
 
-**T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities**
+**T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities**
    Unfinished
    >>> invoice = Invoice()
    >>> invoice.party = customer

@@ -268,6 +268,7 @@ def step_impl(context):
         "Expected 0.00,4.00 but got %.2f,%.2f" % (expense.debit, expense.credit,)
 
 # 12 products, Supplier
+# FixMe: currency
 @step('T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices')
 def step_impl(context, uDescription, uSupplier):
 
@@ -443,10 +444,10 @@ def step_impl(context):
         "Expected 28.00,0.00 but got %.2f,%.2f" % (cogs.debit, cogs.credit,)
 
 # Supplier, Direct
-@step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities')
+@step('T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities')
 def step_impl(context, uSupplier, uPaymentTerm):
     """
-    Create an invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm"
+    Create an Invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm"
     by an accountant with quantities
 	  | description     | quantity	| unit_price |
 	  | product_fixed   | 5.0      	| 4.00	     |
@@ -503,19 +504,20 @@ def step_impl(context, uSupplier, uPaymentTerm):
             password=sGetFeatureData(context, 'user,accountant,password'),
             database_name=current_config.database_name)
         invoice_ids = [i.id for i in purchase.invoices]
-        #? is this right? or does it matter?
-        #? current_config.user = accountant.id
+        #? is this right? instead of the new_config?
+        # current_config.user = accountant.id
 
         Invoice = proteus.Model.get('account.invoice')
         Invoice.write(invoice_ids, {
             'invoice_date': TODAY,
-        }, new_config.context)
-        #? invoice.save()
+        }, current_config.context)
+        #? is this needed:
+        # Invoice.save(invoice_ids, new_config.context)
 
         Invoice.validate_invoice([i.id for i in purchase.invoices], new_config.context)
 
 # Supplier, Direct
-@step('T/ASAS/SASAS Create an invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities')
+@step('T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities')
 def step_impl(context, uSupplier, uPaymentTerm):
     """
     Unfinished

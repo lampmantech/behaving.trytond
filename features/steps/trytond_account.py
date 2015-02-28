@@ -232,7 +232,6 @@ def step_impl(context, uTem, uRoot):
         assert iLen >= 6
 
         payable, receivable, = gGetFeaturesPayRec(context, company)
-        revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
         create_chart.form.account_receivable = receivable
         create_chart.form.account_payable = payable
         create_chart.execute('create_properties')

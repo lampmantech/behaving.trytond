@@ -27,7 +27,7 @@ def step_impl(context):
     product, = Product.find([('name', '=', 'T/SACP Product Template')])
     product.reload()
     assert product.template.cost_price == Decimal('100.0000')
-    
+
 @step('T/SACP Check Cost Price is 150')
 def step_impl(context):
 
@@ -35,7 +35,7 @@ def step_impl(context):
     product, = Product.find([('name', '=', 'T/SACP Product Template')])
     product.reload()
     assert product.template.cost_price == Decimal('150.0000')
-    
+
 @step('T/SACP Stock Average Cost Price Scenario')
 def step_impl(context):
     config = context.oProteusConfig
@@ -51,7 +51,7 @@ def step_impl(context):
     ProductTemplate = proteus.Model.get('product.template')
     Product = proteus.Model.get('product.product')
     product, = Product.find([('name', '=', 'T/SACP Product Template')])
-    
+
 #@step('Get stock locations')
 #def step_impl(context):
 

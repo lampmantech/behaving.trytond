@@ -7,7 +7,7 @@ Convenience functions.
 import datetime
 import time
 from decimal import Decimal
-from proteus import config, Model, Wizard
+import proteus
 
 def sGetFeatureData(context, sKey):
     if sKey in context.dData['feature']:
@@ -79,15 +79,26 @@ def string_to_python (sField, uValue, Party=None):
                "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)
     sRelation = dField['relation']
 
-    Klass = Model.get(sRelation)
+    Klass = proteus.Model.get(sRelation)
     #? FixMe: assume name for now
     lElts = Klass.find([('name', '=', uValue)])
 
     if len(lElts) == 0 and sField in ['country', 'subdivision']:
-        # Im having trouble with country.country as of 3.2
-        # .find([('name','=',gValue)]) returns []
-        # .find([('rec_name','=',gValue)]) returns []
+        # Were having trouble with country.country as of 3.2
+        # This code from trytond_party_vcarddav-3.2.0/party.py doesnt work
+        # Country.find([]) returns nothing
+        Country = proteus.Model.get('country.country')
+        if sField in ['country']:
+            countries = Country.find([
+                    ('rec_name', '=', uValue),
+                    ])
+            # , limit=1
+            if countries:
+                #? .rec_name
+                return countries[0]
+        # to find the subdivision we need the country?
         # FixMe: Just junk the field value for now.
+        Subdivision = proteus.Model.get('country.subdivision')
         return None
 
     assert len(lElts) != 0, \

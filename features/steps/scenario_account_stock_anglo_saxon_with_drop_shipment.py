@@ -39,7 +39,7 @@ def step_impl(context, uDescription, uTemplateName, uSupplier):
 
     Party = proteus.Model.get('party.party')
     supplier, = Party.find([('name', '=', uSupplier),])
-    
+
     ProductTemplate = proteus.Model.get('product.template')
     template, = ProductTemplate.find([('name', '=', uTemplateName)])
     if not ProductSupplier.find([('product.name', '=', uTemplateName),
@@ -52,7 +52,7 @@ def step_impl(context, uDescription, uTemplateName, uSupplier):
                     string_to_python(row['name'], row['value'],
                                      ProductSupplier))
         product_supplier.save()
-        
+
     product_supplier, = ProductSupplier.find([('product.name', '=', uTemplateName),
                                               ('party.id', '=', supplier.id)])
 
@@ -68,7 +68,7 @@ def product_supplier():
         product_supplier.drop_shipment = True
         product_supplier.delivery_time = 0
         product_supplier.save()
-    
+
 @step('T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario')
 def step_impl(context):
 
@@ -86,7 +86,7 @@ def step_impl(context):
     AccountJournal = proteus.Model.get('account.journal')
 
     # ProductSupplier = proteus.Model.get('purchase.product_supplier')
-    
+
     payable, receivable, = stepfuns.gGetFeaturesPayRec(context, company)
     revenue, expense, = stepfuns.gGetFeaturesRevExp(context, company)
 
@@ -233,6 +233,8 @@ def step_impl(context):
     account_user, = User.find([('name', '=', 'Account')])
     config.user = account_user.id
     invoice.invoice_date = TODAY
+    #? this was missing
+    invoice.accounting_date = invoice.invoice_date
     invoice.save()
     Invoice.post([invoice.id], config.context)
     assert invoice.state == u'posted'
