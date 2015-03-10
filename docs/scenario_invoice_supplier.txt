@@ -13,6 +13,21 @@ From: ../features/steps/scenario_invoice_supplier.py
 **TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
 
 **TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
-   Create a credit note for the invoice with description "{uDescription}"
-   and assert the amounts for the credit note equal the invoice amounts.
-   Not idempotent.
+   current_config = context.oProteusConfig
+   Invoice = proteus.Model.get('account.invoice')
+   Party = proteus.Model.get('party.party')
+   sCompanyName = sGetFeatureData(context, 'party,company_name')
+   party, = Party.find([('name', '=', sCompanyName)])
+   Company = proteus.Model.get('company.company')
+   company, = Company.find([('party.id', '=', party.id)])
+   # company.id?
+   invoice, = Invoice.find([('description', '=', uDescription),
+   ('company', '=', company.id),])
+   credit = proteus.Wizard('account.invoice.credit', [invoice])
+   credit.form.with_refund = False
+   credit.execute('credit')
+   credit_note, = Invoice.find([('type', '=', 'in_credit_note')])
+   assert credit_note.state == u'draft'
+   assert credit_note.untaxed_amount == invoice.untaxed_amount
+   assert credit_note.tax_amount == invoice.tax_amount
+   assert credit_note.total_amount == invoice.total_amount

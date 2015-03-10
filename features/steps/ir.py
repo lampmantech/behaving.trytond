@@ -64,10 +64,10 @@ def step_impl(context, uName, uClass):
 
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
-    """
-    Attach to an existing instance with name "{uName}"
-    of class "{uClass}", a link to
-    to an existing file with the following |filename| fields
+    r"""
+    Given \
+    Attach to an existing instance with name "{uName}" of class "{uClass}" \
+    a link to an existing file with the following |filename| fields
     """
     Class = proteus.Model.get(uClass)
 
@@ -81,10 +81,10 @@ def step_impl(context, uField, uValue, uClass):
 
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" the content of an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
-    """
-    Attach to an existing instance with name "{uName}"
-    of class "{uClass}", the content of
-    an existing file with the following |filename| fields
+    r"""
+    Given \
+    Attach to an existing instance with name "{uName}" of class "{uClass}" \
+    the content of an existing file with the following |filename| fields
     """
     Class = proteus.Model.get(uClass)
 

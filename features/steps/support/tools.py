@@ -7,8 +7,11 @@ From OerpScenario support/tools.py
 import sys
 import traceback
 import pdb
+import datetime
 
-__all__ = ['puts', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr']    # + 20 'assert_*'
+TODAY = datetime.date.today()
+
+__all__ = ['puts', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr', 'oDateFromUDate']    # + 20 'assert_*'
 
 
 # Expose assert* from unittest.TestCase with pep8 style names
@@ -192,3 +195,10 @@ def post_mortem(t=None):
 def pm():
     post_mortem(sys.last_traceback)
 
+# misc convenience funtions
+def oDateFromUDate(uDate):
+    if uDate.lower() == 'today' or uDate.lower() == 'now':
+        oDate = TODAY
+    else:
+        oDate = datetime.date(*map(int, uDate.split('-')))
+    return oDate

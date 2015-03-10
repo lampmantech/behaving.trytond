@@ -259,11 +259,11 @@ def get_company_property(ctx, pname, modelname, fieldname, company_oid=None):
             ir_property.write({'company_id': company.id})
     ctx.ir_property = ir_property
 
-@given('I set global property named "{pname}" for model "{modelname}" and field "{fieldname}" for company with ref "{company_oid}"')
+@step('I set global property named "{pname}" for model "{modelname}" and field "{fieldname}" for company with ref "{company_oid}"')
 def impl(ctx, pname, modelname, fieldname, company_oid):
     get_company_property(ctx, pname, modelname, fieldname, company_oid=company_oid)
 
-@given('I set global property named "{pname}" for model "{modelname}" and field "{fieldname}"')
+@step('I set global property named "{pname}" for model "{modelname}" and field "{fieldname}"')
 def impl(ctx, pname, modelname, fieldname):
     get_company_property(ctx, pname, modelname, fieldname)
 
@@ -278,7 +278,7 @@ def impl(ctx, modelname, column, value):
     assert res, "no value for %s value %s" % (column, value)
     ir_property.write({'value_reference': '%s,%s' % (modelname, res.id)})
 
-@given('I am configuring the company with ref "{company_oid}"')
+@step('I am configuring the company with ref "{company_oid}"')
 def impl(ctx, company_oid):
     c_domain = build_search_domain(ctx, 'res.company', {'xmlid': company_oid})
     company = proteus.Model.get('res.company').get(c_domain)

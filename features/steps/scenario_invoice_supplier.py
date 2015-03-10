@@ -36,7 +36,8 @@ def step_impl(context, uDescription, uTaxName):
     company, = Company.find([('party.id', '=', party.id)])
 
     Invoice = proteus.Model.get('account.invoice')
-    invoice, = Invoice.find(['description', '=', uDescription])
+    invoice, = Invoice.find([('description', '=', uDescription),
+                             ('company', '=', company.id),])
 
     assert invoice.untaxed_amount == Decimal(110)
     assert invoice.tax_amount == Decimal(10)
@@ -98,7 +99,8 @@ def step_impl(context, uDescription, uTaxName):
 # Buy the Services Bought
 @step('TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts')
 def step_impl(context, uDescription):
-    """
+    r"""
+    Given \
     Create a credit note for the invoice with description "{uDescription}"
     and assert the amounts for the credit note equal the invoice amounts.
     Not idempotent.
@@ -106,8 +108,15 @@ def step_impl(context, uDescription):
     current_config = context.oProteusConfig
 
     Invoice = proteus.Model.get('account.invoice')
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+    
     # company.id?
-    invoice, = Invoice.find(['description', '=', uDescription])
+    invoice, = Invoice.find([('description', '=', uDescription),
+                             ('company', '=', company.id),])
 
     credit = proteus.Wizard('account.invoice.credit', [invoice])
     credit.form.with_refund = False

@@ -9,7 +9,7 @@ If this test fails, behave is not properly installed.
 
 from behave import *
 
-@given('we have behave installed')
+@step('we have behave installed')
 def step_impl(context):
     """
     If behave is not installed we couldnt get here!

@@ -37,8 +37,9 @@ dCacheCostPriceMethod={}
 @step('T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields')
 # FixMe: actually creates 2 different Product and ProductTemplates
 def step_impl(context, uType, uName):
-    """
-    Create products of type "{uType}" from the ProductTemplate named
+    r"""
+    Given \
+    Create products of type "{uType}" from the ProductTemplate named \
     "{uName}" with fields
 	  | name                | cost_price_method | description         |
 	  | product_fixed	| fixed   	    | Product Fixed       |
@@ -102,8 +103,9 @@ def step_impl(context, uType, uName):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
-    """
-    Purchase products on the P. O. with description "{uDescription}"
+    r"""
+    Given \
+    Purchase products on the P. O. with description "{uDescription}" \
     from supplier "{uSupplier}" with quantities
 	  | description  	| quantity | unit_price |
 	  | product_fixed	| 5.0	   | 4		|
@@ -149,7 +151,11 @@ def step_impl(context, uDescription, uSupplier):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
-    """
+    r"""
+    Given \
+    T/ASAS/SASAS Quote and Confirm a P. O. \
+    with description "{uDescription}" from Supplier "{uSupplier}"
+
     Idempotent.
     """
     current_config = context.oProteusConfig
@@ -175,7 +181,11 @@ def step_impl(context, uDescription, uSupplier):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
-    """
+    r"""
+    Given \
+    T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" \
+    from Supplier "{uSupplier}" with quantities
+
     Idempotent.
     """
     current_config = context.oProteusConfig
@@ -209,8 +219,9 @@ def step_impl(context, uDescription, uSupplier):
             if fQuantity < 0.0001: continue
 
             product = Product.find([('description', '=', uDescription)])[0]
-            stock_move = Move.find([('product.id', '=', product.id),
-                                    ('supplier.id', '=', supplier.id)])[0]
+            # FixMe: more detail on the find
+            stock_move, = Move.find([('product.id', '=', product.id),
+                                     ('supplier.id', '=', supplier.id)])
 
             move = Move(stock_move.id)
             shipment.incoming_moves.append(move)
@@ -355,8 +366,10 @@ def step_impl(context):
 
 @step('T/ASAS/SASAS After shipping to customer assert the account credits and debits')
 def step_impl(context):
-    """
+    r"""
+    Given \
     T/ASAS/SASAS After shipping to customer assert the account credits and debits
+
     NOT idempotent.
     """
 
@@ -446,8 +459,9 @@ def step_impl(context):
 # Supplier, Direct
 @step('T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities')
 def step_impl(context, uSupplier, uPaymentTerm):
-    """
-    Create an Invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm"
+    r"""
+    Given \
+    Create an Invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm" \
     by an accountant with quantities
 	  | description     | quantity	| unit_price |
 	  | product_fixed   | 5.0      	| 4.00	     |

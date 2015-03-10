@@ -120,9 +120,9 @@ def step_impl(context, uName):
 
 @step('Create the company with default COMPANY_NAME and Currency code "{uCode}"')
 def step_impl(context, uCode):
-    """
-    Create the Company associated with the party named "party,company_name"
-    and using the currency "{uCode}"
+    r"""
+    Given \
+    Create the company with default COMPANY_NAME and Currency code "{uCode}"
     """
     uPartyName = sGetFeatureData(context, 'party,company_name')
     context.execute_steps(u'''
@@ -206,8 +206,10 @@ def step_impl(context, uParty, uCode):
 
 @step('Create the currency with Currency code "{uCode}"')
 def step_impl(context, uCode):
-    """
-    Create the currency with the given Currency code.
+    r"""
+    Given \
+    Create the currency with Currency code "{uCode}"
+
     You'll need to do this before you use any other currencies
     than the company's base currency.
     """
@@ -253,8 +255,9 @@ def step_impl(context):
 # party.party Supplier
 @step('Create a saved instance of "{uKlass}" named "{uName}"')
 def step_impl(context, uKlass, uName):
-    """
-    Create an instance of a Model, like Model.get('party.party')
+    r"""
+    Given \
+    Create an instance of a Model, like Model.get('party.party') 
     with the name attribute of 'uName'.
     Idempotent.
     """
@@ -266,7 +269,8 @@ def step_impl(context, uKlass, uName):
 @step('Create an instance of "{uKlass}" named "{uName}" with fields')
 @step('Create an instance of "{uKlass}" named "{uName}" with |name|value| fields')
 def step_impl(context, uKlass, uName):
-    """
+    r"""
+    Given \
     Create an instance of a Model, like Model.get('party.party')
     with the name attribute of 'uName' and the fields from the table.
     It expects a |name|value| table.
@@ -289,7 +293,8 @@ def step_impl(context, uKlass, uName):
 @step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
 @step('Set the instance named "{uName}" of model "{uKlass}" with fields')
 def step_impl(context, uName, uKlass):
-    """
+    r"""
+    Given \
     Guven an instance named "uName" of a Model, like Model.get('party.party')
     set the attributes to the values.   It expects a |name|value| table.
     Idempotent.
@@ -298,8 +303,10 @@ def step_impl(context, uName, uKlass):
 
 @step('Create parties')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create a party named "Supplier"
+    And \
     Create a party named "Customer"
     """
     context.execute_steps(u'''Given Create a party named "Supplier"''')
@@ -321,8 +328,10 @@ def step_impl(context, uName):
 @step('Create a party named "{uName}" with an account_payable attribute')
 @step('Create a party named "{uName}" with payable and receivable properties')
 def step_impl(context, uName):
-    """
-    Create a party named 'uName' with payable and receivable properties.
+    r"""
+    Given \
+    Create a party named "uName" with payable and receivable properties.
+
     The account_payable Account is taken from the
     'account.template,main_payable' entry of the feature data
     (use 'Set the feature data with values' to override)
@@ -340,8 +349,10 @@ def step_impl(context, uName):
 @step('Create a party named "{uName}" with payable and receivable properties with fields')
 @step('Create a party named "{uName}" with payable and receivable properties with |name|value| fields')
 def step_impl(context, uName):
-    """
-    Create a party named 'uName' with payable and receivable properties.
+    r"""
+    Given \
+    Create a party named "uName" with payable and receivable properties. \
+
     The account_payable Account is taken from the
     'account.template,main_payable' entry of the feature data
     (use 'Set the feature data with values' to override)
@@ -362,7 +373,8 @@ def step_impl(context, uName):
 @step('Create a user named "{uName}" with the fields')
 @step('Create a user named "{uName}" with the |name|value| fields')
 def step_impl(context, uName):
-    """
+    r"""
+    Given \
     Create a res.user named 'uName' and the given field values.
     It expects a |name|value| table.
     If one of the field names is 'group', it will add the User to that group.
@@ -394,7 +406,8 @@ def step_impl(context, uName):
 
 @step('Create a grouped user named "{uName}" with |name|value| fields')
 def step_impl(context, uName):
-    """
+    r"""
+    Given \
     Create a user named "{uName}" with |name|value| fields
             | name   | value |
             | login  | sale  |
@@ -426,7 +439,8 @@ def step_impl(context, uName):
 
 @step('Create a sale user')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create a grouped user named "Sale" with |name|value| fields
             | name   | value |
             | login  | sale  |
@@ -442,7 +456,8 @@ def step_impl(context):
 
 @step('Create a purchase user')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Given Create a grouped user named "Purchase" with |name|value| fields
             | name   | value            |
             | login  | purchase         |
@@ -477,7 +492,8 @@ def step_impl(context):
 @step('Create a account user')
 @step('Create an account user')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create a grouped user named "Account" with |name|value| fields
             | name   | value |
             | login  | account |
@@ -494,7 +510,8 @@ def step_impl(context):
 
 @step('Create a product user')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create a grouped user named "Product" with |name|value| fields
             | name   | value                  |
             | login  | product                |
@@ -524,7 +541,8 @@ def step_impl(context):
 
 @step('Create a stock_admin user')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create a grouped user named "Stock Admin" with |name|value| fields
             | name   | value                |
             | login  | stock_admin          |

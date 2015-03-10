@@ -52,7 +52,8 @@ if su postgres -c "psql -l" | grep -q $TUSER ; then
 		# psql returns 0 even on a failure
 		echo "ERROR: dropdb.sh failed to drop $a"
 		exit 13
-	      fi
+	    fi
+	    break
 	  done
       fi
 

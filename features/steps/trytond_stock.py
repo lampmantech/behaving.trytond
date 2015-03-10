@@ -18,7 +18,8 @@ TODAY = datetime.date.today()
 # 'Stock Admin', 'stock_admin', 'Stock Administration'
 @step('Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"')
 def step_impl(context, uName, uLogin, uGroup):
-    """
+    r"""
+    Given \
     Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"
     """
     current_config = context.oProteusConfig
@@ -44,7 +45,8 @@ def step_impl(context, uName, uLogin, uGroup):
 
 @step('Create a new stock.location named "{uName}" of type warehouse')
 def step_impl(context, uName):
-    """
+    r"""
+    Given \
     Create a new stock.location named "{uName}" of type warehouse"
     """
     current_config = context.oProteusConfig
@@ -53,7 +55,7 @@ def step_impl(context, uName):
 
     Location = proteus.Model.get('stock.location')
     if not Location.find([('name', '=', uName)]):
-        uCode = uName.replace(' ', '')
+        uCode = uName.split()[0]
         
         output_loc = Location()
         output_loc.name = uName + ' Output'
@@ -87,7 +89,8 @@ def step_impl(context, uName):
 # 'Provisioning Location', 'storage', 'WH'
 @step('Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"')
 def step_impl(context, uName, uType, uParent):
-    """
+    r"""
+    Given \
     Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"
     """
     current_config = context.oProteusConfig
@@ -99,20 +102,24 @@ def step_impl(context, uName, uType, uParent):
     Location = proteus.Model.get('stock.location')
     if not Location.find([('name', '=', uName)]):
         # WH only?
+        uCode = uName.split()[0]
 
         provisioning_loc = Location()
         provisioning_loc.name = uName
+        provisioning_loc.code = uCode
         provisioning_loc.type = uType
         if uParent:
             storage_loc, = Location.find([('code', '=', uParent)])
             provisioning_loc.parent = storage_loc
         provisioning_loc.save()
 
-    assert Location.find([('name', '=', uName)])
+    oLocation, = Location.find([('name', '=', uName)])
+
 
 @step('Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" ProductTemplates with |product|quantity|expected_quantity| fields')
 def step_impl(context, uUser, uCode):
-    """
+    r"""
+    Given \
     Create an Inventory as user named "{uUser}"
     with storage at the location with code "{uCode}"
     The following fields are the name of the product and the
@@ -147,7 +154,8 @@ def step_impl(context, uUser, uCode):
 
 @step('Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"')
 def step_impl(context, uUser, uCode):
-    """
+    r"""
+    Given \
     Create an Inventory as user named "{uUser}"
     with storage at the location with code "{uCode}"
     """
@@ -170,78 +178,9 @@ def step_impl(context, uUser, uCode):
     admin_user = User(0)
     proteus.config.user = admin_user.id
 
-@step('Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
-@step('Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
-def step_impl(context, uProductTemplate):
-    """
-    Stock Move of product of ProductTemplate "uProductTemplate" \
-    between locations with |name|value| fields
-    | name              | value |
-    | uom 	        | unit  |
-    | quantity 	        | 1     |
-    | from_location 	| SUP |
-    | to_location 	| STO |
-    | planned_date 	| TODAY |
-    | effective_date 	| TODAY |
-    | unit_price 	| 100 |
-    | currency 		| USD |
-    """
-    config = context.oProteusConfig
-    StockMove = proteus.Model.get('stock.move')
-
-    Party = proteus.Model.get('party.party')
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    company, = Company.find([('party.id', '=', party.id)])
-
-    Location = proteus.Model.get('stock.location')
-
-    # should be ProductTemplate ? - nope, must be name
-    # Product.find([('name', '=', uProductTemplate)]) works
-    # ProductTemplate.find([('name', '=', uProductTemplate)]) works
-    # ProductTemplate.find([])[0].name works
-    # ProductTemplate.find([])[0].name works
-    # but Product.find([])[0].name errors
-    # and Product.find([('description', '=', uProductTemplate)]) is empty
-    ProductTemplate = proteus.Model.get('product.template')
-    product, = ProductTemplate.find([('name', '=', uProductTemplate)])
-
-    incoming_move = StockMove()
-    incoming_move.product = product
-    incoming_move.company = company
-
-    for row in context.table:
-        if row['name'] == 'from_location':
-            loc, = Location.find([('code', '=', row['value'])])
-            incoming_move.from_location = loc
-        elif row['name'] == 'to_location':
-            loc, = Location.find([('code', '=', row['value'])])
-            incoming_move.to_location = loc
-        elif row['name'] == 'planned_date':
-            uDate = row['value']
-            if uDate.lower() == 'today' or uDate.lower() == 'now':
-                oDate = TODAY
-            else:
-                oDate = datetime.date(*map(int, uDate.split('-')))
-            incoming_move.planned_date = oDate
-        elif row['name'] == 'effective_date':
-            uDate = row['value']
-            if uDate.lower() == 'today' or uDate.lower() == 'now':
-                oDate = TODAY
-            else:
-                oDate = datetime.date(*map(int, uDate.split('-')))
-            incoming_move.effective_date = oDate
-        else:
-            gValue = string_to_python(row['name'], row['value'], StockMove)
-            setattr(incoming_move, row['name'], gValue )
-
-    incoming_move.save()
-    StockMove.do([incoming_move.id], config.context)
-
 @step('Stock Move of Product with description "{uProductDescription}" between locations with |name|value| fields')
 def step_impl(context, uProductDescription):
-    """
+    r"""
     Stock Move of Product with description "uProductDescription" \
     between locations with |name|value| fields
     | name              | value |
@@ -254,6 +193,33 @@ def step_impl(context, uProductDescription):
     | unit_price 	| 100   |
     | currency 		| USD   |
     """
+    Product = proteus.Model.get('product.product')
+    product, = Product.find([('description', '=', uProductDescription)])
+    vStockMoveOfProductOrTemplate(context, product)
+    
+@step('Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
+@step('Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
+def step_impl(context, uProductTemplate):
+    r"""
+    Stock Move of product of ProductTemplate named "uProductTemplate" \
+    between locations with |name|value| fields
+    | name              | value |
+    | uom 	        | unit  |
+    | quantity 	        | 1     |
+    | from_location 	| SUP |
+    | to_location 	| STO |
+    | planned_date 	| TODAY |
+    | effective_date 	| TODAY |
+    | unit_price 	| 100 |
+    | currency 		| USD |
+
+    Locations are location codes, not names.
+    """
+    ProductTemplate = proteus.Model.get('product.template')
+    product, = ProductTemplate.find([('name', '=', uProductTemplate)])
+    vStockMoveOfProductOrTemplate(context, product)
+
+def vStockMoveOfProductOrTemplate(context, product):
     config = context.oProteusConfig
     StockMove = proteus.Model.get('stock.move')
 
@@ -272,8 +238,6 @@ def step_impl(context, uProductDescription):
     # ProductTemplate.find([])[0].name works
     # but Product.find([])[0].name errors
     # and Product.find([('description', '=', uProductTemplate)]) is empty
-    Product = proteus.Model.get('product.product')
-    product, = Product.find([('description', '=', uProductDescription)])
 
     incoming_move = StockMove()
     incoming_move.product = product
@@ -307,9 +271,104 @@ def step_impl(context, uProductDescription):
     incoming_move.save()
     StockMove.do([incoming_move.id], config.context)
 
+@step('Stock Internal Shipment of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
+def step_impl(context, uProductTemplate):
+    r"""
+    Given \
+    Stock Internal Shipment of product of ProductTemplate named "uProductTemplate" \
+    between locations with |name|value| fields
+    | name              | value |
+    | uom 	        | unit  |
+    | quantity 	        | 1     |
+    | from_location 	| SUP   |
+    | to_location 	| STO   |
+    | planned_date 	| TODAY |
+    | effective_date 	| TODAY |
+
+    Locations are location codes, not names.
+    """
+    ProductTemplate = proteus.Model.get('product.template')
+    product, = ProductTemplate.find([('name', '=', uProductTemplate)])
+    vStockInternalShipmentOfProductOrTemplate(context, product)
+
+@step('Stock Internal Shipment of Product with description "{uProductDescription}" between locations with |name|value| fields')
+def step_impl(context, uProductDescription):
+    r"""
+    Given \
+    Stock Internal Shipment of product of Product \
+    with description  "uProductDescription" \
+    between locations with |name|value| fields
+    | name              | value |
+    | uom 	        | unit  |
+    | quantity 	        | 1     |
+    | from_location 	| SUP   |
+    | to_location 	| STO   |
+    | planned_date 	| TODAY |
+    | effective_date 	| TODAY |
+
+    Locations are location codes, not names.
+    """
+    Product = proteus.Model.get('product.product')
+    product, = Product.find([('description', '=', uProductDescription)])
+    vStockInternalShipmentOfProductOrTemplate(context, product)
+    
+def vStockInternalShipmentOfProductOrTemplate(context, product):
+    config = context.oProteusConfig
+    StockInternalShipment = proteus.Model.get('stock.shipment.internal')
+
+    Party = proteus.Model.get('party.party')
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    Location = proteus.Model.get('stock.location')
+
+    # should be ProductTemplate ? - nope, must be name
+    # Product.find([('name', '=', uProductTemplate)]) works
+    # ProductTemplate.find([('name', '=', uProductTemplate)]) works
+    # ProductTemplate.find([])[0].name works
+    # ProductTemplate.find([])[0].name works
+    # but Product.find([])[0].name errors
+    # and Product.find([('description', '=', uProductTemplate)]) is empty
+    internal_shipment = StockInternalShipment()
+
+    for row in context.table:
+        if row['name'] == 'from_location':
+            loc, = Location.find([('code', '=', row['value'])])
+            internal_shipment.from_location = loc
+        elif row['name'] == 'to_location':
+            loc, = Location.find([('code', '=', row['value'])])
+            internal_shipment.to_location = loc
+        elif row['name'] == 'planned_date':
+            uDate = row['value']
+            if uDate.lower() == 'today' or uDate.lower() == 'now':
+                oDate = TODAY
+            else:
+                oDate = datetime.date(*map(int, uDate.split('-')))
+            internal_shipment.planned_date = oDate
+        elif row['name'] == 'effective_date':
+            uDate = row['value']
+            if uDate.lower() == 'today' or uDate.lower() == 'now':
+                oDate = TODAY
+            else:
+                oDate = datetime.date(*map(int, uDate.split('-')))
+            internal_shipment.effective_date = oDate
+        else:
+            gValue = string_to_python(row['name'], row['value'], StockInternalShipment)
+            setattr(internal_shipment, row['name'], gValue )
+
+    internal_shipment.save()
+    if not StockInternalShipment.assign_try([internal_shipment.id], current_config.context):
+        sys.__stderr__.write('>>> WARN: forcing internal shipment on '+uDate+'\n')
+        StockInternalShipment.assign_force([internal_shipment.id], current_config.context)
+    StockInternalShipment.done([internal_shipment.id], config.context)
+    internal_shipment.reload()
+
 @step('Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description|unit_price| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod):
-    """
+    r"""
+    Given \
     Purchase on date "TODAY" stock with description "Description"
     as user named "Purchase" Products from supplier "Supplier"
     to warehouse "WH"
@@ -325,7 +384,8 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, u
     
 @step('Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod):
-    """
+    r"""
+    Given \
     Purchase on date "TODAY" stock with description "Description"
     as user named "Purchase" in Currency coded "uCur"  
     Products from supplier "Supplier" to warehouse "WH"

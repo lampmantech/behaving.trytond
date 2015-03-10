@@ -16,11 +16,21 @@ From: ../features/steps/ir.py
 **Attach to an instance named "{uName}" of class "{uClass}" a link to an existing file with the following |filename| fields**
 
 **Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields**
-   Attach to an existing instance with name "{uName}"
-   of class "{uClass}", a link to
-   to an existing file with the following |filename| fields
+   Class = proteus.Model.get(uClass)
+   oResource = Class.find([(uField, '=', uValue)])[0]
+   assert context.table
+   for row in context.table:
+   uFile = row['filename']
+   assert os.path.exists(uFile)
+   o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
+   assert o
 
 **Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" the content of an existing file with the following |filename| fields**
-   Attach to an existing instance with name "{uName}"
-   of class "{uClass}", the content of
-   an existing file with the following |filename| fields
+   Class = proteus.Model.get(uClass)
+   oResource = Class.find([(uField, '=', uValue)])[0]
+   assert context.table
+   for row in context.table:
+   uFile = row['filename']
+   assert os.path.exists(uFile)
+   o = stepfuns.oAttachFileContentToResource(oResource, uFile)
+   assert o

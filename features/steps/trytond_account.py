@@ -21,7 +21,8 @@ TODAY = datetime.date.today()
 @step('Create this fiscal year')
 @step('Create this fiscal year without Invoicing')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create the fiscal year "TODAY" without Invoicing
     """
     context.execute_steps(u'''
@@ -30,7 +31,8 @@ def step_impl(context):
 
 @step('Create the fiscal year "{uYear}" without Invoicing')
 def step_impl(context, uYear):
-    """
+    r"""
+    Given \
     Creates a fiscal year 'uYear' with a non-Strict post_move_seq.
     Create the company first before creating fiscal years.
     """
@@ -70,7 +72,8 @@ def step_impl(context, uYear):
 
 @step('Create this fiscal year with Invoicing')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create the fiscal year "TODAY" with Invoicing
     """
     context.execute_steps(u'''
@@ -79,7 +82,8 @@ def step_impl(context):
 
 @step('Create the fiscal year "{uYear}" with Invoicing')
 def step_impl(context, uYear):
-    """
+    r"""
+    Given \
     Creates a fiscal year 'uYear' with a non-Strict move_sequence
     and a Strict invoice_sequence for account.invoice.
     Create the company first.
@@ -130,7 +134,8 @@ def step_impl(context, uYear):
 
 @step('Create this fiscal year with a non-strict post_move_seq')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create the fiscal year "TODAY.year" with a non-Strict post_move_seq
     """
     uYear=str(TODAY.year)
@@ -142,7 +147,8 @@ def step_impl(context):
 # @step('Create the fiscal year "{uYear}" without Invoicing')
 @step('Create the fiscal year "{uYear}" with a non-Strict post_move_seq')
 def step_impl(context, uYear):
-    """
+    r"""
+    Given \
     Creates a fiscal year 'uYear' with a non-Strict post_move_seq.
     Create the company first.
     """
@@ -181,7 +187,8 @@ def step_impl(context, uYear):
 
 @step('Create a default Minimal Account Chart')
 def step_impl(context):
-    """
+    r"""
+    Given \
     Create a default chart of accounts from template
     "Minimal Account Chart" with root "Minimal Account Chart"
 
@@ -193,7 +200,8 @@ def step_impl(context):
 # 'Minimal Account Chart', 'Minimal Account Chart'
 @step('Create a chart of accounts from template "{uTem}" with root "{uRoot}"')
 def step_impl(context, uTem, uRoot):
-    """
+    r"""
+    Given \
     Create a chart of accounts from template "{uTem}"
     with root account "{uRoot}".
     Before you do this, with the step 'Set the feature data with values:'
@@ -279,7 +287,8 @@ def step_impl(context):
 # Direct, 0
 @step('Create a PaymentTerm named "{uTermName}" with "{uNum}" days remainder')
 def step_impl(context, uTermName, uNum):
-    """
+    r"""
+    Given \
     Create a account.invoice.payment_term with name 'uTermName'
     with a account.invoice.payment_term.line of type 'remainder',
     and days=uNum.
@@ -299,7 +308,8 @@ def step_impl(context, uTermName, uNum):
 # 10% Sales Tax
 @step('Create a tax named "{uTaxName}" with fields')
 def step_impl(context, uTaxName):
-    """Create a tax:
+    r"""
+    Given \Create a tax:
 	and Create a tax named "10% Sales Tax" with fields
 	    | name                  | value            |
 	    | description           | 10% Sales Tax    |

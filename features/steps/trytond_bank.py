@@ -19,7 +19,8 @@ from .support.stepfuns import vAssertContentTable
 
 @step('Create a bank associated to a party "{uParty}" with optional |bic| field')
 def step_impl(context, uParty):
-    """
+    r"""
+    Given \
     Create a named bank associated to a party, with optional BIC
      | bic    |
      | THEBIC |
@@ -46,7 +47,8 @@ def step_impl(context, uParty):
 
 @step('Create a bank account with IBAN "{uIban}" at a bank associated to a party "{uParty}", with following optional number, owner or currency')
 def step_impl(context, uIban, uParty):
-    """
+    r"""
+    Given \
     Create a bank account with IBAN "{uBank}" associated with a party "{uParty}
     with a following table of | name | value |.
     Each name is one of: iban number owner or currency.
@@ -163,7 +165,8 @@ def step_impl(context, uNum, uParty):
 # Bank
 @step('Create a sequence on account.journal named "{uBankSequenceName}"')
 def step_impl(context, uBankSequenceName):
-    """
+    r"""
+    Given \
     Create a non-strict sequence on account.journal named "{uBankSequenceName}"
     Idempotent.
     """
@@ -197,7 +200,8 @@ def step_impl(context, uBankSequenceName):
 # DifferentCurrencySJ, StatementAJ, USD
 @step('Create a Bank Statement Journal named "{uName}" from the account.journal named "{uStatementAJName}" with currency "{uCur}"')
 def step_impl(context, uName, uStatementAJName, uCur):
-    """
+    r"""
+    Given \
     Create an account.bank.statement.journal named "{uName}"
     from the account.journal named "{uStatementAJName}"
     with currency "{uCur}"
@@ -223,7 +227,8 @@ def step_impl(context, uName, uStatementAJName, uCur):
 #     StatementAJ, : Main Cash Main Cash
 @step('Create a cash account.journal named "{uName}" from the sequence named "{uBankSequenceName}" with following |name|value| credit_account, debit_account fields')
 def step_impl(context, uName, uBankSequenceName):
-    """
+    r"""
+    Given \
     Create a cash account.journal named "{uName}"
     with the sequence named "{uBankSequenceName}"
     with a following |name|value| table
@@ -280,7 +285,8 @@ def step_impl(context, uName, uBankSequenceName):
 @step('Create a financial account under "{uTemplate}" for the bank account with IBAN "{uIban}"')
 @step('Create a financial account under "{uTemplate}" for the bank account with number "{uIban}"')
 def step_impl(context, uTemplate, uIban):
-    """
+    r"""
+    Given \
     Create a new account into the chart of accounts for a bank account.
     It takes "{uTemplate}" as an argument which is the name an existing account
     in the chart where the new account will be created: if uTemplate is of
@@ -298,7 +304,8 @@ def step_impl(context, uTemplate, uIban):
     o = oCreateNewChartAccountforBank(context, uIban, uTemplate)
 
 def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
-    """
+    r"""
+    Given \
     Create a new account into the chart of accounts for a bank account.
     The account_bank_statement module has to be loaded
     before ANY accounts are created or this will error.

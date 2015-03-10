@@ -11,7 +11,7 @@ from .support import modules
 from .support import tools
 from .support.stepfuns import vAssertContentTable
 
-@given('we have proteus installed')
+@step('we have proteus installed')
 def step_impl(context):
     assert context.oProteusConfig
 
@@ -37,9 +37,11 @@ def step_impl(context):
 
 @step('Ensure that the WebDAV modules are loaded')
 def step_impl(context):
-    """
-    Ensure that the WebDAV modules are loaded so that we
-    can access the calendars and contacts via WebDAV
+    r"""
+    Given \
+    Ensure that the WebDAV modules are loaded 
+
+    So that we can access the calendars and contacts via WebDAV
     """
     context.execute_steps(u'''
     Given Ensure that the "%s" module is loaded

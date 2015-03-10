@@ -21,7 +21,8 @@ TODAY = datetime.date.today()
 # Fixme: currency
 @step('Sale on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCustomer, uTerm, uMethod):
-    """
+    r"""
+    Given \
     Sale on date "TODAY" with description "Description"
     with their reference "uRef" 
     as user named "Sale" products to customer "Customer"
@@ -89,7 +90,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCustomer, uTerm, uMeth
                 sale_line.quantity = Decimal(row['quantity'])
             if row['line_description']:
                 sale_line.description = row['line_description'] or ''
-            #? why no sale_line.save() : for sale to pass itself to the line
+            # no sale_line.save()
         sale.save()
 
     user, = User.find([('login', '=', 'admin')])
@@ -102,7 +103,8 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCustomer, uTerm, uMeth
 
 @step('Sale "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
-    """
+    r"""
+    Given \
     Sale "quote" on date "TODAY" the S.O. with description "P. O #1"
     as user named "Sale" products from customer "Customer"
     """
@@ -130,12 +132,20 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
     elif uAct == 'confirm':
         Sale.confirm([sale.id], config.context)
         assert sale.state == u'confirmed'
+        # this will help us find the invoice later
+        if sale.invoices:
+            invoice, = sale.invoices
+            assert invoice.origins == sale.rec_name
+            if not invoice.description:
+                invoice.description = sale.description
+                invoice.save()
     elif uAct == 'process':
         Sale.process([sale.id], config.context)
         assert sale.state == u'processing'
     else:
         raise ValueError("uAct must be one of quote confirm process: " + uAct)
     sale.reload()
+    
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
 
@@ -143,7 +153,8 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
 
 @step('Invoice "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
-    """
+    r"""
+    Given \
     Invoice "post" on date "TODAY" the S. O. with description "S. O #1"
     as user named "Account" products from customer "Customer"
     """
@@ -167,20 +178,21 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
     account_user, = User.find([('name', '=', uUser)])
     proteus.config.user = account_user.id
     Invoice = proteus.Model.get('account.invoice')
-    invoice = Invoice(sale.invoices[0].id)
-    if uDate.lower() == 'today' or uDate.lower() == 'now':
-        oDate = TODAY
-    else:
-        oDate = datetime.date(*map(int, uDate.split('-')))
-    invoice.invoice_date = oDate
-    invoice.description = uDescription
-    invoice.save()
-    print uDate, uDescription, invoice.type
+#?    invoice = Invoice(sale.invoices[0].id)
+    invoice, = sale.invoices
+    oDate = oDateFromUDate(uDate)
     if uAct == u'post':
         invoice.click(uAct)
+        invoice.reload()
+        if not invoice.invoice_date:
+            invoice.invoice_date = oDate
+            invoice.save()
+        if not invoice.description:
+            invoice.description = uDescription
+            invoice.save()
+#        print uDate, uDescription, invoice.type
     else:
         raise ValueError("uAct must be one of post: " + uAct)
-    invoice.reload()
 
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
@@ -191,11 +203,13 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
 @step('Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields')
 @step('Create a sales order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields')
 def step_impl(context, uDescription, uCur, uCustomer, uDate):
-    """
+    r"""
+    Given \
     Create a sales order with description "{uDescription}" in Currency coded "%(sCur)s" to customer "{uCustomer}" on Date "{uDate}" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct   |
+	  | reference         | None     |
     Idempotent.
     """
     current_config = context.oProteusConfig
@@ -237,8 +251,8 @@ def step_impl(context, uDescription, uCur, uCustomer, uDate):
 
 @step('Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity|unit_price| fields')
 def step_impl(context, uDescription, uCustomer):
-    """
-    Sell products on the S. O. with description "uDescription"
+    r"""
+    Sell Products on the S. O. with description "uDescription" \
     to customer "uCustomer" with quantities
 	  | description     | quantity | unit_price |
 	  | Product Fixed   | 2.0      | 10.00      |
@@ -259,7 +273,8 @@ def step_impl(context, uDescription, uCustomer):
 
 @step('Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity| fields')
 def step_impl(context, uDescription, uCustomer):
-    """
+    r"""
+    Given \
     Sell products on the S. O. with description "uDescription"
     to customer "uCustomer" with quantities
 	  | description     | quantity |
@@ -319,10 +334,10 @@ def oSellProductsSaleOrder(context, uDescription, uCustomer):
 @step('Validate shipments on "{uDate}" for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 @step('Ship the products on "{uDate}" of the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDate, uDescription, uCustomer):
-    """
-    From: T/ASAS/SASAS
-    Ship the products on the S. O. with description "{uDescription}"
+    r"""
+    Ship the products on "{uDate}" of the S. O. with description "{uDescription}" \
     to customer "{uCustomer}"
+    From: T/ASAS/SASAS
     NOT idempotent
     """
     current_config = context.oProteusConfig
@@ -344,22 +359,29 @@ def step_impl(context, uDate, uDescription, uCustomer):
                        ('party.id', '=', customer.id)])
 
     shipment, = sale.shipments
+    # also supplier origin
     if hasattr(shipment, 'warehouse'):
         shipment.warehouse = sale.warehouse
-    if uDate.lower() == 'today' or uDate.lower() == 'now':
-        oDate = TODAY
-    else:
-        oDate = datetime.date(*map(int, uDate.split('-')))
-        # if sale.sale_date: oDate = sale.sale_date
+    oDate = oDateFromUDate(uDate)
+    # if sale.sale_date: oDate = sale.sale_date
     shipment.effective_date = oDate
-    #? if not shipment.planned_date
-    shipment.planned_date = oDate
+    if not shipment.planned_date:
+        shipment.planned_date = oDate
+    if not shipment.reference and sale.reference:
+        shipment.reference = sale.reference
+    #? nowhere on shipment for uDescription?
+    
+    #? purchase has this do I need it for sale?
+    Move = proteus.Model.get('stock.move')
+    for move in sale.moves:
+        outgoing_move = Move(id=move.id)
+        outgoing_move.supplier = customer
+        #? shipment.outgoing_moves.append(outgoing_move)
     shipment.save()
     if not ShipmentOut.assign_try([shipment.id], current_config.context):
         sys.__stderr__.write('>>> WARN: forcing shipment for sale with description: '+uDescription+' on '+uDate+'\n')
-        if not ShipmentOut.assign_force([shipment.id], current_config.context):
-            sys.__stderr__.write('>>> ERROR: failed shipment for sale with description: '+uDescription+' on '+uDate+'\n')
-            return
+        ShipmentOut.assign_force([shipment.id], current_config.context)
+#?        '>>> ERROR: failed shipment for sale with description: '+uDescription+' on '+uDate+'\n'
 
     #? why did this become necessary when it wasnt before?
     shipment.reload()
@@ -386,7 +408,8 @@ def step_impl(context, uDate, uDescription, uCustomer):
 @step('Invoice act "post" for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 @step('Post customer Invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDescription, uCustomer):
-    """
+    r"""
+    Given \
     From T/ASAS/SASAS
     Post customer Invoice for the Sales Order with description "uDescription"
     to customer "uCustomer"
@@ -417,12 +440,15 @@ def step_impl(context, uDescription, uCustomer):
     Invoice = proteus.Model.get('account.invoice')
     invoice, = sale.invoices
     #? Surprised Tryton doesnt do this
-    invoice.description =  uDescription
+    if not invoice.description:
+        invoice.description =  uDescription
+        invoice.save()
     if sale.sale_date:
         invoice.invoice_date = sale.sale_date
-    invoice.save()
+        invoice.save()
     # not idempotent
     Invoice.post([invoice.id], current_config.context)
     invoice.reload()
     assert invoice.state == u'posted'
+
 

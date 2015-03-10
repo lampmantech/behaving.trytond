@@ -6,6 +6,11 @@ From: ../features/steps/scenario_account_payment.py
    Payment Scenario
 
 **T/AP Create a PaymentJournal named "{uName}" of type "{uType}"**
-   T/AP Create a PaymentJournal named "Manual" of type "manual"
+   PaymentJournal = proteus.Model.get('account.payment.journal')
+   if not PaymentJournal.find([('name', '=', uName)]):
+   payment_journal = PaymentJournal(name=uName,
+   process_method=uType)
+   payment_journal.save()
+   payment_journal, = PaymentJournal.find([('name', '=', uName)])
 
 **T/AP Unfinished**
