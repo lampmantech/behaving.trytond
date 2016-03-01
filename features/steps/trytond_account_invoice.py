@@ -127,10 +127,19 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
                 #? need this if line.product too? No it's derived
                 if row['account']:
                     # FixMe: domain for line.account is ['kind', '=', 'expense']
-                    line.account, = Account.find([
-                        ('kind', '=', uKind),
-                        ('name', '=', row['account']),
-                        ('company.id', '=', company.id)])
+                    uNameOrCode = row['account']
+                    try:
+                        int(uNameOrCode)
+                    except ValueError:
+                        line.account, = Account.find([
+                            ('kind', '=', uKind),
+                            ('name', '=', uNameOrCode),
+                            ('company.id', '=', company.id)])
+                    else:
+                        line.account, = Account.find([
+                            ('kind', '=', uKind),
+                            ('code', '=', uNameOrCode),
+                            ('company.id', '=', company.id)])
                 else:
                     line.account = oLineDefault
             line.quantity = \

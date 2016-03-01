@@ -13,6 +13,7 @@ Unfinished.
 
 from behave import *
 import proteus
+import ProteusConfig
 
 import time
 import datetime
@@ -145,15 +146,15 @@ def step_impl(context, uDescription, uSupplier):
             purchase_line.quantity = quantity
             purchase_line.unit_price = unit_price
 
-        # unneeded?
         purchase.save()
 
+# FixMe: eliminate duplication
 # 12 products, Supplier
-@step('T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"')
+@step('T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     r"""
     Given \
-    T/ASAS/SASAS Quote and Confirm a P. O. \
+    T/ASAS/SASAS Quote and Confirm and Process a P. O. \
     with description "{uDescription}" from Supplier "{uSupplier}"
 
     Idempotent.
@@ -173,8 +174,9 @@ def step_impl(context, uDescription, uSupplier):
                                ('party.id', '=', supplier.id)])
 
     if purchase.state == u'draft':
-        Purchase.quote([purchase.id], current_config.context)
-        Purchase.confirm([purchase.id], current_config.context)
+        purchase.click('quote')
+        purchase.click('confirm')
+        purchase.click('process')
 
         # These create the moves on the purchase order
 
@@ -299,7 +301,8 @@ def step_impl(context, uDescription, uSupplier):
 #?                               ('company', '=', company.id),
                                ('party.id', '=', supplier.id)])
     purchase.reload()
-    assert purchase.state == u'confirmed'
+    # Fixme: should be just == u'processing'
+    assert purchase.state in [u'confirmed', u'processing']
     invoice, = purchase.invoices
 
     if invoice.state == u'draft':
@@ -511,9 +514,10 @@ def step_impl(context, uSupplier, uPaymentTerm):
 
         Purchase.quote([purchase.id], current_config.context)
         Purchase.confirm([purchase.id], current_config.context)
-        assert purchase.state == u'confirmed'
+        # Fixme: should be just == u'processing'
+        assert purchase.state in [u'confirmed', u'processing']
 
-        new_config = proteus.config.set_trytond(
+        new_config = ProteusConfig.set_trytond(
             user=sGetFeatureData(context, 'user,accountant,login'),
             password=sGetFeatureData(context, 'user,accountant,password'),
             database_name=current_config.database_name)

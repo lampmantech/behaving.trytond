@@ -251,7 +251,8 @@ def step_impl(context, uTem, uRoot):
                 ])
         # This is only used if the bank module is loaded
         #? check its an attribute first?
-        cash.bank_reconcile = True
+        if hasattr(Account, 'bank_reconcile'):
+            cash.bank_reconcile = True
         cash.save()
 
     assert Account.find([('name', '=', uRoot)])
@@ -299,8 +300,11 @@ def step_impl(context, uTermName, uNum):
     assert iNum >= 0
     if not PaymentTerm.find([('name', '=', uTermName)]):
         PaymentTermLine = proteus.Model.get('account.invoice.payment_term.line')
+        PaymentTermLineRelativeDelta = proteus.Model.get('account.invoice.payment_term.line.relativedelta')
         payment_term = PaymentTerm(name=uTermName)
-        payment_term_line = PaymentTermLine(type='remainder', days=iNum)
+        payment_term_line = PaymentTermLine(type='remainder')
+        # FixMe: was3.4 days=iNum now3.6 relativedeltas=
+        #? , relativedeltas=[PaymentTermLineRelativeDelta(days=30)]
         payment_term.lines.append(payment_term_line)
         payment_term.save()
 

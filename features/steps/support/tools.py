@@ -6,15 +6,14 @@ From OerpScenario support/tools.py
 
 import sys
 import traceback
-import pdb
 import datetime
+import pdb
 
 TODAY = datetime.date.today()
 
-__all__ = ['puts', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr', 'oDateFromUDate']    # + 20 'assert_*'
+__all__ = ['model', 'puts', 'set_trace', 'vRestoreStdoutErr', 'set_trace_with_pdb', 'set_trace_with_pydbgr', 'oDateFromUDate']
 
 
-# Expose assert* from unittest.TestCase with pep8 style names
 from unittest2 import TestCase
 ut = type('unittest', (TestCase,), {'any': any})('any')
 for oper in ('equal', 'not_equal', 'true', 'false', 'is', 'is_not', 'is_none',
@@ -26,7 +25,6 @@ for oper in ('equal', 'not_equal', 'true', 'false', 'is', 'is_not', 'is_none',
     __all__.append(funcname)
 del TestCase, ut, oper, funcname
 
-
 def print_exc():
     """Print exception, and its relevant stack trace."""
     tb = sys.exc_info()[2]
@@ -35,6 +33,7 @@ def print_exc():
         length += 1
         tb = tb.tb_next
     traceback.print_exc(limit=length)
+
 
 # -------
 # HELPERS
@@ -55,10 +54,14 @@ def _get_context(level=2):
         caller_frame = caller_frame.f_back
 
 
+def model(name):
+    """Return an erppeek.Model instance."""
+    ctx = _get_context()
+    return ctx and ctx.client.model(name)
+
+
 def puts(*args):
-    """
-    Print the arguments, after the step is finished.
-    """
+    """Print the arguments, after the step is finished."""
     ctx = _get_context()
     if ctx:
         # Append to the list of messages
@@ -67,6 +70,10 @@ def puts(*args):
         # Context not found
         for arg in args:
             print(arg)
+
+
+# From 'nose.tools': https://github.com/nose-devs/nose/tree/master/nose/tools
+
 
 def vRestoreStdoutErr ():
     for stream in 'stdout', 'stderr':
@@ -79,104 +86,37 @@ def vRestoreStdoutErr ():
                 orig_output.flush()
             setattr(sys, stream, orig_output)
 
-def set_trace_with_pydbgr():
-    """Call pdb.set_trace in the caller's frame.
-
-    First restore sys.stdout and sys.stderr.  Note that the streams are
-    NOT reset to whatever they were before the call once pydbgr is done!
-    """
-    exc, tb = sys.exc_info()[1:]
-    vRestoreStdoutErr()
-    output=sys.__stdout__
-    output.flush()
-    try:
-        output.write(u'Invoking the interactive debugger pydbgr\n')
-        output.flush()
-        import pydbgr
-        if tb:
-            if isinstance(exc, AssertionError) and exc.args:
-                # The traceback is not printed yet
-                print_exc()
-            pydbgr.post_mortem(exc)
-        else:
-            # FixMe: Is this right?
-            pydbgr.post_mortem(exc, frameno=1)
-    except Exception, e:
-        sys.__stderr__.write(str(e))
-
-def set_trace_with_pdb():
-    """Call pdb.set_trace in the caller's frame.
-
-    First restore sys.stdout and sys.stderr.  Note that the streams are
-    NOT reset to whatever they were before the call once pdb is done!
-    """
-    exc, tb = sys.exc_info()[1:]
-    vRestoreStdoutErr()
-    output=sys.__stdout__
-    output.flush()
-    try:
-        output.write(u'Invoking the interactive debugger pdb\n')
-        output.flush()
-        if tb:
-            if isinstance(exc, AssertionError) and exc.args:
-                # The traceback is not printed yet
-                print_exc()
-            pdb.post_mortem(tb)
-        else:
-            pdb.Pdb().set_trace(sys._getframe().f_back)
-    except Exception, e:
-        sys.__stderr__.write(str(e))
-
-
-# patch for stdlib cmd.py
-import cmd
-class Cmd(cmd.Cmd):
-    """A simple framework for writing line-oriented command interpreters.
-    """
-    def onecmd(self, line):
-        """Interpret the argument as though it had been typed in response
-        to the prompt.
-
-        This may be overridden, but should not normally need to be;
-        see the precmd() and postcmd() methods for useful execution hooks.
-        The return value is a flag indicating whether interpretation of
-        commands by the interpreter should stop.
-
-        """
-        cmd, arg, line = self.parseline(line)
-        if not line:
-            return self.emptyline()
-        if cmd is None:
-            return self.default(line)
-        self.lastcmd = line
-        if cmd == '':
-            return self.default(line)
-        else:
-            # Fixed: using hassatr helps reduce error stack pollution
-            if not hasattr(self, 'do_' + cmd):
-                return self.default(line)
-            try:
-                func = getattr(self, 'do_' + cmd)
-            except AttributeError:
-                return self.default(line)
-            return func(arg)
-
-class Pdb(pdb.Pdb):
+class MyPdb(pdb.Pdb):
     def __init__(self, **kw_args):
         pdb.Pdb.__init__(self, **kw_args)
 
-    def onecmd(self, line):
-        """Interpret the argument as though it had been typed in response
-        to the prompt.
-
-        Checks whether this line is typed at the normal prompt or in
-        a breakpoint command list definition.
-        """
-        if not self.commands_defining:
-            # Fixed: use our Cmd instead of cmd.Cmd
-            return Cmd.onecmd(self, line)
+    def handle_command_def(self,line):
+        """Handles one command line during command list definition."""
+        cmd, arg, line = self.parseline(line)
+        if not cmd:
+            return
+        if cmd == 'silent':
+            self.commands_silent[self.commands_bnum] = True
+            return # continue to handle other cmd def in the cmd list
+        elif cmd == 'end':
+            self.cmdqueue = []
+            return 1 # end of cmd list
+        cmdlist = self.commands[self.commands_bnum]
+        if arg:
+            cmdlist.append(cmd+' '+arg)
         else:
-            return self.handle_command_def(line)
+            cmdlist.append(cmd)
+        # Determine if we must stop
+        if hasattr(self, 'do_' + cmd):
+            func = getattr(self, 'do_' + cmd)
+        else:
+            func = self.default
+        # one of the resuming commands
+        if func.func_name in self.commands_resuming:
+            self.commands_doprompt[self.commands_bnum] = False
+            self.cmdqueue = []
+            return 1
+        return
 
 def post_mortem(t=None):
     # handling the default
@@ -185,15 +125,47 @@ def post_mortem(t=None):
         # being handled, otherwise it returns None
         t = sys.exc_info()[2]
         if t is None:
-            raise ValueError("A valid traceback must be passed if no " + \
-                             "exception is being handled")
+            raise ValueError("A valid traceback must be passed if no "
+                                               "exception is being handled")
 
-    p = Pdb()
+    p = MyPdb()
     p.reset()
     p.interaction(None, t)
 
 def pm():
     post_mortem(sys.last_traceback)
+
+def set_trace():
+    """Call pdb.set_trace in the caller's frame.
+
+    First restore sys.stdout and sys.stderr.  Note that the streams are
+    NOT reset to whatever they were before the call once pdb is done!
+    """
+    import pdb
+    for stream in 'stdout', 'stderr':
+        output = getattr(sys, stream)
+        orig_output = getattr(sys, '__%s__' % stream)
+        if output != orig_output:
+            # Flush the output before entering pdb
+            if hasattr(output, 'getvalue'):
+                orig_output.write(output.getvalue())
+                orig_output.flush()
+            setattr(sys, stream, orig_output)
+    exc, tb = sys.exc_info()[1:]
+    if tb:
+        if isinstance(exc, AssertionError) and exc.args:
+            # The traceback is not printed yet
+            print_exc()
+        pdb.post_mortem(tb)
+    else:
+        pdb.Pdb().set_trace(sys._getframe().f_back)
+
+
+def set_trace_with_pdb():
+    return set_trace()
+
+def set_trace_with_pydbgr():
+    return set_trace()
 
 # misc convenience funtions
 def oDateFromUDate(uDate):

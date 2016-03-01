@@ -6,6 +6,7 @@
 import sys, os
 from behave import *
 import proteus
+import ProteusConfig
 
 import datetime
 from decimal import Decimal
@@ -26,7 +27,7 @@ def step_impl(context, uCalName, uUserName):
     Idempotent.
     """
     oCurrentConfig = context.oProteusConfig
-
+    assert oCurrentConfig
     Calendar = proteus.Model.get('calendar.calendar')
 
     User = proteus.Model.get('res.user')
@@ -44,7 +45,7 @@ def step_impl(context, uCalName, uUserName):
                                    password=uUserPassword,
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
-            oNewConfig = proteus.config.set_trytond(**dNewConfig)
+            oNewConfig = ProteusConfig.set_trytond(**dNewConfig)
 
             dElt = dict(name=uCalName,
                         write_users=[('add', [oAdminUser.id])],
@@ -55,7 +56,7 @@ def step_impl(context, uCalName, uUserName):
             oCalendar._config = oNewConfig
             oCalendar.save()
         finally:
-            proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+            ProteusConfig.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
                                        password=context.oEnvironmentCfg.get('trytond', 'password'),
                                        config_file=oCurrentConfig.config_file,
                                        database_name=oCurrentConfig.database_name)
@@ -77,13 +78,14 @@ def step_impl(context, uKind, uCalName, uUserName):
 
     """
     oCurrentConfig = context.oProteusConfig
-
+    assert oCurrentConfig
+    
     Calendar = proteus.Model.get('calendar.calendar')
     Event = proteus.Model.get('calendar.event')
     Location = proteus.Model.get('calendar.location')
     Category = proteus.Model.get('calendar.category')
 
-    # NewCalendar=proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('meec32', 'accountant', 'postgresql', config_file='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'))
+    # NewCalendar=proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('meec32', 'accountant', 'postgresql', config_file='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'))
 
     if True:
         uUserLogin=sGetFeatureData(context, 'user,'+uUserName+',login')
@@ -103,7 +105,7 @@ def step_impl(context, uKind, uCalName, uUserName):
                                    password=uUserPassword,
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
-        oNewConfig = proteus.config.set_trytond(**dNewConfig)
+        oNewConfig = ProteusConfig.set_trytond(**dNewConfig)
         # name date
         for row in context.table:
             uName = row['name']
@@ -181,10 +183,10 @@ def step_impl(context, uKind, uCalName, uUserName):
 #                    ('location', '!=', None),
                 ])
 
-    # accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
+    # accountant_calendar = proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
 
     finally:
-        proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+        ProteusConfig.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
                                    password=context.oEnvironmentCfg.get('trytond', 'password'),
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
@@ -206,7 +208,7 @@ def step_impl(context, uKind, uCalName, uUserName):
     Idempotent.
     """
     oCurrentConfig = context.oProteusConfig
-
+    assert oCurrentConfig
     Calendar = proteus.Model.get('calendar.calendar')
     Event = proteus.Model.get('calendar.event')
     Category = proteus.Model.get('calendar.category')
@@ -227,7 +229,7 @@ def step_impl(context, uKind, uCalName, uUserName):
                                    password=uUserPassword,
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)
-        oNewConfig = proteus.config.set_trytond(**dNewConfig)
+        oNewConfig = ProteusConfig.set_trytond(**dNewConfig)
 
         # name date
         for row in context.table:
@@ -278,10 +280,10 @@ def step_impl(context, uKind, uCalName, uUserName):
                 ('summary', '=', uSummary),
                 ])
 
-    # accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
+    # accountant_calendar = proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
 
     finally:
-        proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+        ProteusConfig.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
                                    password=context.oEnvironmentCfg.get('trytond', 'password'),
                                    config_file=oCurrentConfig.config_file,
                                    database_name=oCurrentConfig.database_name)

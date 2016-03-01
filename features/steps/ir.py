@@ -34,7 +34,7 @@ def step_impl(context):
 
     oAttachment = stepfuns.oAttachLinkToResource(sName, sDescription, sLink, oResource)
 
-    assert oAttachment.resource == oUser
+    assert oAttachment.resource == oUser,  str(oAttachment.resource) +" not == " +str(oUser)
 
 @step('Attach to an instance named "{uName}" of class "{uClass}" the content of this feature file')
 def step_impl(context, uName, uClass):
@@ -58,7 +58,7 @@ def step_impl(context, uName, uClass):
     assert context.table
     for row in context.table:
         uFile = row['filename']
-        assert os.path.exists(uFile)
+        assert os.path.exists(uFile), "Does not exist: " +uFile
         o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
         assert o
 
@@ -75,7 +75,7 @@ def step_impl(context, uField, uValue, uClass):
     assert context.table
     for row in context.table:
         uFile = row['filename']
-        assert os.path.exists(uFile)
+        assert os.path.exists(uFile), "Does not exist: " +uFile
         o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
         assert o
 
@@ -92,6 +92,6 @@ def step_impl(context, uField, uValue, uClass):
     assert context.table
     for row in context.table:
         uFile = row['filename']
-        assert os.path.exists(uFile)
+        assert os.path.exists(uFile), "Does not exist: " +uFile
         o = stepfuns.oAttachFileContentToResource(oResource, uFile)
         assert o

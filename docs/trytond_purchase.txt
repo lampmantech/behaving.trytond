@@ -70,7 +70,7 @@ From: ../features/steps/trytond_purchase.py
    oDate = datetime.date(*map(int, uDate.split('-')))
    purchase.purchase_date = oDate
    # purchases also have warehouse
-   purchase.save()
+   #? purchase.save()
    PurchaseLine = proteus.Model.get('purchase.line')
    for row in context.table:
    # BUG? Product.find([('name' should FAIL
@@ -85,6 +85,7 @@ From: ../features/steps/trytond_purchase.py
    purchase_line.quantity = Decimal(row['quantity'])
    if row['line_description']:
    purchase_line.description = row['line_description']
+   #? purchase_line.save()
    purchase.save()
    user, = User.find([('login', '=', 'admin')])
    proteus.config.user = user.id
@@ -105,14 +106,16 @@ From: ../features/steps/trytond_purchase.py
    purchase, = Purchase.find([('party.id',  '=', supplier.id),
    ('company.id',  '=', company.id),
    ('description', '=', uDescription)])
+   if uUser != u'Administrator':
    purchase_user, = User.find([('name', '=', uUser)])
    proteus.config.user = purchase_user.id
    if uAct == 'quote':
    Purchase.quote([purchase.id], config.context)
-   assert purchase.state == u'quotation'
+   # FixMe: 3.4ism
+   assert purchase.state in [ u'quotation', u'processing', u'done']
    elif uAct == 'confirm':
    Purchase.confirm([purchase.id], config.context)
-   assert purchase.state == u'confirmed'
+   assert purchase.state in [u'confirmed', u'processing', u'done']
    # this will help us find the invoice later
    if purchase.invoices:
    invoice, = purchase.invoices
@@ -120,9 +123,13 @@ From: ../features/steps/trytond_purchase.py
    if not invoice.description:
    invoice.description = purchase.description
    invoice.save()
+   elif uAct == 'process':
+   purchase.click(uAct)
+   assert purchase.state in [u'processing', u'done']
    else:
-   raise ValueError("uAct must be one of quote or confirm: " + uAct)
+   raise ValueError("uAct must be one of quote or confirm or process: " + uAct)
    purchase.reload()
+   if uUser != u'Administrator':
    user, = User.find([('login', '=', 'admin')])
    proteus.config.user = user.id
 
@@ -142,14 +149,16 @@ From: ../features/steps/trytond_purchase.py
    account_user, = User.find([('name', '=', uUser)])
    proteus.config.user = account_user.id
    Invoice = proteus.Model.get('account.invoice')
-   invoice = Invoice(purchase.invoices[0].id)
+   lPurchaseInvoices = purchase.invoices
+   assert lPurchaseInvoices
+   invoice = Invoice(lPurchaseInvoices[0].id)
    oDate = oDateFromUDate(uDate)
    invoice.invoice_date = oDate
    invoice.accounting_date = oDate
    #? Surprised Tryton doesnt do this
    invoice.description = uDescription
    invoice.save()
-   print 'INFO: trytond_purchase,', uDate, uDescription, invoice.type
+   print('INFO: trytond_purchase,' +uDate +" "+ uDescription +" "+ invoice.type)
    if uAct == u'post':
    invoice.click('post')
    else:

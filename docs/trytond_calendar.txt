@@ -10,11 +10,12 @@ From: ../features/steps/trytond_calendar.py
 
 **I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
    oCurrentConfig = context.oProteusConfig
+   assert oCurrentConfig
    Calendar = proteus.Model.get('calendar.calendar')
    Event = proteus.Model.get('calendar.event')
    Location = proteus.Model.get('calendar.location')
    Category = proteus.Model.get('calendar.category')
-   # NewCalendar=proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('meec32', 'accountant', 'postgresql', config_file='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'))
+   # NewCalendar=proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('meec32', 'accountant', 'postgresql', config_file='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'))
    if True:
    uUserLogin=sGetFeatureData(context, 'user,'+uUserName+',login')
    uUserPassword=sGetFeatureData(context, 'user,'+uUserName+',password')
@@ -31,7 +32,7 @@ From: ../features/steps/trytond_calendar.py
    password=uUserPassword,
    config_file=oCurrentConfig.config_file,
    database_name=oCurrentConfig.database_name)
-   oNewConfig = proteus.config.set_trytond(**dNewConfig)
+   oNewConfig = ProteusConfig.set_trytond(**dNewConfig)
    # name date
    for row in context.table:
    uName = row['name']
@@ -106,9 +107,9 @@ From: ../features/steps/trytond_calendar.py
    ('description', '=', uDescription),
    #                    ('location', '!=', None),
    ])
-   # accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
+   # accountant_calendar = proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
    finally:
-   proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+   ProteusConfig.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
    password=context.oEnvironmentCfg.get('trytond', 'password'),
    config_file=oCurrentConfig.config_file,
    database_name=oCurrentConfig.database_name)
@@ -117,6 +118,7 @@ From: ../features/steps/trytond_calendar.py
 
 **I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
    oCurrentConfig = context.oProteusConfig
+   assert oCurrentConfig
    Calendar = proteus.Model.get('calendar.calendar')
    Event = proteus.Model.get('calendar.event')
    Category = proteus.Model.get('calendar.category')
@@ -136,7 +138,7 @@ From: ../features/steps/trytond_calendar.py
    password=uUserPassword,
    config_file=oCurrentConfig.config_file,
    database_name=oCurrentConfig.database_name)
-   oNewConfig = proteus.config.set_trytond(**dNewConfig)
+   oNewConfig = ProteusConfig.set_trytond(**dNewConfig)
    # name date
    for row in context.table:
    uName = row['name']
@@ -184,9 +186,9 @@ From: ../features/steps/trytond_calendar.py
    ('calendar.owner.email', '=', uUserEmail),
    ('summary', '=', uSummary),
    ])
-   # accountant_calendar = proteus.Model.get('calendar.calendar', proteus.config.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
+   # accountant_calendar = proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('test30', 'accountant', 'postgresql', config_file='/etc/trytond.conf'))(2)
    finally:
-   proteus.config.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
+   ProteusConfig.set_trytond(user=context.oEnvironmentCfg.get('trytond', 'user'),
    password=context.oEnvironmentCfg.get('trytond', 'password'),
    config_file=oCurrentConfig.config_file,
    database_name=oCurrentConfig.database_name)

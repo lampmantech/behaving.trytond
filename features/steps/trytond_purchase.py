@@ -3,6 +3,8 @@
 
 
 """
+from __future__ import print_function
+
 from behave import *
 import proteus
 
@@ -121,7 +123,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm,
             oDate = datetime.date(*map(int, uDate.split('-')))
         purchase.purchase_date = oDate
         # purchases also have warehouse
-        purchase.save()
+        #? purchase.save()
 
         PurchaseLine = proteus.Model.get('purchase.line')
         for row in context.table:
@@ -137,6 +139,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm,
                 purchase_line.quantity = Decimal(row['quantity'])
             if row['line_description']:
                 purchase_line.description = row['line_description']
+            #? purchase_line.save()
         purchase.save()
 
     user, = User.find([('login', '=', 'admin')])
@@ -151,7 +154,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm,
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     r"""
     Given \
-    Purchase "quote" on date "TODAY" the P. O. with description "P. O #1"
+    Purchase "quote" on date "TODAY" the P. O. with description "P. O No.1"
     as user named "Purchase" products from supplier "Supplier"
     """
     config = context.oProteusConfig
@@ -170,14 +173,16 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
                                ('company.id',  '=', company.id),
                                ('description', '=', uDescription)])
 
-    purchase_user, = User.find([('name', '=', uUser)])
-    proteus.config.user = purchase_user.id
+    if uUser != u'Administrator':
+        purchase_user, = User.find([('name', '=', uUser)])
+        proteus.config.user = purchase_user.id
     if uAct == 'quote':
         Purchase.quote([purchase.id], config.context)
-        assert purchase.state == u'quotation'
+        # FixMe: 3.4ism
+        assert purchase.state in [ u'quotation', u'processing', u'done']
     elif uAct == 'confirm':
         Purchase.confirm([purchase.id], config.context)
-        assert purchase.state == u'confirmed'
+        assert purchase.state in [u'confirmed', u'processing', u'done']
         # this will help us find the invoice later
         if purchase.invoices:
             invoice, = purchase.invoices
@@ -185,19 +190,22 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
             if not invoice.description:
                 invoice.description = purchase.description
                 invoice.save()
+    elif uAct == 'process':
+        purchase.click(uAct)
+        assert purchase.state in [u'processing', u'done']
     else:
-        raise ValueError("uAct must be one of quote or confirm: " + uAct)
+        raise ValueError("uAct must be one of quote or confirm or process: " + uAct)
     purchase.reload()
-
     
-    user, = User.find([('login', '=', 'admin')])
-    proteus.config.user = user.id
+    if uUser != u'Administrator':
+        user, = User.find([('login', '=', 'admin')])
+        proteus.config.user = user.id
 
 @step('Invoice "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     r"""
     Given \
-    Invoice "post" on date "TODAY" the P. O. with description "P. O #1"
+    Invoice "post" on date "TODAY" the P. O. with description "P. O No.1"
     as user named "Account" products from supplier "Supplier"
     """
     config = context.oProteusConfig
@@ -219,14 +227,16 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     account_user, = User.find([('name', '=', uUser)])
     proteus.config.user = account_user.id
     Invoice = proteus.Model.get('account.invoice')
-    invoice = Invoice(purchase.invoices[0].id)
+    lPurchaseInvoices = purchase.invoices
+    assert lPurchaseInvoices
+    invoice = Invoice(lPurchaseInvoices[0].id)
     oDate = oDateFromUDate(uDate)
     invoice.invoice_date = oDate
     invoice.accounting_date = oDate
     #? Surprised Tryton doesnt do this
     invoice.description = uDescription
     invoice.save()
-    print 'INFO: trytond_purchase,', uDate, uDescription, invoice.type
+    print('INFO: trytond_purchase,' +uDate +" "+ uDescription +" "+ invoice.type)
     if uAct == u'post':
         invoice.click('post')
     else:

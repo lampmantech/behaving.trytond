@@ -1,3 +1,8 @@
+commit 5654bc9ce5fbdec3a0d5007a942e02dd014232c1
+Date:   Tue Mar 10 18:40:18 2015 +0200
+
+    Minor bugfixes and refactorings.
+
 commit fedc5977e8916ca149cb36dc67a446a2723b677e
 Date:   Sat Feb 28 21:54:09 2015 +0200
 

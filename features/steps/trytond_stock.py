@@ -5,6 +5,7 @@
 """
 from behave import *
 import proteus
+import ProteusConfig
 
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -421,9 +422,10 @@ def oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier
                           ('company.id',  '=', company.id),
                           ('party.id', '=', supplier.id)]):
         try:
-            User = proteus.Model.get('res.user')
-            purchase_user, = User.find([('name', '=', uUser)])
-            proteus.config.user = purchase_user.id
+            if uUser != u'Administrator':
+                User = proteus.Model.get('res.user')
+                purchase_user, = User.find([('name', '=', uUser)])
+                proteus.config.user = purchase_user.id
 
             purchase = Purchase()
             purchase.party = supplier
@@ -446,7 +448,7 @@ def oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier
             else:
                 oDate = datetime.date(*map(int, uDate.split('-')))
             purchase.purchase_date = oDate
-            purchase.save()
+            #? purchase.save()
 
             PurchaseLine = proteus.Model.get('purchase.line')
             for row in context.table:
@@ -471,11 +473,12 @@ def oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier
                         purchase_line.unit_price = Decimal(row['unit_price'])
                 if row['line_description']:
                     purchase_line.description = row['line_description']
-
+                
             purchase.save()
         finally:
-            user, = User.find([('login', '=', 'admin')])
-            proteus.config.user = user.id
+            if uUser != 'Administrator':
+                user, = User.find([('login', '=', 'admin')])
+                proteus.config.user = user.id
 
     purchase, = Purchase.find([('description', '=', uDescription),
                                ('company.id',  '=', company.id),

@@ -76,7 +76,7 @@ Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests
             | description  	| quantity | unit_price 	|
             | Product Fixed	| 5.0	   | 4			|
             | Product Average	| 7.0	   | 6			|
-        And T/ASAS/SASAS Quote and Confirm a P. O. \
+        And T/ASAS/SASAS Quote and Confirm and Process a P. O. \
 	    with description "12 products" from supplier "Supplier"
         And T/ASAS/SASAS Receive 9 products from the P. O. \
 	    with description "12 products" from supplier "Supplier" \

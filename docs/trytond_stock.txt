@@ -249,6 +249,7 @@ From: ../features/steps/trytond_stock.py
    ('company.id',  '=', company.id),
    ('party.id', '=', supplier.id)]):
    try:
+   if uUser != u'Administrator':
    User = proteus.Model.get('res.user')
    purchase_user, = User.find([('name', '=', uUser)])
    proteus.config.user = purchase_user.id
@@ -270,7 +271,7 @@ From: ../features/steps/trytond_stock.py
    else:
    oDate = datetime.date(*map(int, uDate.split('-')))
    purchase.purchase_date = oDate
-   purchase.save()
+   #? purchase.save()
    PurchaseLine = proteus.Model.get('purchase.line')
    for row in context.table:
    purchase_line = PurchaseLine()
@@ -296,6 +297,7 @@ From: ../features/steps/trytond_stock.py
    purchase_line.description = row['line_description']
    purchase.save()
    finally:
+   if uUser != 'Administrator':
    user, = User.find([('login', '=', 'admin')])
    proteus.config.user = user.id
    purchase, = Purchase.find([('description', '=', uDescription),

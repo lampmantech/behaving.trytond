@@ -15,8 +15,7 @@ TODAY = datetime.date.today()
 
 @step('T/AP Create a PaymentJournal named "{uName}" of type "{uType}"')
 def step_impl(context, uName, uType):
-    r"""
-    Given \
+    """
     T/AP Create a PaymentJournal named "Manual" of type "manual"
     """
     PaymentJournal = proteus.Model.get('account.payment.journal')

@@ -21,7 +21,7 @@ From: ../features/steps/ir.py
    assert context.table
    for row in context.table:
    uFile = row['filename']
-   assert os.path.exists(uFile)
+   assert os.path.exists(uFile), "Does not exist: " +uFile
    o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
    assert o
 
@@ -31,6 +31,6 @@ From: ../features/steps/ir.py
    assert context.table
    for row in context.table:
    uFile = row['filename']
-   assert os.path.exists(uFile)
+   assert os.path.exists(uFile), "Does not exist: " +uFile
    o = stepfuns.oAttachFileContentToResource(oResource, uFile)
    assert o

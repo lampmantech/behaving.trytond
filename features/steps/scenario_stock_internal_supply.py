@@ -159,7 +159,7 @@ def step_impl(context):
     Location = proteus.Model.get('stock.location')
     inventory = Inventory()
     inventory.location = provisioning_loc
-    inventory.save()
+    #? inventory.save()
     inventory_line = InventoryLine(product=product, inventory=inventory)
     inventory_line.quantity = 100.0
     inventory_line.expected_quantity = 0.0

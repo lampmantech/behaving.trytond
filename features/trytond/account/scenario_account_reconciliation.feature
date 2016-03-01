@@ -11,8 +11,7 @@ Updated for 3.0 and 3.2.
 
       Given Ensure that the "account" module is loaded
         And Set the default feature data
-        And Create the Company with default COMPANY_NAME \
-        And Currency code "EUR"
+        And Create the Company with default COMPANY_NAME and Currency code "EUR"
         And Reload the default User preferences into the context
         And Create this fiscal year
         And Create a chart of accounts \

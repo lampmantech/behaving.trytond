@@ -9,19 +9,24 @@ from optparse import OptionParser
 import proteus
 from proteus import Model, Wizard
 from .steps.support import tools
+from steps import ProteusConfig
 
 from .steps.support import behave_better
 # Some monkey patches to enhance Behave
 behave_better.patch_all()
 
-ETC_TRYTOND_CONF='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'
+sVERSION = '3.6'
+sDB_NAME = 'test36'
+ETC_TRYTOND_CONF = '/n/data/TrytonOpenERP/etc/trytond-' +sVERSION +'.conf'
+sTRYTOND_USER = 'admin'
+sTRYTOND_PASSWD = 'foobar'
 
 def vCreateConfigFile(oEnvironmentCfg, sFile):
 
     oEnvironmentCfg.add_section('trytond')
-    oEnvironmentCfg.set('trytond', 'password', 'foobar')
-    oEnvironmentCfg.set('trytond', 'user', 'admin')
-    oEnvironmentCfg.set('trytond', 'database_name', 'test32')
+    oEnvironmentCfg.set('trytond', 'password', sTRYTOND_PASSWD)
+    oEnvironmentCfg.set('trytond', 'user', sTRYTOND_USER)
+    oEnvironmentCfg.set('trytond', 'database_name', sDB_NAME)
     oEnvironmentCfg.set('trytond', 'database_type', 'postgresql')
     oEnvironmentCfg.set('trytond', 'config_file', ETC_TRYTOND_CONF)
 
@@ -48,26 +53,35 @@ def before_all(context):
     """
     oEnvironmentCfg = oReadConfigFile()
 
-    sUser=oEnvironmentCfg.get('trytond', 'user')
-    assert sUser
-    sDatabaseName=oEnvironmentCfg.get('trytond', 'database_name')
+    sAdminUser = oEnvironmentCfg.get('trytond', 'user')
+    assert sAdminUser
+    sDatabaseName = oEnvironmentCfg.get('trytond', 'database_name')
     assert sDatabaseName
-    sPassword = oEnvironmentCfg.get('trytond', 'password')
-    assert sPassword
-    sDatabaseType=oEnvironmentCfg.get('trytond', 'database_type')
+    sAdminPassword = oEnvironmentCfg.get('trytond', 'password')
+    assert sAdminPassword
+    sDatabaseType = oEnvironmentCfg.get('trytond', 'database_type')
 #?    assert sDatabaseType in ['postgresql'], "Unsupported database type: " + sDatabaseType
-    sTrytonConfigFile=oEnvironmentCfg.get('trytond', 'config_file')
+    sTrytonConfigFile = oEnvironmentCfg.get('trytond', 'config_file')
     assert os.path.exists(sTrytonConfigFile), \
         "Required file not found: " + sTrytonConfigFile
 
     context.oEnvironmentCfg = oEnvironmentCfg
-    context.oProteusConfig = proteus.config.set_trytond(
-        database_name=sDatabaseName,
-        user=context.oEnvironmentCfg.get('trytond', 'user'),
-        database_type=sDatabaseType,
-        password=context.oEnvironmentCfg.get('trytond', 'password'),
-        language='en_US',
-        config_file=sTrytonConfigFile)
+    if sVERSION == '3.2':
+        context.oProteusConfig = ProteusConfig.set_trytond(
+            database_name=sDatabaseName,
+            user=sAdminUser,
+            database_type=sDatabaseType,
+            password=sAdminPassword,
+            language='en_US',
+            config_file=sTrytonConfigFile)
+    else:
+        context.oProteusConfig = ProteusConfig.set_trytond(
+            database_name=sDatabaseName,
+            user=sAdminUser,
+            # database_type=sDatabaseType,
+            password=sAdminPassword,
+            language='en_US',
+            config_file=sTrytonConfigFile)
 
     # one of ['pdb', 'pydbgr']
     sTracer = oEnvironmentCfg.get('scenari', 'tracer')
@@ -88,7 +102,7 @@ def after_all(context):
     """
     # This is REQUIRED if we dont want to leave a hanging
     # database connexion to postgres. It will show up
-    # with netstat evan after the behave process is done.
+    # with netstat even after the behave process is done.
     if context.oProteusConfig:
         if hasattr(context.oProteusConfig, 'database_connexion'):
             # a patch of ours to proteus 2.8 config.py to support this

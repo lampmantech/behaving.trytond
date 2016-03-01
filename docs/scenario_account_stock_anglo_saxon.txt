@@ -84,11 +84,11 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    purchase_line.product = product
    purchase_line.quantity = quantity
    purchase_line.unit_price = unit_price
-   # unneeded?
    purchase.save()
+   # FixMe: eliminate duplication
    # 12 products, Supplier
 
-**T/ASAS/SASAS Quote and Confirm a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+**T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
    current_config = context.oProteusConfig
    Party = proteus.Model.get('party.party')
    sCompanyName = sGetFeatureData(context, 'party,company_name')
@@ -100,8 +100,9 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    purchase, = Purchase.find([('description', '=', uDescription),
    ('party.id', '=', supplier.id)])
    if purchase.state == u'draft':
-   Purchase.quote([purchase.id], current_config.context)
-   Purchase.confirm([purchase.id], current_config.context)
+   purchase.click('quote')
+   purchase.click('confirm')
+   purchase.click('process')
    # These create the moves on the purchase order
    # 12 products, Supplier
 
@@ -208,8 +209,9 @@ From: ../features/steps/scenario_account_stock_anglo_saxon.py
    purchase.save()
    Purchase.quote([purchase.id], current_config.context)
    Purchase.confirm([purchase.id], current_config.context)
-   assert purchase.state == u'confirmed'
-   new_config = proteus.config.set_trytond(
+   # Fixme: should be just == u'processing'
+   assert purchase.state in [u'confirmed', u'processing']
+   new_config = ProteusConfig.set_trytond(
    user=sGetFeatureData(context, 'user,accountant,login'),
    password=sGetFeatureData(context, 'user,accountant,password'),
    database_name=current_config.database_name)

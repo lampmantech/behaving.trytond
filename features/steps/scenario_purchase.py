@@ -214,6 +214,8 @@ def step_impl(context):
     Purchase.quote([return_.id], config.context)
     Purchase.confirm([return_.id], config.context)
     assert return_.state == u'confirmed'
+    Purchase.process([return_.id], config.context)
+    assert return_.state == u'processing'
     return_.reload()
     assert len(return_.shipments) == 0
     assert len(return_.shipment_returns) == 1
@@ -280,6 +282,8 @@ def step_impl(context):
     Purchase.quote([mix.id], config.context)
     Purchase.confirm([mix.id], config.context)
     assert mix.state == u'confirmed'
+    Purchase.process([mix.id], config.context)
+    assert mix.state == u'processing'
     mix.reload()
     assert len(mix.moves) == 2
     assert len(mix.shipment_returns) == 1
@@ -369,6 +373,8 @@ def step_impl(context):
     Purchase.quote([mix.id], config.context)
     Purchase.confirm([mix.id], config.context)
     assert mix.state == u'confirmed'
+    Purchase.process([mix.id], config.context)
+    assert mix.state == u'processing'
     mix.reload()
     assert len(mix.moves) == 2
     assert len(mix.shipment_returns) == 1
@@ -415,6 +421,8 @@ def step_impl(context):
     service_purchase.click('quote')
     service_purchase.click('confirm')
     assert service_purchase.state == u'confirmed'
+    service_purchase.click('process')
+    assert service_purchase.state == u'processing'
     service_invoice, = service_purchase.invoices
 
 #@step('T/PUR Pay the service invoice')
