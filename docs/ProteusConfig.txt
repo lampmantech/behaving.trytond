@@ -1,0 +1,7 @@
+# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
+
+From: ../features/steps/ProteusConfig.py
+
+
+   Configuration for trytond.
+   We restore the 3.2 behaviour of creating the database if it does not exist.
