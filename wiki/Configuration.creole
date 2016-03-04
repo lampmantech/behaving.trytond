@@ -1,0 +1,44 @@
+Configuration
+
+The file
+{{{
+features/environment.cfg
+}}}
+contains the configuration information for the trytond
+server you are testing. Edit the settings to suit your setup;
+the default values are:
+
+{{{
+[trytond]
+user = admin
+password = admin
+database_name = test30
+database_type = postgres
+config_file = /etc/trytond.conf
+
+[scenari]
+verbosity = 0
+tracer =
+}}}
+
+If the trytond database does not exist, it will be created.  As a
+rule, these tests to not tear down what they have done at the end, so
+that can be adapted to load database information and code into
+production systems, as well as testing. If you are running the tests
+in trytond_scenari, you must drop the database created in a previous run.
+This also means that the order of execution of feature files may be
+important, if one step builds on a previous one, or interferes with it.
+
+As a rule, all tests within a directory should not
+interfere with each other, but dont be surprised
+if there in interference between directories.
+
+If you set tracer in the scenari section of the
+configuration file to be pdb, it will drop you into
+the pdb debugger on an error, if you invoked behave 
+with the --stop flag (stop at the first error).
+You must also use the behave option --no-capture.
+
+Behave is monkey-patched by environment.py to allow backslashes \
+at the end of a line in feature files, to allow long verbose steps.
+Whitespace both sides of the backslash are collapsed to one space.

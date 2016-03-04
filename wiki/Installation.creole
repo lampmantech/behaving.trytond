@@ -1,0 +1,12 @@
+Installation
+------------
+
+Once you have behave and proteus installed, there is no
+installation required for trytond_scenari: simply change
+to this directory and run behave. So far, it has only
+been tested on postgres backends using proteus. The
+most trivial test, which does not even use trytond is:
+{{{
+  behave --stop features/behave_test.feature
+}}}
+

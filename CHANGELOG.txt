@@ -1,3 +1,13 @@
+commit ee009f6392b649f42c9f54a5ebdb608f1cd1546d
+Date:   Fri Mar 4 23:11:40 2016 +0200
+
+    Moved the documentation to the wiki
+
+commit 806aca1479e9ecb6fc0c154bbd2f3f21b3380a1e
+Date:   Fri Mar 4 21:16:06 2016 +0200
+
+    Fixed documentation
+
 commit 8cd2fa8697a2c7933e118ae35aae4a1d2d92396b
 Date:   Thu Mar 3 20:06:22 2016 +0200
 

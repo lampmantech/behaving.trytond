@@ -40,9 +40,9 @@ with Tryton 3.8 with no problems.
 
 === Documentation ===
 
-* Home (https://github.com/lampmantech/trytond_scenari/wiki/Home)
+* [[Home|https://github.com/lampmantech/trytond_scenari/wiki/Home]]
 
-* TitleIndex (https://github.com/lampmantech/trytond_scenari/wiki/TitleIndex)
+* [[TitleIndex|https://github.com/lampmantech/trytond_scenari/wiki/TitleIndex]]
 
 === Project ===
 
@@ -53,4 +53,4 @@ Please format wiki pages as Creole.
 For info on creole, see http://wikicreole.org/
 
 Please file any bugs in the
-issues tracker (https://github.com/lampmantech/trytond_scenari/issues).
+[[issues tracker|https://github.com/lampmantech/trytond_scenari/issues]].

@@ -40,17 +40,26 @@ with Tryton 3.8 with no problems.
 
 === Documentation ===
 
-* Home (https://github.com/lampmantech/trytond_scenari/wiki/Home)
+For the moment, the documentation is in the docstrings to the steps. 
+We've writen a simple shell script that can harvest these for the
+documentation so that the documentation can be automatically generated
+from the steps; if you think it's a hack (it is), write a better one!
 
-* TitleIndex (https://github.com/lampmantech/trytond_scenari/wiki/TitleIndex)
+* [[Installation]]
+* [[Configuration]]
+
+* [[TitleIndex]]
 
 === Project ===
 
-Use the Wiki to start topics for discussion. You will need to be
+Use the Wiki to start topics for discussion; it's better to use the
+wiki for knowledge capture, and then we can pull pages back into the
+release documentation in the {{{wiki}}} directory. You may need to be
 signed into github.com to edit in the wiki.
 
-Please format wiki pages as Creole.
-For info on creole, see http://wikicreole.org/
+Please format wiki pages as Creole. http://wikicreole.org/
 
 Please file any bugs in the
-issues tracker (https://github.com/lampmantech/trytond_scenari/issues).
+[[issues tracker|https://github.com/lampmantech/trytond_scenari/issues]].
+
+----

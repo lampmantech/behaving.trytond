@@ -1,6 +1,6 @@
 # -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
 
-From: ../features/steps/scenario_doctests.py
+From: [[features/steps/scenario_doctests.py|features/steps/scenario_doctests.py]]
 
 
    This is a straight cut-and-paste from
@@ -28,7 +28,7 @@ From: ../features/steps/scenario_doctests.py
 **Set the feature data with values**
    You can use this step to define a set of default feature data
    that will be available using the vSetFeatureData and vSetFeatureData
-   functions to pass data between steps. It expects a |name|value| table.
+   functions to pass data between steps. It expects a {{{|name|value|}}} table.
 
 **Create database with pool.test set to True**
    Sets pool.test set to True
@@ -62,14 +62,14 @@ From: ../features/steps/scenario_doctests.py
 **Create an instance of "{uKlass}" named "{uName}" with |name|value| fields**
    Given     Create an instance of a Model, like Model.get('party.party')
    with the name attribute of 'uName' and the fields from the table.
-   It expects a |name|value| table.
+   It expects a {{{|name|value|}}} table.
    Idempotent.
 
 **Set the slots of the instance named "{uName}" of model "{uKlass}" to the values**
 
 **Set the instance named "{uName}" of model "{uKlass}" with fields**
    Given     Guven an instance named "uName" of a Model, like Model.get('party.party')
-   set the attributes to the values.   It expects a |name|value| table.
+   set the attributes to the values.   It expects a {{{|name|value|}}} table.
    Idempotent.
 
 **Set the slots of the instance described "{uName}" of model "{uKlass}" to the values**
@@ -78,7 +78,7 @@ From: ../features/steps/scenario_doctests.py
 
 **Set the instance described "{uName}" of model "{uKlass}" with fields**
    Given     Guven an instance described "uName" of a Model, like Model.get('account.invoice')
-   set the attributes to the values.   It expects a |name|value| table.
+   set the attributes to the values.   It expects a {{{|name|value|}}} table.
    Idempotent.
 
 **I find an instance of "{uKlass}" named "{uName}"**
@@ -109,40 +109,40 @@ From: ../features/steps/scenario_doctests.py
    The account_payable Account is taken from the
    'account.template,main_payable' entry of the feature data
    (use 'Set the feature data with values' to override)
-   Then use the following |name|value| fields to set fields on the party.
+   Then use the following {{{|name|value|}}} fields to set fields on the party.
    Idempotent.
 
 **Create a user named "{uName}" with the fields**
 
 **Create a user named "{uName}" with the |name|value| fields**
    Given     Create a res.user named 'uName' and the given field values.
-   It expects a |name|value| table.
+   It expects a {{{|name|value|}}} table.
    If one of the field names is 'group', it will add the User to that group.
    It also loads the values into the feature data under the  keys
    'user,'+uName+","+row['name']
    Idempotent.
 
 **Create a grouped user named "{uName}" with |name|value| fields**
-   Given     Create a user named "{uName}" with |name|value| fields
+   Given     Create a user named "{uName}" with {{{|name|value|}}} fields
    | name   | value |
    | login  | sale  |
    | group  | Sales |
    group can be repeated for list of groups.
 
 **Create a sale user**
-   Given     Create a grouped user named "Sale" with |name|value| fields
+   Given     Create a grouped user named "Sale" with {{{|name|value|}}} fields
    | name   | value |
    | login  | sale  |
    | group  | Sales |
 
 **Create a purchase user**
-   Given     Given Create a grouped user named "Purchase" with |name|value| fields
+   Given     Given Create a grouped user named "Purchase" with {{{|name|value|}}} fields
    | name   | value            |
    | login  | purchase         |
    | group  | Purchase         |
 
 **Create a stock user**
-   Given Create a grouped user named "Stock" with |name|value| fields
+   Given Create a grouped user named "Stock" with {{{|name|value|}}} fields
    | name   | value |
    | login  | stock |
    | group  | Stock |
@@ -150,19 +150,21 @@ From: ../features/steps/scenario_doctests.py
 **Create a account user**
 
 **Create an account user**
-   Given     Create a grouped user named "Account" with |name|value| fields
+   Given     Create a grouped user named "Account" with {{{|name|value|}}} fields
    | name   | value |
    | login  | account |
    | group  | Account |
 
 **Create a product user**
-   Given     Create a grouped user named "Product" with |name|value| fields
+   Given     Create a grouped user named "Product" with {{{|name|value|}}} fields
    | name   | value                  |
    | login  | product                |
    | group  | Product Administration |
 
 **Create a stock_admin user**
-   Given     Create a grouped user named "Stock Admin" with |name|value| fields
+   Given     Create a grouped user named "Stock Admin" with {{{|name|value|}}} fields
    | name   | value                |
    | login  | stock_admin          |
    | group  | Stock Administration |
+----
+This file is automatically generated from the source code: do not edit.
