@@ -20,7 +20,7 @@ TODAY = datetime.date.today()
 
 @step('Create a Purchase Order with description "{uDescription}" from supplier "{uSupplier}" with fields')
 def step_impl(context, uDescription, uSupplier):
-    r"""
+    """
     Given \
     Create a Purchase Order from a supplier with a description.
     It expects a |name|value| table; the fields typically include:
@@ -69,7 +69,7 @@ def step_impl(context, uDescription, uSupplier):
 
 @step('Purchase on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" ProductTemplates from supplier "{uSupplier}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |name|quantity|line_description| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm, uMethod):
-    r"""
+    """
     Purchase on date "TODAY" with description "Description" \
     with their reference "{uRef}" \
     as user named "Purchase" in Currency coded "{uCur}"  \
@@ -152,7 +152,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm,
 
 @step('Purchase "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
-    r"""
+    """
     Given \
     Purchase "quote" on date "TODAY" the P. O. with description "P. O No.1"
     as user named "Purchase" products from supplier "Supplier"
@@ -203,7 +203,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
 
 @step('Invoice "{uAct}" on date "{uDate}" the P. O. with description "{uDescription}" as user named "{uUser}" products from supplier "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
-    r"""
+    """
     Given \
     Invoice "post" on date "TODAY" the P. O. with description "P. O No.1"
     as user named "Account" products from supplier "Supplier"
@@ -248,7 +248,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
 
 @step('Validate shipments on "{uDate}" for P. O. with description "{uDescription}" as user named "{uUser}" for products from supplier "{uSupplier}"')
 def step_impl(context, uDate, uDescription, uUser, uSupplier):
-    r"""
+    """
    Validate shipments on "TODAY" for P. O. with description "Description" \
    as user named "Administrator" for products from supplier "Supplier"
    """
@@ -302,7 +302,7 @@ def step_impl(context, uDate, uDescription, uUser, uSupplier):
 # unfinished, untested
 @step('Create a Purchase order with description "{uDescription}" in Currency coded "{uCur}" from supplier "{uSupplier}" on Date "{uDate}" with |name|value| fields')
 def step_impl(context, uDescription, uCur, uSupplier, uDate):
-    r"""
+    """
     Create a Purchase order with description "{uDescription}" \
     in Currency coded "%(sCur)s" from supplier "{uSupplier}" \
     on Date "{uDate}" with |name|value| fields
@@ -352,7 +352,7 @@ def step_impl(context, uDescription, uCur, uSupplier, uDate):
 # unfinished, untested
 @step('Buy Products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with |description|quantity|unit_price| fields')
 def step_impl(context, uDescription, uSupplier):
-    r"""
+    """
     Buy Products on the P. O. with description "uDescription" \
     from supplier "uSupplier" with quantities
 	  | description     | quantity | unit_price |
@@ -375,7 +375,7 @@ def step_impl(context, uDescription, uSupplier):
 # unfinished, untested
 @step('Buy Products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with |description|quantity| fields')
 def step_impl(context, uDescription, uSupplier):
-    r"""
+    """
     Given \
     Buy products on the P. O. with description "uDescription" \
     from supplier "uSupplier" with quantities

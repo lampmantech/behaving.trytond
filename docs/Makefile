@@ -3,6 +3,6 @@
 default:: doc
 
 doc::
-	rm *.txt
+	rm -f *.txt
 	bash steps_to_txt.bash
 

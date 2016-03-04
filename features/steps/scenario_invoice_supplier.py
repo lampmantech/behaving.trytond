@@ -99,7 +99,7 @@ def step_impl(context, uDescription, uTaxName):
 # Buy the Services Bought
 @step('TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts')
 def step_impl(context, uDescription):
-    r"""
+    """
     Given \
     Create a credit note for the invoice with description "{uDescription}"
     and assert the amounts for the credit note equal the invoice amounts.

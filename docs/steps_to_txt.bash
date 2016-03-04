@@ -19,7 +19,7 @@ steps_to_txt () {
           fi
 	sixth=${line:0:3}
 	# shell strips the preceding whitespace on line
-	if [ "$sixth" == '"""' ] ; then
+	if [ "$sixth" == '"""' ] || [ "$sixth" == 'r"""' ] ; then
 	    if [ "$state" == "before" ] ; then
 		state=in
 	        continue

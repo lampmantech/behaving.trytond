@@ -18,10 +18,8 @@ From: ../features/steps/basic_modules.py
    Print the list of loaded modules on behave's stdout.
 
 **Ensure that the WebDAV modules are loaded**
-   context.execute_steps(u'''
-   Given Ensure that the "%s" module is loaded
-   ''' % ('party_vcarddav',))
-   # party.party
+   Given     Ensure that the WebDAV modules are loaded
+   So that we can access the calendars and contacts via WebDAV
 
 **we have the following table of "{mod}" instances**
    Creates the instances of the Model 'uMod' with the names from the table.

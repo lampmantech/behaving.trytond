@@ -65,7 +65,7 @@ def step_impl(context, uCalName, uUserName):
 
 @step('I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
 def step_impl(context, uKind, uCalName, uUserName):
-    r"""
+    """
     Given \
     Create "{uKind}" events in the calendar named "{uCalName}"
     owned by the user named "{uUserName}". {uKind} can be empty, but
@@ -195,7 +195,7 @@ iTHIS_YEAR = datetime.date.today().year
 # unfinished
 @step('I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
 def step_impl(context, uKind, uCalName, uUserName):
-    r"""
+    """
     Given \
     Create "{uKind}" annual events in the calendar named "{uCalName}"
     owned by the user named "{uUserName}". {uKind} can be empty, but

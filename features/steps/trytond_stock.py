@@ -19,7 +19,7 @@ TODAY = datetime.date.today()
 # 'Stock Admin', 'stock_admin', 'Stock Administration'
 @step('Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"')
 def step_impl(context, uName, uLogin, uGroup):
-    r"""
+    """
     Given \
     Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"
     """
@@ -46,7 +46,7 @@ def step_impl(context, uName, uLogin, uGroup):
 
 @step('Create a new stock.location named "{uName}" of type warehouse')
 def step_impl(context, uName):
-    r"""
+    """
     Given \
     Create a new stock.location named "{uName}" of type warehouse"
     """
@@ -90,7 +90,7 @@ def step_impl(context, uName):
 # 'Provisioning Location', 'storage', 'WH'
 @step('Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"')
 def step_impl(context, uName, uType, uParent):
-    r"""
+    """
     Given \
     Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"
     """
@@ -119,7 +119,7 @@ def step_impl(context, uName, uType, uParent):
 
 @step('Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" ProductTemplates with |product|quantity|expected_quantity| fields')
 def step_impl(context, uUser, uCode):
-    r"""
+    """
     Given \
     Create an Inventory as user named "{uUser}"
     with storage at the location with code "{uCode}"
@@ -155,7 +155,7 @@ def step_impl(context, uUser, uCode):
 
 @step('Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"')
 def step_impl(context, uUser, uCode):
-    r"""
+    """
     Given \
     Create an Inventory as user named "{uUser}"
     with storage at the location with code "{uCode}"
@@ -181,7 +181,7 @@ def step_impl(context, uUser, uCode):
 
 @step('Stock Move of Product with description "{uProductDescription}" between locations with |name|value| fields')
 def step_impl(context, uProductDescription):
-    r"""
+    """
     Stock Move of Product with description "uProductDescription" \
     between locations with |name|value| fields
     | name              | value |
@@ -201,7 +201,7 @@ def step_impl(context, uProductDescription):
 @step('Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
 @step('Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
 def step_impl(context, uProductTemplate):
-    r"""
+    """
     Stock Move of product of ProductTemplate named "uProductTemplate" \
     between locations with |name|value| fields
     | name              | value |
@@ -274,7 +274,7 @@ def vStockMoveOfProductOrTemplate(context, product):
 
 @step('Stock Internal Shipment of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
 def step_impl(context, uProductTemplate):
-    r"""
+    """
     Given \
     Stock Internal Shipment of product of ProductTemplate named "uProductTemplate" \
     between locations with |name|value| fields
@@ -294,7 +294,7 @@ def step_impl(context, uProductTemplate):
 
 @step('Stock Internal Shipment of Product with description "{uProductDescription}" between locations with |name|value| fields')
 def step_impl(context, uProductDescription):
-    r"""
+    """
     Given \
     Stock Internal Shipment of product of Product \
     with description  "uProductDescription" \
@@ -368,7 +368,7 @@ def vStockInternalShipmentOfProductOrTemplate(context, product):
 
 @step('Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description|unit_price| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod):
-    r"""
+    """
     Given \
     Purchase on date "TODAY" stock with description "Description"
     as user named "Purchase" Products from supplier "Supplier"
@@ -385,7 +385,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, u
     
 @step('Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod):
-    r"""
+    """
     Given \
     Purchase on date "TODAY" stock with description "Description"
     as user named "Purchase" in Currency coded "uCur"  

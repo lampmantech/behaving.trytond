@@ -64,7 +64,7 @@ def step_impl(context, uName, uClass):
 
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
-    r"""
+    """
     Given \
     Attach to an existing instance with name "{uName}" of class "{uClass}" \
     a link to an existing file with the following |filename| fields
@@ -81,7 +81,7 @@ def step_impl(context, uField, uValue, uClass):
 
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" the content of an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
-    r"""
+    """
     Given \
     Attach to an existing instance with name "{uName}" of class "{uClass}" \
     the content of an existing file with the following |filename| fields

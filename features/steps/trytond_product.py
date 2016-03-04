@@ -25,7 +25,7 @@ from .support import stepfuns
 # Category
 @step('Create a ProductCategory named "{uName}"')
 def step_impl(context, uName):
-    r"""
+    """
     Given \
     Create a saved instance of "product.category" named "{uName}"
     Idempotent.
@@ -37,7 +37,7 @@ def step_impl(context, uName):
 # product , Category
 @step('Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields')
 def step_impl(context, uName, uCatName):
-    r"""
+    """
     Given \
     Create a ProductTemplate named "{uName}"
     from a ProductCategory named "{uCatName}" with |name|value| fields
@@ -158,7 +158,7 @@ def step_impl(context, uName, uCatName):
 # Service Product
 @step('Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}"')
 def step_impl(context, uTemplateName, uTaxName):
-    r"""
+    """
     Given \
     Create a ProductTemplate named "{uTemplateName}"
     with a supplier_tax named "{uTaxName}"
@@ -172,7 +172,7 @@ def step_impl(context, uTemplateName, uTaxName):
 # Service Product
 @step('Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields')
 def step_impl(context, uTemplateName, uTaxName):
-    r"""
+    """
     Given \
     Create a ProductTemplate named "{uTemplateName}"
     with supplier_tax named "{uTaxName}"
@@ -243,12 +243,12 @@ def step_impl(context, uTemplateName, uTaxName):
             template.supplier_taxes.append(tax)
 
         template.save()
-    assert ProductTemplate.find([('name', '=', uTemplateName)])
+    oPt, = ProductTemplate.find([('name', '=', uTemplateName)])
 
 # Services Bought, Service Product
 @step('Create a product with description "{uDescription}" from template "{uTemplateName}"')
 def step_impl(context, uDescription, uTemplateName):
-    r"""
+    """
     Given \
     Create a product with description "{uDescription}" from template "{uTemplateName}"
     Idempotent.

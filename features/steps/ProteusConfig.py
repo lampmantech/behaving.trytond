@@ -15,12 +15,12 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
     """
 
     def __init__(self, database_uri=None, user='admin', language='en_US',
-                 password='',
-                 server_password=None,
+                 admin_password='',
+                 super_pwd=None,
                  config_file=None):
         OrigConfigModule.Config.__init__(self)
-        # straighten this mess out
-        
+        # FixMe: straighten this mess out
+
         if config_file is None:
             config_file = os.environ.get('TRYTOND_CONFIG')
         assert config_file and os.path.isfile(config_file), \
@@ -75,16 +75,21 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
                 :param admin_password: the admin password
                 :return: True if succeed
                 '''
-                if not server_password:
+                if not super_pwd:
                     sys.stderr.write(
-                        "WARN: No server_password to create db %s\n" % (database_name,))
-                    server_password = 'postgresTryton' # os.environ['PGPASSWORD']
-    
+                        "WARN: No super_pwd to create db %s\n" % (database_name,))
+                    #! This is NOT the postgres server password
+                    #! This calls security.check_super(password)
+                    #! which is set in the conf file, [session]super_pwd
+                    #! using crypt to generate it from from the command line
+                    #! We default it to admin which may also be the
+                    #! of the user 'admin': admin_password
+                    super_pwd = 'admin' 
                     
-                assert password, "ERROR: No password to create db " + database_name
+                assert admin_password, "ERROR: No admin_password to create db " + database_name
                 sys.stderr.write(
-                    "create %s %s %s %s\n" % (database_name, server_password, language, password,))
-                create(database_name, server_password, language, password)
+                    "create %s %s %s %s\n" % (database_name, super_pwd, language, admin_password,))
+                create(database_name, super_pwd, language, admin_password)
 
             database_list = Pool.database_list()
             self.pool = Pool(database_name)
@@ -104,25 +109,38 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
 
 
 def set_trytond(database_name=None,
-                user='admin', language='en_US', password='',
+                user='admin', language='en_US', password='admin',
                 config_file=None):
     'Set trytond package as backend'
-
+    admin_password = password
+    super_pwd = 'admin'
     sTrytonConfigFile = config_file
     assert database_name
     os.environ['DB_NAME'] = database_name
     assert sTrytonConfigFile and os.path.isfile(sTrytonConfigFile)
     os.environ['TRYTOND_CONFIG'] = sTrytonConfigFile
-    # this is required - even though the info is in the tryton config file - or is it?
-    server_password = 'postgresTryton' # os.environ['PGPASSWORD']
-    server_user  = 'tryton'            # os.environ['PGUSER']
-    database_uri = 'postgresql://%s:%s@127.0.0.1:5432/%s' % (
-        server_user, server_password, database_name,
-    ) # os.environ['TRYTOND_DATABASE_URI']
-        
+    # this is required - should this info be in the tryton config file?
+    assert 'PGPASSWORD' in os.environ and os.environ['PGPASSWORD'], \
+		"Set PGPASSWORD in th OS environment to be the postgres password"
+    postgres_password = os.environ['PGPASSWORD'] # 'postgresTryton'
+    assert 'PGUSER' in os.environ and os.environ['PGUSER'], \
+		"Set PGPASSWORD in the OS environment to be the postgres user"
+    postgres_user  = os.environ['PGUSER']        # 'tryton'
+    if 'PGPORT' in os.environ and os.environ['PGPORT']:
+        postgres_port = os.environ['PGPORT']
+    else:
+        postgres_port = '5432'
+    # this is partly in the uri field in the tryton config file?
+    #? what's os.environ['TRYTOND_DATABASE_URI']
+    database_uri = 'postgresql://%s:%s@127.0.0.1:%s/%s' % (
+        postgres_user, postgres_password, postgres_port, database_name,
+    )
+    del postgres_password, postgres_user
+    
     # morons - trytond-3.4.4-py2.7.egg/trytond/backend/postgresql/database.py
     OrigConfigModule._CONFIG.current = TrytondConfig(database_uri, user,
-                                                     password=password,
+                                                     admin_password=admin_password,
+                                                     super_pwd=super_pwd,
                                                      language=language,
                                                      config_file=sTrytonConfigFile)
     return OrigConfigModule._CONFIG.current

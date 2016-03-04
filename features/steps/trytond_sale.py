@@ -21,7 +21,7 @@ TODAY = datetime.date.today()
 # Fixme: currency
 @step('Sale on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCustomer, uTerm, uMethod):
-    r"""
+    """
     Given \
     Sale on date "TODAY" with description "Description"
     with their reference "uRef" 
@@ -103,7 +103,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCustomer, uTerm, uMeth
 
 @step('Sale "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
-    r"""
+    """
     Given \
     Sale "quote" on date "TODAY" the S.O. with description "P. O #1"
     as user named "Sale" products from customer "Customer"
@@ -153,7 +153,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
 
 @step('Invoice "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
-    r"""
+    """
     Given \
     Invoice "post" on date "TODAY" the S. O. with description "S. O #1"
     as user named "Account" products from customer "Customer"
@@ -203,7 +203,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
 @step('Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields')
 @step('Create a sales order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields')
 def step_impl(context, uDescription, uCur, uCustomer, uDate):
-    r"""
+    """
     Given \
     Create a sales order with description "{uDescription}" in Currency coded "%(sCur)s" to customer "{uCustomer}" on Date "{uDate}" with fields
 	  | name              | value    |
@@ -251,7 +251,7 @@ def step_impl(context, uDescription, uCur, uCustomer, uDate):
 
 @step('Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity|unit_price| fields')
 def step_impl(context, uDescription, uCustomer):
-    r"""
+    """
     Sell Products on the S. O. with description "uDescription" \
     to customer "uCustomer" with quantities
 	  | description     | quantity | unit_price |
@@ -273,7 +273,7 @@ def step_impl(context, uDescription, uCustomer):
 
 @step('Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity| fields')
 def step_impl(context, uDescription, uCustomer):
-    r"""
+    """
     Given \
     Sell products on the S. O. with description "uDescription"
     to customer "uCustomer" with quantities
@@ -334,7 +334,7 @@ def oSellProductsSaleOrder(context, uDescription, uCustomer):
 @step('Validate shipments on "{uDate}" for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 @step('Ship the products on "{uDate}" of the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDate, uDescription, uCustomer):
-    r"""
+    """
     Ship the products on "{uDate}" of the S. O. with description "{uDescription}" \
     to customer "{uCustomer}"
     From: T/ASAS/SASAS
@@ -411,7 +411,7 @@ def step_impl(context, uDate, uDescription, uCustomer):
 @step('Invoice act "post" for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 @step('Post customer Invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"')
 def step_impl(context, uDescription, uCustomer):
-    r"""
+    """
     Given \
     From T/ASAS/SASAS
     Post customer Invoice for the Sales Order with description "uDescription"

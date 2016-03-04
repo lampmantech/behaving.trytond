@@ -37,7 +37,7 @@ def step_impl(context):
 
 @step('Ensure that the WebDAV modules are loaded')
 def step_impl(context):
-    r"""
+    """
     Given \
     Ensure that the WebDAV modules are loaded 
 

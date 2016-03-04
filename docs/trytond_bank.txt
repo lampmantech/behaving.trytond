@@ -12,234 +12,56 @@ From: ../features/steps/trytond_bank.py
    have self-referential fields. Grr.
 
 **Create a bank associated to a party "{uParty}" with optional |bic| field**
-   Party = proteus.Model.get('party.party')
-   oParty, = Party.find([('name', '=', uParty)])
-   Bank = proteus.Model.get('bank')
-   if not Bank.find([('party.id', '=', oParty.id)]):
-   oBank = Bank(party=oParty)
-   if hasattr(context, 'table') and context.table:
-   for row in context.table:
-   if row['bic']:
-   uBic = row['bic']
-   assert len(uBic) <= 11
-   oBank.bic=uBic
-   break
-   oBank.save()
-   assert Bank.find([('party.id', '=', oParty.id)])
+   Given     Create a named bank associated to a party, with optional BIC
+   | bic    |
+   | THEBIC |
+   Create the party first, with things like addresses, and
+   then use this to create the bank.
+   The uBic field can be missing; if not it has 11 characters.
 
 **Create a bank account with IBAN "{uIban}" at a bank associated to a party "{uParty}", with following optional number, owner or currency**
-   config = context.oProteusConfig
-   BankAccountNumber = proteus.Model.get('bank.account.number')
-   BankAccount = proteus.Model.get('bank.account')
-   Bank = proteus.Model.get('bank')
-   Currency = proteus.Model.get('currency.currency')
-   Party = proteus.Model.get('party.party')
-   oParty, = Party.find([('name', '=', uParty)])
-   oBank, = Bank.find([('party.id', '=', oParty.id)])
-   lAccs = BankAccount.find([('bank.party.id', '=', oBank.id)])
-   if not lAccs:
-   # FixMe: cant search BankAccount Numbers 'numbers'
-   uIban = uIban.replace(' ','')
-   dBankAccount = {
-   'bank': oBank.id,
-   }
-   # FixMe: the order of the numbers determines the record name
-   # return self.numbers[0].number
-   lNumbers  = [{
-   'type': 'iban',
-   'number': uIban,
-   }]
-   lOwners  = []
-   for row in context.table:
-   if row['name'] == u'currency':
-   currency, = Currency.find([('code', '=', row['value'])])
-   dBankAccount['currency'] = currency.id
-   elif row['name'] == u'iban':
-   # already in
-   pass
-   elif row['name'] == u'owner':
-   #  FixMe: Party or Bank Party?
-   oOwner, = Party.find([('name', '=', row['value'])])
-   # lOwners.append({'code': oOwner.code})
-   lOwners.append({'name': oOwner.name})
-   elif row['name'] == u'number':
-   lNumbers.append({
-   'type': 'other',
-   'number': row['value'],
-   })
-   dBankAccount['numbers'] = [('create', lNumbers)]
-   iBankAccount, = BankAccount.create([dBankAccount], config.context)
-   oBankAccount = BankAccount(iBankAccount)
-   if lOwners:
-   oBankAccount.owners.append(oOwner)
-   oBankAccount.save()
-   # IBAN is NOT international: Canada and the US dont use them
+   Given     Create a bank account with IBAN "{uBank}" associated with a party "{uParty}"
+   with a following table of | name | value |.
+   Each name is one of: iban number owner or currency.
+   Owner is a party name, and currency is a currency code.
 
 **Create a bank account with number "{uNum}" at a bank associated to a party "{uParty}" with optional owner or currency following |name|value|**
-   config = context.oProteusConfig
-   BankAccountNumber = proteus.Model.get('bank.account.number')
-   BankAccount = proteus.Model.get('bank.account')
-   Bank = proteus.Model.get('bank')
-   Currency = proteus.Model.get('currency.currency')
-   Party = proteus.Model.get('party.party')
-   oParty, = Party.find([('name', '=', uParty)])
-   oBank, = Bank.find([('party.id', '=', oParty.id)])
-   # FixMe should be looking for the account with number? self.numbers[0].number
-   lAccs = BankAccount.find([('bank.party.id', '=', oBank.id)])
-   if True or not lAccs:
-   # FixMe: cant search BankAccount Numbers 'numbers'
-   uNum = uNum.replace(' ','')
-   dBankAccount = {
-   'bank': oBank.id,
-   }
-   # FixMe: the order of the numbers determines the record name
-   # return self.numbers[0].number
-   lNumbers  = [{
-   'type': 'other',
-   'number': uNum,
-   }]
-   lOwners  = []
-   for row in context.table:
-   if row['name'] == u'currency':
-   currency, = Currency.find([('code', '=', row['value'])])
-   dBankAccount['currency'] = currency.id
-   elif row['name'] == u'iban':
-   # unused
-   pass
-   elif row['name'] == u'owner':
-   #  FixMe: Party or Bank Party?
-   oOwner, = Party.find([('name', '=', row['value'])])
-   # lOwners.append({'code': oOwner.code})
-   lOwners.append({'name': oOwner.name})
-   elif row['name'] == u'number':
-   pass
-   assert lNumbers
-   dBankAccount['numbers'] = [('create', lNumbers)]
-   iBankAccount, = BankAccount.create([dBankAccount], config.context)
-   oBankAccount = BankAccount(iBankAccount)
-   if lOwners:
-   oBankAccount.owners.append(oOwner)
-   oBankAccount.save()
-   # Bank
+   Create a bank account with number "{uNum}"     at a bank associated to a party "{uParty}"     with optional owner or currency following |name|value|
+   Each name is one of: owner or currency.
+   Owner is a party name, and currency is a currency code.
 
 **Create a sequence on account.journal named "{uBankSequenceName}"**
-   current_config = context.oProteusConfig
-   sCompanyName = sGetFeatureData(context, 'party,company_name')
-   Party = proteus.Model.get('party.party')
-   party, = Party.find([('name', '=', sCompanyName)])
-   Company = proteus.Model.get('company.company')
-   company, = Company.find([('party.id', '=', party.id)])
-   Sequence = proteus.Model.get('ir.sequence')
-   if not Sequence.find([('name', '=', uBankSequenceName,)]):
-   oSequence = Sequence(name=uBankSequenceName,
-   code='account.journal',
-   company=company)
-   oSequence.save()
-   assert Sequence.find([('name', '=', uBankSequenceName,)])
-   # is this needed?
-   Account = proteus.Model.get('account.account')
-   cash, = Account.find([
-   ('kind', '=', 'other'),
-   ('company', '=', company.id),
-   ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
-   ])
-   if hasattr(Account, 'bank_reconcile'):
-   cash.bank_reconcile = True
-   cash.save()
-   # DifferentCurrencySJ, StatementAJ, USD
+   Given     Create a non-strict sequence on account.journal named "{uBankSequenceName}"
+   Idempotent.
 
 **Create a Bank Statement Journal named "{uName}" from the account.journal named "{uStatementAJName}" with currency "{uCur}"**
-   Currency = proteus.Model.get('currency.currency')
-   oCur, = Currency.find([('code', '=', uCur)])
-   AccountJournal = proteus.Model.get('account.journal')
-   oAccountJournal, =  AccountJournal.find([('name', '=', uStatementAJName),
-   ('type', '=', 'cash')])
-   oAccountJournal.credit_account.bank_reconcile = True
-   oAccountJournal.credit_account.save()
-   oAccountJournal.credit_account.reload()
-   oAccountJournal.debit_account.bank_reconcile = True
-   oAccountJournal.debit_account.save()
-   oAccountJournal.debit_account.reload()
-   oAccountJournal.save()
-   oAccountJournal.reload()
-   # WTF
-   ## assert oAccountJournal.credit_account and     ##        oAccountJournal.credit_account.bank_reconcile and     ##        oAccountJournal.debit_account and     ##        oAccountJournal.debit_account.bank_reconcile
-   StatementJournal = proteus.Model.get('account.bank.statement.journal')
-   uStatementJournalName=uName
-   if not StatementJournal.find([('name', '=', uStatementJournalName)]):
-   oStatementJournalDollar = StatementJournal(name=uStatementJournalName,
-   journal=oAccountJournal,
-   currency=oCur)
-   oStatementJournalDollar.save()
-   assert StatementJournal.find([('name', '=', uStatementJournalName)])
-   #     StatementAJ, : Main Cash Main Cash
+   Given     Create an account.bank.statement.journal named "{uName}"
+   from the account.journal named "{uStatementAJName}"
+   with currency "{uCur}"
+   Idempotent.
 
 **Create a cash account.journal named "{uName}" from the sequence named "{uBankSequenceName}" with following |name|value| credit_account, debit_account fields**
-   Account = proteus.Model.get('account.account')
-   AccountJournal = proteus.Model.get('account.journal')
-   sCompanyName = sGetFeatureData(context, 'party,company_name')
-   Party = proteus.Model.get('party.party')
-   party, = Party.find([('name', '=', sCompanyName)])
-   Company = proteus.Model.get('company.company')
-   company, = Company.find([('party.id', '=', party.id)])
-   Sequence = proteus.Model.get('ir.sequence')
-   oSequence, = Sequence.find([('name', '=', uBankSequenceName,)])
-   if not AccountJournal.find([('name', '=', uName),
-   ('type', '=', 'cash')]):
-   oDefaultCash, = Account.find([
-   # FixMe: is it kind other or kind cash?
-   ('kind', '=', 'other'),
-   ('company', '=', company.id),
-   ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
-   ])
-   credit_account = debit_account = oDefaultCash
-   for row in context.table:
-   if row['name'] == 'credit_account':
-   credit_account, = Account.find([
-   ('kind', '=', 'other'),
-   ('company', '=', company.id),
-   ('name', '=', row['value'])])
-   credit_account.bank_reconcile = True
-   credit_account.save()
-   # looks like this is necessary
-   credit_account.reload()
-   elif row['name'] == 'debit_account':
-   debit_account, = Account.find([
-   ('kind', '=', 'other'),
-   ('company', '=', company.id),
-   ('name', '=', row['value'])])
-   debit_account.bank_reconcile = True
-   debit_account.save()
-   # looks like this is necessary
-   debit_account.reload()
-   oAccountJournal = AccountJournal(name=uName,
-   type='cash',
-   credit_account=credit_account,
-   debit_account=debit_account,
-   sequence=oSequence)
-   oAccountJournal.save()
-   oAccountJournal, = AccountJournal.find([('name', '=', uName),
-   ('type', '=', 'cash')])
-   if not hasattr(oAccountJournal.debit_account, 'bank_reconcile'):
-   puts("ERROR: oAccountJournal.debit_account missing bank_reconcile slot "              +oAccountJournal.debit_account.code)
-   elif not oAccountJournal.debit_account.bank_reconcile:
-   oAccountJournal.debit_account.bank_reconcile = True
-   oAccountJournal.debit_account.save()
-   oAccountJournal.debit_account.reload()
-   if not hasattr(oAccountJournal.credit_account, 'bank_reconcile'):
-   puts("ERROR: oAccountJournal.credit_account missing bank_reconcile slot "              +oAccountJournal.credit_account.code)
-   elif not oAccountJournal.credit_account.bank_reconcile:
-   oAccountJournal.credit_account.bank_reconcile = True
-   oAccountJournal.credit_account.save()
-   oAccountJournal.credit_account.reload()
+   Given     Create a cash account.journal named "{uName}"
+   with the sequence named "{uBankSequenceName}"
+   with a following |name|value| table
+   with credit_account, debit_account fields, e.g.
+   | name 	     	  | value	  |
+   | credit_account  | Main Cash	  |
+   | debit_account   | Main Cash	  |
+   The accounts must be of domain: ('kind', '=', 'other')
+   Idempotent.
 
 **Create a financial account under "{uTemplate}" for the bank account with IBAN "{uIban}"**
 
 **Create a financial account under "{uTemplate}" for the bank account with number "{uIban}"**
-   # sFormat = sGetFeatureData('account.template', 'bank_account_format')
-   o = oCreateNewChartAccountforBank(context, uIban, uTemplate)
-   def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
-   r"""
    Given     Create a new account into the chart of accounts for a bank account.
+   It takes "{uTemplate}" as an argument which is the name an existing account
+   in the chart where the new account will be created: if uTemplate is of
+   kind view, the new chart will have it as its parent; if not,
+   the new chart will be the next available sibling, with code += 1.
+   The step assumes that the sTemplate account has an integer code, <= 9999;
+   it just adds 1 until it finds the next available account, so you can
+   have many calls to this step with different IBANS.
+   The name of the new account is the IBAN.
    The account_bank_statement module has to be loaded
    before ANY accounts are created or this will error.

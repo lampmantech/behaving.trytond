@@ -38,7 +38,7 @@ dCacheCostPriceMethod={}
 @step('T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields')
 # FixMe: actually creates 2 different Product and ProductTemplates
 def step_impl(context, uType, uName):
-    r"""
+    """
     Given \
     Create products of type "{uType}" from the ProductTemplate named \
     "{uName}" with fields
@@ -104,7 +104,7 @@ def step_impl(context, uType, uName):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
-    r"""
+    """
     Given \
     Purchase products on the P. O. with description "{uDescription}" \
     from supplier "{uSupplier}" with quantities
@@ -152,7 +152,7 @@ def step_impl(context, uDescription, uSupplier):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
-    r"""
+    """
     Given \
     T/ASAS/SASAS Quote and Confirm and Process a P. O. \
     with description "{uDescription}" from Supplier "{uSupplier}"
@@ -183,7 +183,7 @@ def step_impl(context, uDescription, uSupplier):
 # 12 products, Supplier
 @step('T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
-    r"""
+    """
     Given \
     T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" \
     from Supplier "{uSupplier}" with quantities
@@ -369,7 +369,7 @@ def step_impl(context):
 
 @step('T/ASAS/SASAS After shipping to customer assert the account credits and debits')
 def step_impl(context):
-    r"""
+    """
     Given \
     T/ASAS/SASAS After shipping to customer assert the account credits and debits
 
@@ -462,7 +462,7 @@ def step_impl(context):
 # Supplier, Direct
 @step('T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities')
 def step_impl(context, uSupplier, uPaymentTerm):
-    r"""
+    """
     Given \
     Create an Invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm" \
     by an accountant with quantities

@@ -173,7 +173,11 @@ def vCreatePartyWithPayRec(context, uName, company):
 
     assert Party.find([('name', '=', uName)])
 
-def vSetNamedInstanceFields(context, uName, uKlass):
+def vSetDescribedInstanceFields(context, uName, uKlass):
+    # e.g. account.invoice
+    vSetNamedInstanceFields(context, uName, uKlass, 'description')
+    
+def vSetNamedInstanceFields(context, uName, uKlass, sSlot='name'):
     assert context.table, "Please supply a table of |name|value| fields"
     if hasattr(context.table, 'headings'):
         # if we have a real table, ensure it has 2 columns
@@ -181,7 +185,7 @@ def vSetNamedInstanceFields(context, uName, uKlass):
         assert len(context.table.headings) >= 2
 
     Klass = proteus.Model.get(uKlass)
-    oInstance, = Klass.find([('name', '=', uName)])
+    oInstance, = Klass.find([(sSlot, '=', uName)])
     for row in context.table:
         setattr(oInstance, row['name'],
                 string_to_python(row['name'], row['value'], Klass))

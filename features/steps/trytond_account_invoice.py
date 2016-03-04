@@ -10,18 +10,36 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
-from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 from .support import modules
 from .support.tools import *
+from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 
 TODAY = datetime.date.today()
 
 
-# TODAY, Buy the Services Bought, Term 30 days, Supplier
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|VAT|currency| fields')
+
+# Create an invoice on date "2014-07-01" with description "Jackson and Grimes 2014 Bill Adjustments" and a PaymentTerm named "Term 30 days" to supplier "Jackson and Grimes" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields'
+
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
+    """
+    Given \
+Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+"{uSupplier}" with following |description|quantity|unit_price|account| fields
+Note that this uses the heading description rather than name
+  | description       | quantity   | unit_price | account      |tax_amount|base_amount|tax_code_id|base_code_id|tax_account| currency |
+  | Services Bought   | 5	   | 		|              | | | | | | |          |
+  | Test     	      | 1	   | 10.00	| Main Expense | | | | | | | USD      |
+    """
+    sType = 'in_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
+
+
 @step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
-    r"""
+    """
     Given \
 Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
@@ -34,11 +52,26 @@ Note that this uses the heading description rather than name
     assert context.table
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
 
-# TODAY, Services Sold, Customer
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|VAT|currency| fields')
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
+    """
+    Given \
+Create an Invoice with description "{uDescription}" to customer
+"{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
+Note that this uses the heading description rather than name
+  | description       | quantity   | unit_price | account      |tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency |
+  | Services Bought   | 5	   | 		|              | | | | | | |          |
+  | Test     	      | 1	   | 10.00	| Main Revenue | | | | | | | USD      |
+    """
+    sType = 'out_invoice'
+    assert context.table
+    oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uCustomer, sType)
+
+
 @step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
-    r"""
+    """
     Given \
 Create an Invoice with description "{uDescription}" to customer
 "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
@@ -60,9 +93,9 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
-    supplier, = Party.find([('name', '=', uParty),])
+    oParty, = Party.find([('name', '=', uParty),])
     Invoice = proteus.Model.get('account.invoice')
-    if not Invoice.find([('party.id',  '=', supplier.id),
+    if not Invoice.find([('party.id',  '=', oParty.id),
                          ('company.id',  '=', company.id),
                          ('description', '=', uDescription)]):
         invoice = Invoice()
@@ -96,7 +129,9 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
             ('company', '=', company.id),
         ])
         invoice.account = oMain
-
+        # journal?
+        # period?
+        
         oLineDefault, = Account.find([
             ('kind', '=', uKind),
             ('name', '=', sGetFeatureData(context, 'account.template,main_'+uKind)),
@@ -104,55 +139,84 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
         ])
 
         InvoiceLine = proteus.Model.get('account.invoice.line')
+        TaxLine = proteus.Model.get('account.invoice.tax')
+        TaxCode = proteus.Model.get('account.tax.code')
         Product = proteus.Model.get('product.product')
         Currency = proteus.Model.get('currency.currency')
         for row in context.table:
-            # FixMe: lines can have currency
-            line = InvoiceLine()
-            invoice.lines.append(line)
-            # Note that this uses the heading 'description' rather than 'name'
-            lProducts = Product.find([('description', '=', row['description'])])
+            # FixMe: lines can have tax
+            oLine = InvoiceLine()
+            invoice.lines.append(oLine)
             if u'currency' in context.table.headings and row['currency']:
                 oCurrency, = Currency.find([('code', '=', row['currency'])])
-                line.currency = oCurrency
+                oLine.currency = oCurrency
             if u'party' in context.table.headings and row['party']:
                 oLineParty, = Party.find([('name', '=', row['party'])])
-                line.party = oLineParty
+                oLine.party = oLineParty
+            uQuantity = row['quantity']
+            if uQuantity:
+                oLine.quantity = \
+                    string_to_python('quantity', uQuantity, InvoiceLine)
+            # Note that this uses the heading 'description' rather than 'name'
+            lProducts = Product.find([('description', '=', row['description'])])
             if lProducts:
-                line.product = lProducts[0]
+                oLine.product = lProducts[0]
                 # 'unit_price' is derived from the Product
             else:
-                line.description = row['description']
-                line.unit_price = Decimal(row['unit_price'])
-                #? need this if line.product too? No it's derived
+                oLine.description = row['description']
+                #? need this if oLine.product too? No it's derived
                 if row['account']:
-                    # FixMe: domain for line.account is ['kind', '=', 'expense']
+                    # FixMe: domain for oLine.account is ['kind', '=', 'expense']
                     uNameOrCode = row['account']
                     try:
                         int(uNameOrCode)
                     except ValueError:
-                        line.account, = Account.find([
+                        oLine.account, = Account.find([
                             ('kind', '=', uKind),
                             ('name', '=', uNameOrCode),
                             ('company.id', '=', company.id)])
                     else:
-                        line.account, = Account.find([
+                        oLine.account, = Account.find([
                             ('kind', '=', uKind),
                             ('code', '=', uNameOrCode),
                             ('company.id', '=', company.id)])
                 else:
-                    line.account = oLineDefault
-            line.quantity = \
-                    string_to_python('quantity', row['quantity'], InvoiceLine)
+                    oLine.account = oLineDefault
+                uUnitPrice = row['unit_price']
+                if uUnitPrice and uUnitPrice != u'0.00':
+                    oLine.unit_price = Decimal(uUnitPrice)
+                #?
+                oLine.save()
+                
+            if u'tax_account' in context.table.headings and row['tax_account']:
+                # tax_amount|base_amount|tax_code_id|base_code_id|tax_account
+                oTaxLine = TaxLine()
+                invoice.taxes.append(oTaxLine)
+                oTaxLine.tax = Decimal(row['tax_amount'])
+                oTaxLine.base = Decimal(row['base_amount'])
+                oTaxLine.account, = Account.find([
+                        ('kind', '!=', 'view'),
+                        ('code', '=', row['tax_account']),
+                        ('company.id', '=', company.id)])
+                oTaxLine.base_sign = 1 #?
+                oTaxLine.base_code, = TaxCode.find([
+                        ('code', '=', row['base_code_id']),
+                        ('company.id', '=', company.id)])
+                oTaxLine.tax_sign = 1 #?
+                oTaxLine.tax_code, = TaxCode.find([
+                        ('code', '=', row['tax_code_id']),
+                        ('company.id', '=', company.id)])
+                #?
+                oTaxLine.save()
         invoice.save()
         
-    invoice, = Invoice.find([('party.id',  '=', supplier.id),
+    invoice, = Invoice.find([('party.id',  '=', oParty.id),
                              ('company.id',  '=', company.id),
                              ('description', '=', uDescription)])
 
 @step('Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
-    r"""
+    """
     Given \
     Action "post" on date "TODAY" the Invoice with description "Invoice #1"
     as user named "Account" products from party "Supplier"

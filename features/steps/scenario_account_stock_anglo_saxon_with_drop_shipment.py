@@ -24,7 +24,7 @@ TODAY = datetime.date.today()
 # product, Supplier
 @step('Create a ProductSupplier with description "{uDescription}" from a ProductTemplate named "{uTemplateName}" with supplier named "{uSupplier}" with |name|value| fields')
 def step_impl(context, uDescription, uTemplateName, uSupplier):
-    r"""
+    """
     Given \
     Create a ProductSupplier from a Template named "product" \
     with a supplier named "Supplier" \

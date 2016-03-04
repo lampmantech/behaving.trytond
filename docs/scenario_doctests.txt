@@ -38,73 +38,56 @@ From: ../features/steps/scenario_doctests.py
    in case thats different to installing a module.
 
 **Create the company with default COMPANY_NAME and Currency code "{uCode}"**
-   uPartyName = sGetFeatureData(context, 'party,company_name')
-   context.execute_steps(u'''
-   Given Create the Company associated with the party named "%s" and using the currency "%s"
-   ''' % (uPartyName, uCode,)
-   )
-   # ['code', 'create_date', 'addresses', 'supplier_location', 'write_uid', 'customer_location', 'full_name', 'vat_number', 'id', 'receivable', 'create_uid', 'receivable_today', 'account_payable', 'code_readonly', 'code_length', 'vat_code', 'email', 'website', 'rec_name', 'fax', 'account_receivable', 'customer_tax_rule', 'payable', 'contact_mechanisms', 'write_date', 'active', 'categories', 'lang', 'supplier_tax_rule', 'name', 'phone', 'mobile', 'supplier_payment_term', 'vat_country', 'customer_payment_term', 'payable_today']
+   Given     Create the company with default COMPANY_NAME and Currency code "{uCode}"
 
 **Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"**
 
 **Create the currency with Currency code "{uCode}"**
-   Currency = proteus.Model.get('currency.currency')
-   currencies = Currency.find([('code', '=', uCode)])
-   if not currencies:
-   if uCode == 'EUR':
-   currency = Currency(name='EUR', symbol=u'€', code='EUR',
-   rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-   mon_decimal_point=',')
-   elif uCode == 'GBP':
-   currency = Currency(name='GBP', symbol=u'£', code='GBP',
-   rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-   mon_decimal_point='.')
-   elif uCode == 'USD':
-   currency = Currency(name='USD', symbol=u'$', code='USD',
-   rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-   mon_decimal_point='.')
-   elif uCode == 'CAD':
-   currency = Currency(name='CAD', symbol=u'$', code='CAD',
-   rounding=Decimal('0.01'), mon_grouping='[3, 3, 0]',
-   mon_decimal_point='.')
-   else:
-   assert code in ['EUR', 'GBP', 'USD', 'CAD'],                    "Unsupported currency code: %s" % (uCode,)
-   currency.save()
-   assert Currency.find([('code', '=', uCode)])
+   Given     Create the currency with Currency code "{uCode}"
+   You'll need to do this before you use any other currencies
+   than the company's base currency.
 
 **Reload the default User preferences into the context**
    Reload the default User get_preferences.
 
 **Create a saved instance of "{uKlass}" named "{uName}"**
-   oKlass = proteus.Model.get(uKlass)
-   if not oKlass.find([('name', '=', uName)]):
-   instance = oKlass(name=uName)
-   instance.save()
+   Given     Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName'.
+   Idempotent.
+
+**Create an instance of "{uKlass}" keyed "{uKey}" "{uName}" with |name|value| fields**
 
 **Create an instance of "{uKlass}" named "{uName}" with fields**
 
 **Create an instance of "{uKlass}" named "{uName}" with |name|value| fields**
-   vAssertContentTable(context, 2)
-   Klass = proteus.Model.get(uKlass)
-   l = Klass.find([('name', '=', uName)])
-   if l:
-   oInstance = l[0]
-   else:
-   oInstance = Klass(name=uName)
-   for row in context.table:
-   gValue = string_to_python(row['name'], row['value'], Klass)
-   setattr(oInstance, row['name'], gValue )
-   oInstance.save()
-   oInstance, = Klass.find([('name', '=', uName)])
+   Given     Create an instance of a Model, like Model.get('party.party')
+   with the name attribute of 'uName' and the fields from the table.
+   It expects a |name|value| table.
+   Idempotent.
 
 **Set the slots of the instance named "{uName}" of model "{uKlass}" to the values**
 
 **Set the instance named "{uName}" of model "{uKlass}" with fields**
-   vSetNamedInstanceFields(context, uName, uKlass)
+   Given     Guven an instance named "uName" of a Model, like Model.get('party.party')
+   set the attributes to the values.   It expects a |name|value| table.
+   Idempotent.
+
+**Set the slots of the instance described "{uName}" of model "{uKlass}" to the values**
+
+**Set the instance described "{uName}" of model "{uKlass}" with |name|value| fields**
+
+**Set the instance described "{uName}" of model "{uKlass}" with fields**
+   Given     Guven an instance described "uName" of a Model, like Model.get('account.invoice')
+   set the attributes to the values.   It expects a |name|value| table.
+   Idempotent.
+
+**I find an instance of "{uKlass}" named "{uName}"**
+   Find an instance of a Model, like Model.get('party.party')
+   Idempotent.
 
 **Create parties**
-   context.execute_steps(u'''Given Create a party named "Supplier"''')
-   context.execute_steps(u'''Given Create a party named "Customer"''')
+   Given     Create a party named "Supplier"
+   And     Create a party named "Customer"
 
 **Create a party named "{uName}"**
 
@@ -113,86 +96,50 @@ From: ../features/steps/scenario_doctests.py
 **Create a party named "{uName}" with an account_payable attribute**
 
 **Create a party named "{uName}" with payable and receivable properties**
-   Party = proteus.Model.get('party.party')
-   Company = proteus.Model.get('company.company')
-   sCompanyName = sGetFeatureData(context, 'party,company_name')
-   party, = Party.find([('name', '=', sCompanyName)])
-   company, = Company.find([('party.id', '=', party.id)])
-   stepfuns.vCreatePartyWithPayRec(context, uName, company)
+   Given     Create a party named "uName" with payable and receivable properties.
+   The account_payable Account is taken from the
+   'account.template,main_payable' entry of the feature data
+   (use 'Set the feature data with values' to override)
+   Idempotent.
 
 **Create a party named "{uName}" with payable and receivable properties with fields**
 
 **Create a party named "{uName}" with payable and receivable properties with |name|value| fields**
-   Party = proteus.Model.get('party.party')
-   Company = proteus.Model.get('company.company')
-   sCompanyName = sGetFeatureData(context, 'party,company_name')
-   party, = Party.find([('name', '=', sCompanyName)])
-   company, = Company.find([('party.id', '=', party.id)])
-   stepfuns.vCreatePartyWithPayRec(context, uName, company)
-   vSetNamedInstanceFields(context, uName, 'party.party')
-   # Accountant, Account
+   Given     Create a party named "uName" with payable and receivable properties.
+   The account_payable Account is taken from the
+   'account.template,main_payable' entry of the feature data
+   (use 'Set the feature data with values' to override)
+   Then use the following |name|value| fields to set fields on the party.
+   Idempotent.
 
 **Create a user named "{uName}" with the fields**
 
 **Create a user named "{uName}" with the |name|value| fields**
-   User = proteus.Model.get('res.user')
-   if not User.find([('name', '=', uName)]):
-   Group = proteus.Model.get('res.group')
-   user = User()
-   user.name = uName
-   # login password
-   for row in context.table:
-   if row['name'] == u'group':
-   # multiple allowed?
-   group, = Group.find([('name', '=', row['value'])])
-   user.groups.append(group)
-   continue
-   setattr(user, row['name'],
-   string_to_python(row['name'], row['value'], User))
-   sKey='user,'+uName+","+row['name']
-   context.dData['feature'][sKey]=row['value']
-   user.save()
-   assert User.find([('name', '=', uName)])
+   Given     Create a res.user named 'uName' and the given field values.
+   It expects a |name|value| table.
+   If one of the field names is 'group', it will add the User to that group.
+   It also loads the values into the feature data under the  keys
+   'user,'+uName+","+row['name']
+   Idempotent.
 
 **Create a grouped user named "{uName}" with |name|value| fields**
-   Party = proteus.Model.get('party.party')
-   Company = proteus.Model.get('company.company')
-   uPartyName = sGetFeatureData(context, 'party,company_name')
-   oParty, = Party.find([('name', '=', uPartyName)])
-   company, = Company.find([('party.id', '=', oParty.id)])
-   User = proteus.Model.get('res.user')
-   if not User.find([('name', '=', uName)]):
-   oUser = User(name=uName)
-   oUser.main_company = company
-   Group = proteus.Model.get('res.group')
-   for row in context.table:
-   if row['name'] == 'group':
-   oGroup, = Group.find([('name', '=', row['value'])])
-   oUser.groups.append(oGroup)
-   continue
-   setattr(oUser, row['name'],
-   string_to_python(row['name'], row['value'], User))
-   oUser.save()
-   oUser, = User.find([('name', '=', uName)])
-   return oUser
-
-**Create a sale user**
-   User = proteus.Model.get('res.user')
-   context.execute_steps(u'''
-   Given Create a grouped user named "%s" with |name|value| fields
+   Given     Create a user named "{uName}" with |name|value| fields
    | name   | value |
    | login  | sale  |
    | group  | Sales |
-   ''' % ('Sale',))
+   group can be repeated for list of groups.
+
+**Create a sale user**
+   Given     Create a grouped user named "Sale" with |name|value| fields
+   | name   | value |
+   | login  | sale  |
+   | group  | Sales |
 
 **Create a purchase user**
-   User = proteus.Model.get('res.user')
-   context.execute_steps(u'''
-   Given Create a grouped user named "%s" with |name|value| fields
+   Given     Given Create a grouped user named "Purchase" with |name|value| fields
    | name   | value            |
    | login  | purchase         |
    | group  | Purchase         |
-   ''' % ('Purchase',))
 
 **Create a stock user**
    Given Create a grouped user named "Stock" with |name|value| fields
@@ -203,46 +150,19 @@ From: ../features/steps/scenario_doctests.py
 **Create a account user**
 
 **Create an account user**
-   User = proteus.Model.get('res.user')
-   context.execute_steps(u'''
-   Given Create a grouped user named "%s" with |name|value| fields
+   Given     Create a grouped user named "Account" with |name|value| fields
    | name   | value |
    | login  | account |
    | group  | Account |
-   ''' % ('Account',))
 
 **Create a product user**
-   User = proteus.Model.get('res.user')
-   Group = proteus.Model.get('res.group')
-   Party = proteus.Model.get('party.party')
-   sCompanyName = sGetFeatureData(context, 'party,company_name')
-   party, = Party.find([('name', '=', sCompanyName)])
-   Company = proteus.Model.get('company.company')
-   company, = Company.find([('party.id', '=', party.id)])
-   product_admin_user = User()
-   product_admin_user.name = 'Product'
-   product_admin_user.login = 'product'
-   product_admin_user.main_company = company
-   product_admin_group, = Group.find([
-   ('name', '=', 'Product Administration')
-   ])
-   product_admin_user.groups.append(product_admin_group)
-   product_admin_user.save()
-   product_admin_user, = User.find([('name', '=', 'Product')])
+   Given     Create a grouped user named "Product" with |name|value| fields
+   | name   | value                  |
+   | login  | product                |
+   | group  | Product Administration |
 
 **Create a stock_admin user**
-   User = proteus.Model.get('res.user')
-   Group = proteus.Model.get('res.group')
-   Party = proteus.Model.get('party.party')
-   sCompanyName = sGetFeatureData(context, 'party,company_name')
-   party, = Party.find([('name', '=', sCompanyName)])
-   Company = proteus.Model.get('company.company')
-   company, = Company.find([('party.id', '=', party.id)])
-   stock_admin_user = User()
-   stock_admin_user.name = 'Stock Admin'
-   stock_admin_user.login = 'stock_admin'
-   stock_admin_user.main_company = company
-   stock_admin_group, = Group.find([('name', '=', 'Stock Administration')])
-   stock_admin_user.groups.append(stock_admin_group)
-   stock_admin_user.save()
-   stock_admin_user, = User.find([('name', '=', 'Stock Admin')])
+   Given     Create a grouped user named "Stock Admin" with |name|value| fields
+   | name   | value                |
+   | login  | stock_admin          |
+   | group  | Stock Administration |
