@@ -7,7 +7,7 @@ steps_to_wiki () {
     local state=before
     local line
     
-    cat $1 | \
+    grep -v '^#' $1 | \
     while read line ; do
 	[ "$line" == "" ] && { continue ; }
 	first=${line:0:1}

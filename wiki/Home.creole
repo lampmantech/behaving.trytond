@@ -1,4 +1,3 @@
--*- encoding: utf-8 -*-
 
 trytond_scenari
 http://github.com/lampmantech/trytond_scenari
@@ -48,6 +47,7 @@ from the steps; if you think it's a hack (it is), write a better one!
 * [[Installation]]
 * [[Configuration]]
 
+For the automatically extracted documentation from the steps files, see:
 * [[TitleIndex]]
 
 === Project ===

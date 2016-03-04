@@ -1,6 +1,4 @@
--*- encoding: utf-8 -*-
 
-trytond_scenari
 http://github.com/lampmantech/trytond_scenari
 
 This module provides scenario testing for trytond using behave BDD
@@ -50,7 +48,7 @@ Use the Wiki to start topics for discussion. You will need to be
 signed into github.com to edit in the wiki.
 
 Please format wiki pages as Creole.
-For info on creole, see http://wikicreole.org/
+For info on Creole, see http://wikicreole.org/
 
 Please file any bugs in the
 [[issues tracker|https://github.com/lampmantech/trytond_scenari/issues]].

@@ -46,7 +46,6 @@ From: [[features/steps/trytond_product.py|features/steps/trytond_product.py]]
    | default_uom	      | Unit    |
    | account_expense   | Main Expense |
    | account_revenue   | Main Revenue |
-   #	  | cost_price_method | fixed        |
    We'll put a hack to work on systems without a CoTs:
    just call the tax "NO Sales Tax".
    Idempotent.
