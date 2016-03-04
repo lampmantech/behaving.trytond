@@ -1,5 +1,4 @@
 
-------------
 
 By default, behave runs all \*.feature files in
 the directory features/ and its sub-directories

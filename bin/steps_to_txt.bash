@@ -39,6 +39,7 @@ grep -l ^@ features/steps/*py | \
     grep -v '/support/\|__init__' | \
     while read file ; do
 	outfile=wiki/`echo $file | sed -e 's@^.*features/steps/@Steps_@' -e 's@/@-@g' -e 's@py$@creole@'`
+	[ $outfile -nt $file ] && continue
 	steps_to_wiki "$file" >> ${outfile}
 	[ -s ${outfile} ] || { rm -f ${outfile} ; continue ; }
 	echo -e "# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-\n" > foo

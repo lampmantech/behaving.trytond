@@ -1,4 +1,3 @@
-Configuration
 
 The file
 {{{
@@ -12,7 +11,7 @@ the default values are:
 [trytond]
 user = admin
 password = admin
-database_name = test30
+database_name = test36
 database_type = postgres
 config_file = /etc/trytond.conf
 
@@ -21,23 +20,32 @@ verbosity = 0
 tracer =
 }}}
 
-If the trytond database does not exist, it will be created.  As a
-rule, these tests to not tear down what they have done at the end, so
-that can be adapted to load database information and code into
-production systems, as well as testing. If you are running the tests
-in trytond_scenari, you must drop the database created in a previous run.
-This also means that the order of execution of feature files may be
-important, if one step builds on a previous one, or interferes with it.
+If the trytond database does not exist, it will be created.
+You may need to define the Postgres user, port and pasword to create
+new databases, by setting environment variables: 
+{{{
+export PGPASSWORD='postgresTryton' # server_password
+export PGUSER='tryton'             #     server_user
+export PGPORT=5432
+export PGHOST=127.0.0.1
+}}}
 
-As a rule, all tests within a directory should not
-interfere with each other, but dont be surprised
-if there in interference between directories.
+As a rule, these tests to not tear down what they have done at the
+end, so that can be adapted to load database information and code into
+production systems, as well as testing. If you are running the tests
+in trytond_scenari, you must drop the database created in a previous
+run.  This also means that the order of execution of feature files may
+be important, if one step builds on a previous one, or interferes with
+it.
+
+As a rule, all tests within a directory should not interfere with each
+other, but dont be surprised if there in interference between directories.
 
 If you set tracer in the scenari section of the
 configuration file to be pdb, it will drop you into
 the pdb debugger on an error, if you invoked behave 
 with the --stop flag (stop at the first error).
-You must also use the behave option --no-capture.
+You must also use the behave option {{{--no-capture --no-capture-stderr}}}.
 
 Behave is monkey-patched by environment.py to allow backslashes \
 at the end of a line in feature files, to allow long verbose steps.

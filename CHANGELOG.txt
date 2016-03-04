@@ -1,3 +1,8 @@
+commit 478a7b0591e0d0ced68a1b7c5b050fe7d1ca265d
+Date:   Fri Mar 4 23:29:55 2016 +0200
+
+    Fixed documentation to the wiki
+
 commit df1872a43bdffd72f5eb7881f9174be1da0cbc70
 Date:   Fri Mar 4 23:14:11 2016 +0200
 

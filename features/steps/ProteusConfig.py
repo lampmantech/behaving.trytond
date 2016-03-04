@@ -126,14 +126,18 @@ def set_trytond(database_name=None,
     assert 'PGUSER' in os.environ and os.environ['PGUSER'], \
 		"Set PGPASSWORD in the OS environment to be the postgres user"
     postgres_user  = os.environ['PGUSER']        # 'tryton'
+    if 'PGHOST' in os.environ and os.environ['PGHOST']:
+        postgres_host = os.environ['PGHOST']
+    else:
+        postgres_host = '127.0.0.1'
     if 'PGPORT' in os.environ and os.environ['PGPORT']:
         postgres_port = os.environ['PGPORT']
     else:
         postgres_port = '5432'
     # this is partly in the uri field in the tryton config file?
     #? what's os.environ['TRYTOND_DATABASE_URI']
-    database_uri = 'postgresql://%s:%s@127.0.0.1:%s/%s' % (
-        postgres_user, postgres_password, postgres_port, database_name,
+    database_uri = 'postgresql://%s:%s@%s:%s/%s' % (
+        postgres_user, postgres_password, postgres_host, postgres_port, database_name,
     )
     del postgres_password, postgres_user
     
