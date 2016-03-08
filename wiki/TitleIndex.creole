@@ -18,6 +18,7 @@
 * [[Steps_scenario_account_stock_anglo_saxon_with_drop_shipment]]
 * [[Steps_scenario_doctests]]
 * [[Steps_scenario_invoice_supplier]]
+* [[Steps_scenario_move_template]]
 * [[Steps_scenario_purchase]]
 * [[Steps_scenario_stock_average_cost_price]]
 * [[Steps_scenario_stock_internal_supply]]

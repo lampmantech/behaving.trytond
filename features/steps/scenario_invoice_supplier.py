@@ -113,7 +113,7 @@ def step_impl(context, uDescription):
     party, = Party.find([('name', '=', sCompanyName)])
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
-    
+
     # company.id?
     invoice, = Invoice.find([('description', '=', uDescription),
                              ('company', '=', company.id),])

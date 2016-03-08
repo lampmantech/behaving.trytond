@@ -257,7 +257,7 @@ def step_impl(context):
 def step_impl(context, uKlass, uName):
     """
     Given \
-    Create an instance of a Model, like Model.get('party.party') 
+    Create an instance of a Model, like Model.get('party.party')
     with the name attribute of 'uName'.
     Idempotent.
     """
@@ -293,7 +293,7 @@ def step_impl(context, uKlass, uName):
         gValue = string_to_python(row['name'], row['value'], Klass)
         setattr(oInstance, row['name'], gValue )
     oInstance.save()
-    oInstance, = Klass.find([('name', '=', uName)])
+    assert Klass.find([('name', '=', uName)])
 
 @step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
 @step('Set the instance named "{uName}" of model "{uKlass}" with fields')
@@ -327,7 +327,7 @@ def step_impl(context, uKlass, uName):
     Klass = proteus.Model.get(uKlass)
     l = Klass.find([('name', '=', uName)])
     assert len(l) == 1
-    
+
 @step('Create parties')
 def step_impl(context):
     """
@@ -593,5 +593,5 @@ def step_impl(context):
     stock_admin_user.groups.append(stock_admin_group)
     stock_admin_user.save()
 
-    stock_admin_user, = User.find([('name', '=', 'Stock Admin')])
+    assert User.find([('name', '=', 'Stock Admin')])
 

@@ -79,7 +79,7 @@ def step_impl(context, uKind, uCalName, uUserName):
     """
     oCurrentConfig = context.oProteusConfig
     assert oCurrentConfig
-    
+
     Calendar = proteus.Model.get('calendar.calendar')
     Event = proteus.Model.get('calendar.event')
     Location = proteus.Model.get('calendar.location')

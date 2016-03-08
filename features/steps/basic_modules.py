@@ -39,7 +39,7 @@ def step_impl(context):
 def step_impl(context):
     """
     Given \
-    Ensure that the WebDAV modules are loaded 
+    Ensure that the WebDAV modules are loaded
 
     So that we can access the calendars and contacts via WebDAV
     """

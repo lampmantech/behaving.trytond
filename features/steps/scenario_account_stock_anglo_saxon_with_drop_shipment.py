@@ -54,8 +54,8 @@ def step_impl(context, uDescription, uTemplateName, uSupplier):
                                      ProductSupplier))
         product_supplier.save()
 
-    product_supplier, = ProductSupplier.find([('product.name', '=', uTemplateName),
-                                              ('party.id', '=', supplier.id)])
+    assert ProductSupplier.find([('product.name', '=', uTemplateName),
+                                     ('party.id', '=', supplier.id)])
 
 
 def product_supplier():

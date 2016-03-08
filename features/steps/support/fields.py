@@ -9,7 +9,7 @@ import time
 from decimal import Decimal
 import proteus
 
-def sGetFeatureData(context, sKey):
+def sGetFeatureData(context, sKey, sDefault=''):
     if sKey in context.dData['feature']:
         return context.dData['feature'][sKey]
 
@@ -19,6 +19,7 @@ def sGetFeatureData(context, sKey):
     g = context.oEnvironmentCfg.get(*lKeys)
     if g: return g
 
+    if sDefault: return sDefault
     raise UserError("ERROR: Use 'Set the feature data with values' to set the value of "+sKey)
 
 def vSetFeatureData(context, sKey, sValue):

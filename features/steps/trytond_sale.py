@@ -24,7 +24,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCustomer, uTerm, uMeth
     """
     Given \
     Sale on date "TODAY" with description "Description"
-    with their reference "uRef" 
+    with their reference "uRef"
     as user named "Sale" products to customer "Customer"
     with PaymentTerm "Direct" and InvoiceMethod "order"
     If the quantity is the word comment, the line type is set to comment.
@@ -145,7 +145,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
     else:
         raise ValueError("uAct must be one of: quote confirm process: " + uAct)
     sale.reload()
-    
+
     user, = User.find([('login', '=', 'admin')])
     proteus.config.user = user.id
 
@@ -370,7 +370,7 @@ def step_impl(context, uDate, uDescription, uCustomer):
     if not shipment.reference and sale.reference:
         shipment.reference = sale.reference
     #? nowhere on shipment for uDescription?
-    
+
     #? purchase has this do I need it for sale?
     Move = proteus.Model.get('stock.move')
     for move in sale.moves:

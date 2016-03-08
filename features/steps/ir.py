@@ -7,10 +7,11 @@ Test the core trytond/ir/ functionalities.
 
 
 """
-from behave import *
+import random, os, sys
+
 import proteus
 
-import random, os, sys
+from behave import *
 
 from .support import stepfuns
 from .support.tools import *
@@ -56,11 +57,14 @@ def step_impl(context, uName, uClass):
     uField = 'name'
     oResource = Class.find([(uField, '=', uName)])[0]
     assert context.table
+    bNeedSave = False
     for row in context.table:
         uFile = row['filename']
-        assert os.path.exists(uFile), "Does not exist: " +uFile
         o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
-        assert o
+        if o: bNeedSave = True
+    if bNeedSave and hasattr(oResource, 'save'):
+        #?
+        oResource.save()
 
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" a link to an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):
@@ -75,9 +79,7 @@ def step_impl(context, uField, uValue, uClass):
     assert context.table
     for row in context.table:
         uFile = row['filename']
-        assert os.path.exists(uFile), "Does not exist: " +uFile
-        o = stepfuns.oAttachLinkToFileToResource(oResource, uFile)
-        assert o
+        stepfuns.oAttachLinkToFileToResource(oResource, uFile)
 
 @step('Attach to an instance with field "{uField}" "{uValue}" of class "{uClass}" the content of an existing file with the following |filename| fields')
 def step_impl(context, uField, uValue, uClass):

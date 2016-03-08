@@ -309,13 +309,13 @@ def step_impl(context, uTermName, uNum):
         payment_term.save()
 
     assert PaymentTerm.find([('name', '=', uTermName)])
+
 # 10% Sales Tax
 @step('Create a tax named "{uTaxName}" with fields')
 def step_impl(context, uTaxName):
     """
     Given \
-        Create a tax:
-	and Create a tax named "10% Sales Tax" with fields
+        Create a tax named "10% Sales Tax" with fields
 	    | name                  | value            |
 	    | description           | 10% Sales Tax    |
 	    | type 	                | percentage       |
@@ -365,5 +365,5 @@ def step_impl(context, uTaxName):
                     string_to_python(row['name'], row['value'], Tax))
 
         tax.save()
-    oTax, = Tax.find([('name', '=', uTaxName)])
-    
+    assert Tax.find([('name', '=', uTaxName)])
+

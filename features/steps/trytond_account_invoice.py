@@ -95,9 +95,10 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
 
     oParty, = Party.find([('name', '=', uParty),])
     Invoice = proteus.Model.get('account.invoice')
-    if not Invoice.find([('party.id',  '=', oParty.id),
-                         ('company.id',  '=', company.id),
-                         ('description', '=', uDescription)]):
+    # creates unconditionally
+    if True or not Invoice.find([('party.id',  '=', oParty.id),
+                            ('company.id',  '=', company.id),
+                            ('description', '=', uDescription)]):
         invoice = Invoice()
         invoice.type = sType
         if uDate.lower() == 'today' or uDate.lower() == 'now':
@@ -120,9 +121,14 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
         if sType == 'in_invoice':
             sMainKind = 'payable'
             uKind = 'expense'
+            # use Costs of Goods Sold 5013
+            sCSogsName = sGetFeatureData(context, 'account.template,main_cogs')
         else:
             sMainKind = 'receivable'
             uKind = 'revenue'
+            # use Sales of Goods 4013
+            # sCSogsName = sGetFeatureData(context, 'account.template,main_sogs')
+            sCSogsName = 'Sales of Goods'
         oMain, = Account.find([
             ('kind', '=', sMainKind),
             ('name', '=', sGetFeatureData(context, 'account.template,main_'+sMainKind)),
@@ -131,7 +137,7 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
         invoice.account = oMain
         # journal?
         # period?
-        
+
         oLineDefault, = Account.find([
             ('kind', '=', uKind),
             ('name', '=', sGetFeatureData(context, 'account.template,main_'+uKind)),
@@ -139,13 +145,13 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
         ])
 
         InvoiceLine = proteus.Model.get('account.invoice.line')
-        TaxLine = proteus.Model.get('account.invoice.tax')
+        InvoiceTax = proteus.Model.get('account.invoice.tax')
         TaxCode = proteus.Model.get('account.tax.code')
         Product = proteus.Model.get('product.product')
         Currency = proteus.Model.get('currency.currency')
         for row in context.table:
             # FixMe: lines can have tax
-            oLine = InvoiceLine()
+            oLine = InvoiceLine(unit_digits=6)
             invoice.lines.append(oLine)
             if u'currency' in context.table.headings and row['currency']:
                 oCurrency, = Currency.find([('code', '=', row['currency'])])
@@ -168,49 +174,64 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
                 if row['account']:
                     # FixMe: domain for oLine.account is ['kind', '=', 'expense']
                     uNameOrCode = row['account']
+                    # if '0' <= uNameOrCode[0] <= '9'
                     try:
                         int(uNameOrCode)
                     except ValueError:
                         oLine.account, = Account.find([
-                            ('kind', '=', uKind),
                             ('name', '=', uNameOrCode),
                             ('company.id', '=', company.id)])
                     else:
                         oLine.account, = Account.find([
-                            ('kind', '=', uKind),
                             ('code', '=', uNameOrCode),
                             ('company.id', '=', company.id)])
+                    # uKind is very restrictive - must be one of
+                    # revenue/expense and cannot be stock
+                    # use Costs of Goods Sold 5013
+                    # to hold stock sales as an expense and then JV
+                    if oLine.account.kind in ['income', 'stock']:
+                        oLine.account, = Account.find([
+                            ('kind', '=', uKind),
+                            ('name', '=', sCSogsName),
+                            ('company.id', '=', company.id)])
+                        assert oLine.account.kind in ['revenue', 'expense']
+                        # FixMe: make the JV line for the feature
                 else:
                     oLine.account = oLineDefault
                 uUnitPrice = row['unit_price']
                 if uUnitPrice and uUnitPrice != u'0.00':
                     oLine.unit_price = Decimal(uUnitPrice)
-                #?
-                oLine.save()
-                
+                #? - no - leads to AttributeErrorbecause the invoice isnt saved
+                # : 'account.invoice' Model has no attribute 'state': None
+                # oLine.save()
+
             if u'tax_account' in context.table.headings and row['tax_account']:
                 # tax_amount|base_amount|tax_code_id|base_code_id|tax_account
-                oTaxLine = TaxLine()
-                invoice.taxes.append(oTaxLine)
-                oTaxLine.tax = Decimal(row['tax_amount'])
-                oTaxLine.base = Decimal(row['base_amount'])
-                oTaxLine.account, = Account.find([
+                oInvoiceTax = InvoiceTax()
+                invoice.taxes.append(oInvoiceTax)
+                if uQuantity:
+                    oInvoiceTax.description = 'VAT'
+                else:
+                    oInvoiceTax.description = row['description']
+                oInvoiceTax.amount = Decimal(row['tax_amount'])
+                # code account.tax.code
+                oInvoiceTax.base = Decimal(row['base_amount'])
+                oInvoiceTax.account, = Account.find([
                         ('kind', '!=', 'view'),
                         ('code', '=', row['tax_account']),
                         ('company.id', '=', company.id)])
-                oTaxLine.base_sign = 1 #?
-                oTaxLine.base_code, = TaxCode.find([
+                oInvoiceTax.base_sign = Decimal(1) #?
+                oInvoiceTax.base_code, = TaxCode.find([
                         ('code', '=', row['base_code_id']),
                         ('company.id', '=', company.id)])
-                oTaxLine.tax_sign = 1 #?
-                oTaxLine.tax_code, = TaxCode.find([
+                oInvoiceTax.tax_sign = Decimal(1) #?
+                oInvoiceTax.tax_code, = TaxCode.find([
                         ('code', '=', row['tax_code_id']),
                         ('company.id', '=', company.id)])
-                #?
-                oTaxLine.save()
+                #? oInvoiceTax.save()
         invoice.save()
-        
-    invoice, = Invoice.find([('party.id',  '=', oParty.id),
+
+    assert Invoice.find([('party.id',  '=', oParty.id),
                              ('company.id',  '=', company.id),
                              ('description', '=', uDescription)])
 
@@ -222,6 +243,9 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     as user named "Account" products from party "Supplier"
 
     """
+    oActOnInvoice(context, uAct, uDate, uDescription, uUser, uSupplier, 'description')
+
+def oActOnInvoice(context, uAct, uDate, uDescription, uUser, uSupplier, sUniq='description'):
     config = context.oProteusConfig
 
     Party = proteus.Model.get('party.party')
@@ -234,19 +258,20 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
 
     Invoice = proteus.Model.get('account.invoice')
     # FixMe: Tryton doesnt pass the Purchase description
-    # to the invoive that it generates
+    # to the invoice that it generates
     supplier, = Party.find([('name', '=', uSupplier),])
     invoice, = Invoice.find([('party.id',  '=', supplier.id),
                              ('company.id',  '=', company.id),
-                             ('description', '=', uDescription)])
+                             (sUniq, '=', uDescription)])
 
     account_user, = User.find([('name', '=', uUser)])
     proteus.config.user = account_user.id
     oDate = oDateFromUDate(uDate)
     invoice.invoice_date = oDate
     invoice.accounting_date = invoice.invoice_date
+    #? reference
     invoice.save()
-    
+
     if uAct == u'post':
         invoice.click('post')
     elif uAct == u'validate_invoice':

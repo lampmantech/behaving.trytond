@@ -4,13 +4,13 @@
 stepfuns has some convenience funtions used within steps.
 
 """
-import proteus
-
-import time
+import sys, os, time
 import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 import hashlib
+
+import proteus
 
 from .fields import string_to_python, sGetFeatureData, vSetFeatureData
 
@@ -94,6 +94,14 @@ def gGetFeaturesStockAccs(context, company):
         stock_production, stock_supplier,
 
 def oAttachLinkToFileToResource(oResource, uFile):
+    """returns None if the file does not exist."""
+    if uFile.startswith('file:///'):
+        uFile = uFile[7:]
+    elif uFile.startswith('file://'):
+        uFile = uFile[6:]
+    if not os.path.exists(uFile):
+        sys.stderr.write("WARN: File does not exist " +": " +uFile +'\n')
+        return None
     sLink = 'file://' + uFile
     sDescription = uFile
     # ToDo cannonicalize the filename
@@ -107,7 +115,7 @@ def oAttachLinkToFileToResource(oResource, uFile):
     except Exception, e:
         sys.__stderr__.write(">>> ERROR: creating link, %s,\n%s\n%s\n" % (
             str(e), uFile, sName,))
-
+        return None
 
 def oAttachFeatureFileContentToResource(oResource, context):
     uFile = context.scenario.filename

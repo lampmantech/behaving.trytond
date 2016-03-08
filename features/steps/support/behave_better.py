@@ -90,7 +90,7 @@ def _patched_load_step_definitions(self, extra_step_paths=None):
 
     for path in [steps_dir] + list(extra_step_paths):
         for name in os.listdir(path):
-            if name.endswith('.py'):
+            if name.endswith('.py') and not name.startswith('.'):
                 exec_file(os.path.join(path, name), step_globals)
 
     # clean up the path

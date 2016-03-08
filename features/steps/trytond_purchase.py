@@ -107,7 +107,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm,
                           ('party.id', '=', supplier.id)]):
         purchase = Purchase()
         purchase.party = supplier
-        
+
         PaymentTerm = proteus.Model.get('account.invoice.payment_term')
         payment_term, = PaymentTerm.find([('name', '=', uTerm)])
         purchase.payment_term = payment_term
@@ -196,7 +196,7 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     else:
         raise ValueError("uAct must be one of quote or confirm or process: " + uAct)
     purchase.reload()
-    
+
     if uUser != u'Administrator':
         user, = User.find([('login', '=', 'admin')])
         proteus.config.user = user.id

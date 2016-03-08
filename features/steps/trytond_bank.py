@@ -103,7 +103,7 @@ def step_impl(context, uIban, uParty):
         if lOwners:
             oBankAccount.owners.append(oOwner)
         oBankAccount.save()
-        
+
 # IBAN is NOT international: Canada and the US dont use them
 @step('Create a bank account with number "{uNum}" at a bank associated to a party "{uParty}" with optional owner or currency following |name|value|')
 def step_impl(context, uNum, uParty):
@@ -154,7 +154,7 @@ def step_impl(context, uNum, uParty):
                 lOwners.append({'name': oOwner.name})
             elif row['name'] == u'number':
                 pass
-            
+
         assert lNumbers
         dBankAccount['numbers'] = [('create', lNumbers)]
         iBankAccount, = BankAccount.create([dBankAccount], config.context)
@@ -215,7 +215,7 @@ def step_impl(context, uName, uStatementAJName, uCur):
     AccountJournal = proteus.Model.get('account.journal')
     oAccountJournal, =  AccountJournal.find([('name', '=', uStatementAJName),
                                              ('type', '=', 'cash')])
-    
+
     oAccountJournal.credit_account.bank_reconcile = True
     oAccountJournal.credit_account.save()
     oAccountJournal.credit_account.reload()
@@ -229,7 +229,7 @@ def step_impl(context, uName, uStatementAJName, uCur):
     ##        oAccountJournal.credit_account.bank_reconcile and \
     ##        oAccountJournal.debit_account and \
     ##        oAccountJournal.debit_account.bank_reconcile
-    
+
     StatementJournal = proteus.Model.get('account.bank.statement.journal')
     uStatementJournalName=uName
     if not StatementJournal.find([('name', '=', uStatementJournalName)]):

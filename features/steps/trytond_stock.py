@@ -57,7 +57,7 @@ def step_impl(context, uName):
     Location = proteus.Model.get('stock.location')
     if not Location.find([('name', '=', uName)]):
         uCode = uName.split()[0]
-        
+
         output_loc = Location()
         output_loc.name = uName + ' Output'
         output_loc.type = 'storage'
@@ -86,7 +86,7 @@ def step_impl(context, uName):
         warehouse_loc.save()
 
     warehouse_loc, = Location.find([('name', '=', uName)])
-    
+
 # 'Provisioning Location', 'storage', 'WH'
 @step('Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"')
 def step_impl(context, uName, uType, uParent):
@@ -197,7 +197,7 @@ def step_impl(context, uProductDescription):
     Product = proteus.Model.get('product.product')
     product, = Product.find([('description', '=', uProductDescription)])
     vStockMoveOfProductOrTemplate(context, product)
-    
+
 @step('Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
 @step('Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields')
 def step_impl(context, uProductTemplate):
@@ -312,7 +312,7 @@ def step_impl(context, uProductDescription):
     Product = proteus.Model.get('product.product')
     product, = Product.find([('description', '=', uProductDescription)])
     vStockInternalShipmentOfProductOrTemplate(context, product)
-    
+
 def vStockInternalShipmentOfProductOrTemplate(context, product):
     config = context.oProteusConfig
     StockInternalShipment = proteus.Model.get('stock.shipment.internal')
@@ -382,13 +382,13 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, u
       | product | 3.0      |             | 10.00 |
     """
     oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod)
-    
+
 @step('Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields')
 def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod):
     """
     Given \
     Purchase on date "TODAY" stock with description "Description"
-    as user named "Purchase" in Currency coded "uCur"  
+    as user named "Purchase" in Currency coded "uCur"
     Products from supplier "Supplier" to warehouse "WH"
     with PaymentTerm "Direct" and InvoiceMethod "order"
     If the quantity is the word comment, the line type is set to comment.
@@ -399,7 +399,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, u
       | product | 3.0      |             |
     """
     oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod)
-    
+
 def oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uWh, uTerm, uMethod):
     # should we make quantity == 'comment'
     config = context.oProteusConfig
@@ -433,16 +433,16 @@ def oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier
             purchase.invoice_method = uMethod
             purchase.description = uDescription
             purchase.supplier_reference = uRef
-            
+
             Location = proteus.Model.get('stock.location')
             oWh, = Location.find([('name', '=', uWh),
                                   ('type', '=', 'warehouse')])
             purchase.warehouse = oWh
-            
+
             Currency = proteus.Model.get('currency.currency')
             oCurrency, = Currency.find([('code', '=', uCur)])
             purchase.currency = oCurrency
-            
+
             if uDate.lower() == 'today' or uDate.lower() == 'now':
                 oDate = TODAY
             else:
@@ -473,7 +473,7 @@ def oPurchaseProducts(context, uDate, uDescription, uRef, uUser, uCur, uSupplier
                         purchase_line.unit_price = Decimal(row['unit_price'])
                 if row['line_description']:
                     purchase_line.description = row['line_description']
-                
+
             purchase.save()
         finally:
             if uUser != 'Administrator':

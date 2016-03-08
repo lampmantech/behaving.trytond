@@ -1,3 +1,8 @@
+commit d72b7d41df1cccb7606eee66b4a3dc4b94a21c99
+Date:   Sat Mar 5 00:00:06 2016 +0200
+
+    Fixed documentation
+
 commit 478a7b0591e0d0ced68a1b7c5b050fe7d1ca265d
 Date:   Fri Mar 4 23:29:55 2016 +0200
 

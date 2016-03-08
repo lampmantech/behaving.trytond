@@ -11,7 +11,7 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
 
     We restore the 3.2 behaviour of creating the database if it does not exist.
 
-    
+
     """
 
     def __init__(self, database_uri=None, user='admin', language='en_US',
@@ -25,17 +25,17 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
             config_file = os.environ.get('TRYTOND_CONFIG')
         assert config_file and os.path.isfile(config_file), \
             "Set the environment variable TRYTOND_CONFIG to the path of TRYTOND CONFIG"
-        
+
         if not database_uri:
             database_uri = os.environ.get('TRYTOND_DATABASE_URI')
         else:
             os.environ['TRYTOND_DATABASE_URI'] = database_uri
         assert os.path.isfile(config_file), \
             "set os.environ.get('TRYTOND_CONFIG') to be the Tryton config file"
-            
+
         from trytond.config import config
         config.update_etc(config_file)
-        
+
         from trytond.pool import Pool
         from trytond import backend
         from trytond.protocols.dispatcher import create
@@ -60,7 +60,7 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
             self.pool = Pool(database_name)
             self.pool.init()
         else:
-            # 3.2 code created the database if it did not exist            
+            # 3.2 code created the database if it did not exist
             with Transaction().start(None, 0) as transaction:
                 cursor = transaction.cursor
                 databases = backend.get('Database').list(cursor)
@@ -84,8 +84,8 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
                     #! using crypt to generate it from from the command line
                     #! We default it to admin which may also be the
                     #! of the user 'admin': admin_password
-                    super_pwd = 'admin' 
-                    
+                    super_pwd = 'admin'
+
                 assert admin_password, "ERROR: No admin_password to create db " + database_name
                 sys.stderr.write(
                     "create %s %s %s %s\n" % (database_name, super_pwd, language, admin_password,))
@@ -95,7 +95,7 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
             self.pool = Pool(database_name)
             if database_name not in database_list:
                 self.pool.init()
-            
+
         with Transaction().start(self.database_name, 0) as transaction:
             Cache.clean(database_name)
             User = self.pool.get('res.user')
@@ -140,7 +140,7 @@ def set_trytond(database_name=None,
         postgres_user, postgres_password, postgres_host, postgres_port, database_name,
     )
     del postgres_password, postgres_user
-    
+
     # morons - trytond-3.4.4-py2.7.egg/trytond/backend/postgresql/database.py
     OrigConfigModule._CONFIG.current = TrytondConfig(database_uri, user,
                                                      admin_password=admin_password,
