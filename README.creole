@@ -13,17 +13,13 @@ of the end-user. At the same time, duplication of code is eliminated.
 
 Tests are contained is textual feature files written in a
 domain specific natural language with a Gherkin syntax, in the files:
-{{{
-   features/*.feature
-}}}
+{{{features/*.feature}}}
+
 The steps of the language draw on the definitions in:
-{{{
-   features/steps/*.py
-}}}
+{{{features/steps/*.py}}}
+
 For modularity, there is a local python module of undecorated python code:
-{{{
-  features/steps/support/
-}}}
+{{{features/steps/support/}}}
 
 trytond_scenari is inspired by OpenERPScenario:
 https:///github.com/camptocamp/oerpscenario/
@@ -34,7 +30,7 @@ trytond_scenari uses proteus.
 
 Active development is on Tryton 3.6.  To see what this version is,
 look at the first date in the file CHANGELOG.txt.  This should work
-with Tryton 3.8 with no problems.
+with Tryton 3.8 with no problems, or only minor alterations.
 
 === Documentation ===
 

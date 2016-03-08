@@ -14,7 +14,7 @@ def sGetFeatureData(context, sKey, sDefault=''):
         return context.dData['feature'][sKey]
 
     # fall through to oEnvironmentCfg
-    lKeys=sKey.split(',', 1)
+    lKeys = sKey.split(',', 1)
     assert len(lKeys) == 2
     g = context.oEnvironmentCfg.get(*lKeys)
     if g: return g

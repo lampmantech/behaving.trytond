@@ -1,3 +1,8 @@
+commit 84f5171a96b61b780b7947153a4fa251d8b1760f
+Date:   Tue Mar 8 17:08:18 2016 +0200
+
+    Added scenario_move_template
+
 commit d72b7d41df1cccb7606eee66b4a3dc4b94a21c99
 Date:   Sat Mar 5 00:00:06 2016 +0200
 

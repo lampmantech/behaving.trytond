@@ -1,6 +1,4 @@
-# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
-
-From: [[features/steps/scenario_stock_internal_supply.py|features/steps/scenario_stock_internal_supply.py]]
+From: https://github.com/lampmantech/trytond_scenari/raw/master/features/steps/scenario_stock_internal_supply.py
 
 
    Stock Shipment Out Scenario

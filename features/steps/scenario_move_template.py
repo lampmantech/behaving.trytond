@@ -185,22 +185,15 @@ def step_impl(context, uName, uDate):
 
     data = {}
     keywords = data['keywords'] = {}
-    if False:
-        supplier, = Party.find([('name', '=', 'Supplier'),])
-        keywords['party'] = supplier.id
-        uLineDescription = uName +' ' +uDate
-        keywords['description'] = uLineDescription
-        keywords['amount'] = Decimal('12.24')
-    else:
-        for row in context.table:
-            uKey = row['name']
-            if uKey == 'description':
-                keywords[uKey] = row['value']
-            elif uKey == 'party':
-                oParty, = Party.find([('name', '=', row['value']),])
-                keywords[uKey] = oParty.id
-            elif uKey == 'amount':
-                keywords[uKey] = Decimal(row['value'])
+    for row in context.table:
+        uKey = row['name']
+        if uKey == 'description':
+            keywords[uKey] = row['value']
+        elif uKey == 'party':
+            oParty, = Party.find([('name', '=', row['value']),])
+            keywords[uKey] = oParty.id
+        elif uKey == 'amount':
+            keywords[uKey] = Decimal(row['value'])
 
     # derive keywords['period'] from uDate for move
     if uDate == 'TODAY':
@@ -208,7 +201,9 @@ def step_impl(context, uName, uDate):
     else:
         # FixMe: derive assumes yyyy-mm-dd
         oDate = datetime.date(*uDate.split('-'))
-    period_ids = Period.find(company.id, date=oDate)
+
+    period_ids = Period.find([('code', '=', '%d-%d' % (oDate.year, oDate.month)),
+                              ('company', '=', company.id)])
     if len(period_ids) == 1:
         keywords['period'] = period_ids[0]
 

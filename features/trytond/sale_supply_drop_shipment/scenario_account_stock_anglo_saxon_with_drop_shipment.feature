@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-@works32
+@works32 @works34 @works36
 Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests
     adapted from scenario_account_stock_anglo_saxon_with_drop_shipment.rst
     in trytond_account_stock_anglo_saxon-3.2.1/tests/

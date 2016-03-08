@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
     
-@works32
+@works32 @works34 @works36
 Feature:    showing off trytond dsl from OpenERPScenario
 This is the monkey-patched syntax of behave The change is to change
 a trailing line backslash and space both sides of it into a space.

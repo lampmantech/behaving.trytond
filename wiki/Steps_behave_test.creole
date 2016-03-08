@@ -1,6 +1,4 @@
-# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
-
-From: [[features/steps/behave_test.py|features/steps/behave_test.py]]
+From: https://github.com/lampmantech/trytond_scenari/raw/master/features/steps/behave_test.py
 
 
    This is the elementary behave test from its tutorial;

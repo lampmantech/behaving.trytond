@@ -1,6 +1,4 @@
-# -*- mode: text; fill-column: 75; coding: utf-8-unix; encoding: utf-8 -*-
-
-From: [[features/steps/dsl.py|features/steps/dsl.py]]
+From: https://github.com/lampmantech/trytond_scenari/raw/master/features/steps/dsl.py
 
 
    This is the advanced syntax for behave testing.

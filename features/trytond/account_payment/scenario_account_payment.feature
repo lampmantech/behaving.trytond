@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-@works32
+@works32 @works34 @works36
 Feature:    Run the Trytond scenario_payment doctests
     adapted from the file scenario_account_payment.rst
     in trytond_account_payment-3.2.1/tests/

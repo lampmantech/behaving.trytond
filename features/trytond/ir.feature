@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-@works32
+@works32 @works34 @works36
 Feature:    /n/data/TrytonOpenERP/src/Tryton-3.2/trytond-3.2.4/trytond/ir/
 
   Scenario: attachment.py
