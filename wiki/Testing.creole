@@ -1,0 +1,39 @@
+
+=== Testing ===
+
+To see what this version is,
+look at the first date in the file CHANGELOG.txt.
+
+As a rule, all tests within a directory should not interfere with each
+other, it is expected that there is interference between directories.
+So you cannot call behave from the root of the distribution.
+You can call behave with {{{behave/*.feature}}} or
+{{{behave/subdir/*.feature}}} for each subdirectory.
+
+==== Tags ====
+
+This should work
+with Tryton 3.4 with no problems: look at each feature for the tags
+{{{works32}}} {{{works34}}} {{{works36}}}, and {{{broken36}}}.
+The latter means it was working, but has now broken in Tryton 3.6.
+Usually these are minor problems, but we just haven't had the time to fix it.
+To run only the features that are working in 3.6, use the
+{{{
+--tags="@works36"
+}}}
+argument to behave.
+
+Finally the {{{@wip}}} tag means a Work in Progress, which may or may not
+be working, or may not even be finished. To run only these features, use the
+{{{
+--wip
+}}}
+argument to behave. For details on behave's command line arguments,
+see the [[Features-behave_test]] page in the wiki, or
+the {{{behave_test.feature}}} file in {{{features/}}}.
+
+The feature files, and the summaries of the available steps, are in the Wiki;
+see the [[TitleIndex]] for the pages that start with Feature or Steps.
+
+----
+Parent: [[Home]]
