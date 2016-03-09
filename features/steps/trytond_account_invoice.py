@@ -151,8 +151,9 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
         Currency = proteus.Model.get('currency.currency')
         for row in context.table:
             # FixMe: lines can have tax
-            oLine = InvoiceLine(unit_digits=6)
-            invoice.lines.append(oLine)
+            # FixMe: unit_digits=4
+            oLine = invoice.lines.new()
+            #! assert oLine.unit_digits == 4
             if u'currency' in context.table.headings and row['currency']:
                 oCurrency, = Currency.find([('code', '=', row['currency'])])
                 oLine.currency = oCurrency

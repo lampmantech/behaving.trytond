@@ -38,15 +38,12 @@ run.  This also means that the order of execution of feature files may
 be important, if one step builds on a previous one, or interferes with
 it.
 
-As a rule, all tests within a directory should not interfere with each
-other, but dont be surprised if there in interference between directories.
-
 If you set tracer in the scenari section of the
 configuration file to be pdb, it will drop you into
 the pdb debugger on an error, if you invoked behave 
 with the --stop flag (stop at the first error).
 You must also use the behave option {{{--no-capture --no-capture-stderr}}}.
 
-Behave is monkey-patched by environment.py to allow backslashes \
+Behave is monkey-patched by {{{environment.py}}} to allow backslashes \
 at the end of a line in feature files, to allow long verbose steps.
 Whitespace both sides of the backslash are collapsed to one space.

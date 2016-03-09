@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 
-@works32 @works34 @works36
+@works32 @works34 @broken36
 Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests
     adapted from the file scenario_account_stock_anglo_saxon.rst
     in trytond_account_stock_anglo_saxon-2.8.0/tests/
@@ -29,6 +29,7 @@ Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests
       Given Create the company with default COMPANY_NAME and Currency code "EUR"
         And Reload the default User preferences into the context
         And Create this fiscal year with Invoicing
+        And Set the fiscal years to use anglo-saxon accounting
         And Create a chart of accounts from template "Minimal Account Chart" \
 	    with root "Minimal Account Chart"
         And Create a saved instance of "party.party" named "Supplier"

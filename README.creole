@@ -15,10 +15,10 @@ Tests are contained is textual feature files written in a
 domain specific natural language with a Gherkin syntax, in the files:
 {{{features/*.feature}}}
 
-The steps of the language draw on the definitions in:
+The steps of the language draw on the Python definitions in:
 {{{features/steps/*.py}}}
 
-For modularity, there is a local python module of undecorated python code:
+For modularity, there is a local python module of undecorated Python code:
 {{{features/steps/support/}}}
 
 trytond_scenari is inspired by OpenERPScenario:
@@ -28,14 +28,14 @@ which uses behave: http://pythonhosted.org/behave
 for BDD testing of OpenERP (v6.x and 7.0).
 trytond_scenari uses proteus.
 
-Active development is on Tryton 3.6.  To see what this version is,
-look at the first date in the file CHANGELOG.txt.  This should work
-with Tryton 3.8 with no problems, or only minor alterations.
+Active development is on Tryton 3.6; see
+* Testing (https://github.com/lampmantech/trytond_scenari/wiki/Testing)
 
 === Documentation ===
 
 * Home (https://github.com/lampmantech/trytond_scenari/wiki/Home)
 
+The feature files, and the summaries of the available steps, are in the Wiki:
 * TitleIndex (https://github.com/lampmantech/trytond_scenari/wiki/TitleIndex)
 
 === Project ===

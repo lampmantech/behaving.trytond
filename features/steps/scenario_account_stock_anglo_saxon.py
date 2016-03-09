@@ -34,6 +34,29 @@ TODAY = datetime.date.today()
 # cost_price_method - one of
 dCacheCostPriceMethod={}
 
+@step('Set the fiscal years to use anglo-saxon accounting')
+def step_impl(context, uYear):
+    """
+    Given \
+    Set the fiscal years to use anglo-saxon accounting.
+    Create the company and fiscal years first, but do it before
+    you create the chart of accounts (I think).
+    """
+    config = context.oProteusConfig
+
+    FiscalYear = proteus.Model.get('account.fiscalyear')
+    Party = proteus.Model.get('party.party')
+
+    sCompanyName = sGetFeatureData(context, 'party,company_name')
+    party, = Party.find([('name', '=', sCompanyName)])
+    Company = proteus.Model.get('company.company')
+    company, = Company.find([('party.id', '=', party.id)])
+
+    for oElt in FiscalYear.find([('company', '=', company.id),]):
+        if hasattr(oElt, 'account_stock_method'):
+            oElt.account_stock_method = 'anglo_saxon'
+
+
 # goods, product
 @step('T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields')
 # FixMe: actually creates 2 different Product and ProductTemplates

@@ -177,7 +177,10 @@ def step_impl(context):
     purchase_request, = PurchaseRequest.find()
     create_purchase = proteus.Wizard('purchase.request.create_purchase',
             [purchase_request])
-    create_purchase.form.payment_term = payment_term
+    if hasattr(create_purchase.form, 'payment_term'):
+        # gone in 3.6?
+        create_purchase.form.payment_term = payment_term
+    
     create_purchase.execute('start')
 
     purchase, = Purchase.find()

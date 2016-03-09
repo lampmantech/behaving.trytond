@@ -27,6 +27,7 @@ def vSetFeatureData(context, sKey, sValue):
 
 def string_to_python (sField, uValue, Party=None):
     #? should replace this with DSL
+    
 
     if Party is None:
         sType = ''

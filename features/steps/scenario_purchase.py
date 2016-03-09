@@ -1,9 +1,8 @@
 # -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 
 """
-=================
 Purchase Scenario
-=================
+
 
 Unfinished
 """
@@ -35,7 +34,8 @@ def step_impl(context, uDescription, uSupplier):
                                ('company.id',  '=', company.id),
                                ('description', '=', uDescription)])
 
-    assert len(purchase.moves) == 2
+    assert len(purchase.moves) == 2, \
+      "Expected 2 purchase.moves: " +repr(purchase.moves)
     assert len(purchase.shipment_returns) == 0
     assert len(purchase.invoices) == 1
     invoice, = purchase.invoices

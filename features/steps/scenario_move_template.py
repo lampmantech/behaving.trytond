@@ -36,6 +36,7 @@ def step_impl(context, uName, uJCode):
     template = MoveTemplate()
     # date company description
     template.name = uName
+    template.company = company
     template.journal, = Journal.find([('code', '=', uJCode),])
     template.save()
 
@@ -49,19 +50,11 @@ def step_impl(context, uName, uTDescription):
     template, = MoveTemplate.find([('name', '=', uName)])
     uTDescription = '{party} - {description}'
     template.description = uTDescription
-    if False:
-        _ = template.keywords.new(name='party', string='Party',
-                type_='party')
-        _ = template.keywords.new(name='description', string='Description',
-                type_='char')
-        _ = template.keywords.new(name='amount', string='Amount',
-                type_='numeric', digits=2)
-    else:
-        for row in context.table:
-            dElts = dict(name=row['name'], string=row['string'], type_=row['type'])
-            if dElts['type_'] == 'numeric' and row['digits']:
-                dElts['digits'] = int(row['digits'])
-            _ = template.keywords.new(**dElts)
+    for row in context.table:
+        dElts = dict(name=row['name'], string=row['string'], type_=row['type'])
+        if dElts['type_'] == 'numeric' and row['digits']:
+            dElts['digits'] = int(row['digits'])
+        _ = template.keywords.new(**dElts)
     template.save()
 
 @step('Add lines to a MoveTemplate named "{uName}" with Tax "{uTaxName}" and |amount|account|tax|party|operation| following')
@@ -108,51 +101,25 @@ def step_impl(context, uName, uTaxName):
     assert tax.type == 'percentage'
     oTaxRate = tax.rate
 
-    if True:
-        for row in context.table:
-            line = template.lines.new()
-            line.operation = row['operation']
-            if row['account'] == 'payable':
-                line.account = payable
-            elif row['account'] == 'expense':
-                line.account = expense
-            elif row['account'] == 'invoice_account':
-                line.account = tax.invoice_account
-            line.party = row['party']
-            line.amount = row['amount']
-            if row['tax']:
-                ttax = line.taxes.new()
-                ttax.amount = line.amount
-                if row['tax'] == 'base':
-                    ttax.code = tax.invoice_base_code
-                elif row['tax'] == 'tax':
-                    ttax.code = tax.invoice_tax_code
-                ttax.tax = tax
-    else:
+    for row in context.table:
         line = template.lines.new()
-        line.operation = 'credit'
-        line.account = payable
-        line.party = 'party'
-        line.amount = 'amount'
-
-        line = template.lines.new()
-        line.operation = 'debit'
-        line.account = expense
-        line.amount = 'amount / 1.1'
-        ttax = line.taxes.new()
-        ttax.amount = line.amount
-        ttax.code = tax.invoice_base_code
-        ttax.tax = tax
-
-        line = template.lines.new()
-        line.operation = 'debit'
-        line.account = tax.invoice_account
-        line.amount = 'amount * (1 - 1/1.1)'
-        ttax = line.taxes.new()
-        ttax.amount = line.amount
-        ttax.code = tax.invoice_tax_code
-        ttax.tax = tax
-
+        line.operation = row['operation']
+        if row['account'] == 'payable':
+            line.account = payable
+        elif row['account'] == 'expense':
+            line.account = expense
+        elif row['account'] == 'invoice_account':
+            line.account = tax.invoice_account
+        line.party = row['party']
+        line.amount = row['amount']
+        if row['tax']:
+            ttax = line.taxes.new()
+            ttax.amount = line.amount
+            if row['tax'] == 'base':
+                ttax.code = tax.invoice_base_code
+            elif row['tax'] == 'tax':
+                ttax.code = tax.invoice_tax_code
+            ttax.tax = tax
     template.save()
 
 @step('Create a move from a MoveTemplate named "{uName}" on date "{uDate}" with |name|value| keywords following')

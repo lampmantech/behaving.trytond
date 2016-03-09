@@ -56,7 +56,7 @@ def _patched_feature_files(self):
             for dirpath, dirnames, filenames in os.walk(path):
                 dirnames.sort()
                 for filename in sorted(filenames):
-                    if filename.endswith('.feature'):
+                    if filename.endswith('.feature') and not filename.startswith('.'):
                         files.append(os.path.join(dirpath, filename))
         elif path.startswith('@'):
             files.extend([filename.strip() for filename in open(path)])

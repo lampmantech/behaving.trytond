@@ -1,3 +1,13 @@
+commit f3b0b472e8e27c0aef8161c5ddbe77a9fc6fe94d
+Date:   Wed Mar 9 16:31:36 2016 +0200
+
+    Added @works36 and @broken36 tags to the features
+
+commit 1b0a1a3956da8a582a2ddd0480b8a084fe096489
+Date:   Tue Mar 8 21:14:52 2016 +0200
+
+    Added features/trytond/move_template/
+
 commit 84f5171a96b61b780b7947153a4fa251d8b1760f
 Date:   Tue Mar 8 17:08:18 2016 +0200
 
