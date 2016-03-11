@@ -42,7 +42,7 @@ def step_impl(context):
 #def step_impl(context):
 
     Move = proteus.Model.get('account.move')
-    Journal = proteus.proteus.Model.get('account.journal')
+    Journal = proteus.Model.get('account.journal')
     expense, = Journal.find([('code', '=', 'EXP')])
 
     move = Move()

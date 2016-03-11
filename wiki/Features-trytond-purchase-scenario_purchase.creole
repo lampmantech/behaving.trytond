@@ -2,11 +2,14 @@ From: https://github.com/lampmantech/trytond_scenari/raw/master/features/trytond
 
 
 
+
+
 Tags: works32 @works34 @broken36
 == Feature:    Run the Trytond scenario_purchase doctests ==
     adapted from 
     in 
     Works, but still UNFINISHED.
+    See this note in trytond_product-3.6.0/product.py:
     
 === Scenario: Setup the tests of the purchase module ===
 

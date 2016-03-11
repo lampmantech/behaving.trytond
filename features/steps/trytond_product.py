@@ -35,6 +35,7 @@ def step_impl(context, uName):
     ''' % (uName,))
 
 # product , Category
+# FixMe: pass in STO
 @step('Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields')
 def step_impl(context, uName, uCatName):
     """
@@ -68,6 +69,7 @@ def step_impl(context, uName, uCatName):
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
+    # not company
     if not ProductTemplate.find([('name', '=', uName),
                                  ('category.name', '=', uCatName),
                              ]):
@@ -133,6 +135,7 @@ def step_impl(context, uName, uCatName):
         # this requires anglo_saxon
         template.account_cogs = cogs
 
+        # not company
         category, = ProductCategory.find([('name', '=', uCatName)])
         template.category = category
 
@@ -151,6 +154,7 @@ def step_impl(context, uName, uCatName):
 
         template.save()
 
+    # not company
     assert ProductTemplate.find([('name', '=', uName),
                                  ('category.name', '=', uCatName),
                              ])
@@ -203,6 +207,7 @@ def step_impl(context, uTemplateName, uTaxName):
     Company = proteus.Model.get('company.company')
     company, = Company.find([('party.id', '=', party.id)])
 
+    # not company
     if not ProductTemplate.find([('name', '=', uTemplateName)]):
         template = ProductTemplate()
         template.name = uTemplateName
@@ -243,7 +248,7 @@ def step_impl(context, uTemplateName, uTaxName):
             template.supplier_taxes.append(tax)
 
         template.save()
-    oPt, = ProductTemplate.find([('name', '=', uTemplateName)])
+    assert ProductTemplate.find([('name', '=', uTemplateName)])
 
 # Services Bought, Service Product
 @step('Create a product with description "{uDescription}" from template "{uTemplateName}"')
@@ -257,10 +262,14 @@ def step_impl(context, uDescription, uTemplateName):
     template, = ProductTemplate.find([('name', '=', uTemplateName)])
 
     Product = proteus.Model.get('product.product')
+    # not company
     if not Product.find([('template.name', '=', uTemplateName),
                          ('description', '=', uDescription)]):
         product = Product()
         product.template = template
         product.description = uDescription
         product.save()
-    assert Product.find([('description', '=', uDescription)])
+    # not company
+    assert Product.find([('template.name', '=', uTemplateName),
+                         ('description', '=', uDescription)])
+    

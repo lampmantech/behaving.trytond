@@ -202,8 +202,7 @@ def step_impl(context):
     return_.party = supplier
     return_.payment_term = payment_term
     return_.invoice_method = 'shipment'
-    return_line = PurchaseLine()
-    return_.lines.append(return_line)
+    return_line = return_.lines.new()
     return_line.product = product
     return_line.quantity = -4.
     return_line = PurchaseLine()

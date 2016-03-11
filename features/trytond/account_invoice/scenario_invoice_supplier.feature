@@ -42,8 +42,8 @@ Feature:    Run the Trytond scenario_invoice_supplier doctests
         And Create a product with description "Services Bought" \
 	    from template "Service Product"
         And Create an Invoice on date "TODAY" \
-	    with description "Buy the Services Bought" \
-        And a PaymentTerm named "Term" to supplier "Supplier" with \
+	    with description "Buy the Services Bought" and \
+            a PaymentTerm named "Term" to supplier "Supplier" with \
 	    following |description|quantity|unit_price|account|currency| fields
 # Note that this uses the heading description rather than name
             | description       | quantity | unit_price | account      | currency 	|

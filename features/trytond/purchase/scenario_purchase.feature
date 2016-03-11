@@ -1,10 +1,22 @@
 # -*- encoding: utf-8 -*-
 
+
+# FixMe: I think that we're confusing Product and ProductTemplate
+
 @works32 @works34 @broken36
 Feature:    Run the Trytond scenario_purchase doctests
     adapted from 
     in 
     Works, but still UNFINISHED.
+    See this note in trytond_product-3.6.0/product.py:
+# This is a false positive as there is 1 product with the
+# template 1 and the same product with category 1. If you do not
+# create two categories (or any other relation on the template
+# model) you wont be able to check as in most cases the
+# id of the template and the related model would be same (1).
+# So two products have been created with same category. So that
+# domain ('template.category', '=', 1) will return 2 records which
+# it supposed to be.
     
   Scenario: Setup the tests of the purchase module
 

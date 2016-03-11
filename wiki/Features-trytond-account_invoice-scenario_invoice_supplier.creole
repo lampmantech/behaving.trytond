@@ -44,8 +44,8 @@ Tags: works32 @works34 @works36
          **And** Create a product with description "Services Bought" \
 	    from template "Service Product"
          **And** Create an Invoice on date "TODAY" \
-	    with description "Buy the Services Bought" \
-         **And** a PaymentTerm named "Term" to supplier "Supplier" with \
+	    with description "Buy the Services Bought" and \
+            a PaymentTerm named "Term" to supplier "Supplier" with \
 	    following |description|quantity|unit_price|account|currency| fields
             | description       | quantity | unit_price | account      | currency 	|
             | Services Bought   | 5	   | 	        |              |          	|

@@ -141,7 +141,8 @@ def step_impl(context, uUser, uCode):
 
     InventoryLine = proteus.Model.get('stock.inventory.line')
     for row in context.table:
-        product, = Product.find([('name','=', row['name'])])
+        # FixMe: I think that we're confusing Product and ProductTemplate
+        product = Product.find([('name','=', row['name'])])[0]
         inventory_line = InventoryLine(product=product, inventory=inventory)
         inventory_line.quantity = float(row['quantity'])
         inventory_line.expected_quantity = float(row['expected_quantity'])

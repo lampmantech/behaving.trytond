@@ -35,7 +35,7 @@ TODAY = datetime.date.today()
 dCacheCostPriceMethod={}
 
 @step('Set the fiscal years to use anglo-saxon accounting')
-def step_impl(context, uYear):
+def step_impl(context):
     """
     Given \
     Set the fiscal years to use anglo-saxon accounting.
@@ -85,8 +85,10 @@ def step_impl(context, uType, uName):
     company, = Company.find([('party.id', '=', party.id)])
 
     # not ('company', '=', company.id),
-    oTemplate, = ProductTemplate.find([('name', '=', uName),
-                                      ('type', '=', uType)])
+    # FixMe: I'm confused - there are 2 instances, not 1
+    # Do I have a fundamental mixup with Product and ProductTemplate?
+    oTemplate = ProductTemplate.find([('name', '=', uName),
+                                      ('type', '=', uType)])[0]
 
     for row in context.table:
         uRowName = row['name']
@@ -153,7 +155,6 @@ def step_impl(context, uDescription, uSupplier):
     purchase, = Purchase.find([('description', '=', uDescription),
                                ('party.id', '=', supplier.id)])
     if not len(purchase.lines):
-        PurchaseLine = proteus.Model.get('purchase.line')
         for row in context.table:
             uPDescription = row['description']
             quantity = float(row['quantity'])
@@ -163,8 +164,7 @@ def step_impl(context, uDescription, uSupplier):
 
             product = Product.find([('description', '=', uPDescription)])[0]
 
-            purchase_line = PurchaseLine()
-            purchase.lines.append(purchase_line)
+            purchase_line = purchase.lines.new()
             purchase_line.product = product
             purchase_line.quantity = quantity
             purchase_line.unit_price = unit_price
@@ -518,7 +518,6 @@ def step_impl(context, uSupplier, uPaymentTerm):
         purchase.invoice_method = 'order'
 
         Product = proteus.Model.get('product.product')
-        PurchaseLine = proteus.Model.get('purchase.line')
         for row in context.table:
             uDescription = row['description']
             fQuantity = float(row['quantity'])
@@ -528,8 +527,7 @@ def step_impl(context, uSupplier, uPaymentTerm):
 
             product = Product.find([('description', '=', uDescription)])[0]
 
-            purchase_line = PurchaseLine()
-            purchase.lines.append(purchase_line)
+            purchase_line = purchase.lines.new()
             purchase_line.product = product
             purchase_line.quantity = fQuantity
             purchase_line.unit_price = mUnitPrice

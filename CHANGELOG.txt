@@ -1,3 +1,8 @@
+commit 6dd64603e3824595d80b8dc6d9b9591f4a4bc041
+Date:   Thu Mar 10 01:31:30 2016 +0200
+
+    Updated tags for 3.6
+
 commit f3b0b472e8e27c0aef8161c5ddbe77a9fc6fe94d
 Date:   Wed Mar 9 16:31:36 2016 +0200
 

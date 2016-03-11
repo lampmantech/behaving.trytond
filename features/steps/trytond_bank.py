@@ -200,12 +200,12 @@ def step_impl(context, uBankSequenceName):
     cash.save()
 
 # DifferentCurrencySJ, StatementAJ, USD
-@step('Create a Bank Statement Journal named "{uName}" from the account.journal named "{uStatementAJName}" with currency "{uCur}"')
-def step_impl(context, uName, uStatementAJName, uCur):
+@step('Create a Bank Statement Journal named "{uName}" from the "{uType}" account.journal named "{uStatementAJName}" with currency "{uCur}"')
+def step_impl(context, uName, uType, uStatementAJName, uCur):
     """
     Given \
     Create an account.bank.statement.journal named "{uName}"
-    from the account.journal named "{uStatementAJName}"
+    from the "cash" account.journal named "{uStatementAJName}"
     with currency "{uCur}"
     Idempotent.
     """
@@ -214,12 +214,14 @@ def step_impl(context, uName, uStatementAJName, uCur):
 
     AccountJournal = proteus.Model.get('account.journal')
     oAccountJournal, =  AccountJournal.find([('name', '=', uStatementAJName),
-                                             ('type', '=', 'cash')])
+                                             ('type', '=', uType)])
 
-    oAccountJournal.credit_account.bank_reconcile = True
+    if hasattr(oAccountJournal.credit_account, 'bank_reconcile'):
+        oAccountJournal.credit_account.bank_reconcile = True
     oAccountJournal.credit_account.save()
     oAccountJournal.credit_account.reload()
-    oAccountJournal.debit_account.bank_reconcile = True
+    if hasattr(oAccountJournal.debit_account, 'bank_reconcile'):
+        oAccountJournal.debit_account.bank_reconcile = True
     oAccountJournal.debit_account.save()
     oAccountJournal.debit_account.reload()
     oAccountJournal.save()
@@ -230,7 +232,12 @@ def step_impl(context, uName, uStatementAJName, uCur):
     ##        oAccountJournal.debit_account and \
     ##        oAccountJournal.debit_account.bank_reconcile
 
-    StatementJournal = proteus.Model.get('account.bank.statement.journal')
+    from .support import modules
+    if 'account_bank_statement' in modules.lInstalledModules():
+        StatementJournal = proteus.Model.get('account.bank.statement.journal')
+    else:
+        StatementJournal = proteus.Model.get('account.statement.journal')
+
     uStatementJournalName=uName
     if not StatementJournal.find([('name', '=', uStatementJournalName)]):
         oStatementJournalDollar = StatementJournal(name=uStatementJournalName,
@@ -240,12 +247,12 @@ def step_impl(context, uName, uStatementAJName, uCur):
 
     assert StatementJournal.find([('name', '=', uStatementJournalName)])
 
-#     StatementAJ, : Main Cash Main Cash
-@step('Create a cash account.journal named "{uName}" from the sequence named "{uBankSequenceName}" with following |name|value| credit_account, debit_account fields')
-def step_impl(context, uName, uBankSequenceName):
+#     cash StatementAJ, : Main Cash Main Cash
+@step('Create a "{uType}" account.journal named "{uName}" from the sequence named "{uBankSequenceName}" with following |name|value| credit_account, debit_account fields')
+def step_impl(context, uType, uName, uBankSequenceName):
     """
     Given \
-    Create a cash account.journal named "{uName}"
+    Create a "cash" account.journal named "{uName}"
     with the sequence named "{uBankSequenceName}"
     with a following |name|value| table
     with credit_account, debit_account fields, e.g.
@@ -268,7 +275,7 @@ def step_impl(context, uName, uBankSequenceName):
     oSequence, = Sequence.find([('name', '=', uBankSequenceName,)])
 
     if not AccountJournal.find([('name', '=', uName),
-                                ('type', '=', 'cash')]):
+                                ('type', '=', uType)]):
             oDefaultCash, = Account.find([
                 # FixMe: is it kind other or kind cash?
                 ('kind', '=', 'other'),
@@ -283,7 +290,8 @@ def step_impl(context, uName, uBankSequenceName):
                         ('kind', '=', 'other'),
                         ('company', '=', company.id),
                         ('name', '=', row['value'])])
-                    credit_account.bank_reconcile = True
+                    if hasattr(credit_account, 'bank_reconcile'):
+                        credit_account.bank_reconcile = True
                     credit_account.save()
                     # looks like this is necessary
                     credit_account.reload()
@@ -292,33 +300,30 @@ def step_impl(context, uName, uBankSequenceName):
                         ('kind', '=', 'other'),
                         ('company', '=', company.id),
                         ('name', '=', row['value'])])
-                    debit_account.bank_reconcile = True
+                    if hasattr(debit_account, 'bank_reconcile'):
+                        debit_account.bank_reconcile = True
                     debit_account.save()
                     # looks like this is necessary
                     debit_account.reload()
             oAccountJournal = AccountJournal(name=uName,
-                                             type='cash',
+                                             type=uType,
                                              credit_account=credit_account,
                                              debit_account=debit_account,
                                              sequence=oSequence)
             oAccountJournal.save()
 
     oAccountJournal, = AccountJournal.find([('name', '=', uName),
-                                            ('type', '=', 'cash')])
-    if not hasattr(oAccountJournal.debit_account, 'bank_reconcile'):
-        puts("ERROR: oAccountJournal.debit_account missing bank_reconcile slot " \
-             +oAccountJournal.debit_account.code)
-    elif not oAccountJournal.debit_account.bank_reconcile:
+                                            ('type', '=', uType)])
+    if hasattr(oAccountJournal.debit_account, 'bank_reconcile') and \
+      not oAccountJournal.debit_account.bank_reconcile:
         oAccountJournal.debit_account.bank_reconcile = True
         oAccountJournal.debit_account.save()
-        oAccountJournal.debit_account.reload()
-    if not hasattr(oAccountJournal.credit_account, 'bank_reconcile'):
-        puts("ERROR: oAccountJournal.credit_account missing bank_reconcile slot " \
-             +oAccountJournal.credit_account.code)
-    elif not oAccountJournal.credit_account.bank_reconcile:
+    oAccountJournal.debit_account.reload()
+    if hasattr(oAccountJournal.credit_account, 'bank_reconcile') and \
+      not oAccountJournal.credit_account.bank_reconcile:
         oAccountJournal.credit_account.bank_reconcile = True
         oAccountJournal.credit_account.save()
-        oAccountJournal.credit_account.reload()
+    oAccountJournal.credit_account.reload()
 
 @step('Create a financial account under "{uTemplate}" for the bank account with IBAN "{uIban}"')
 @step('Create a financial account under "{uTemplate}" for the bank account with number "{uIban}"')
@@ -340,7 +345,8 @@ def step_impl(context, uTemplate, uIban):
     """
     # sFormat = sGetFeatureData('account.template', 'bank_account_format')
     o = oCreateNewChartAccountforBank(context, uIban, uTemplate)
-
+    # FixMe: BNK1
+    
 def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
     """
     Given \
@@ -377,8 +383,9 @@ def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
         # account_bank_statement module has to be loaded
         # before accounts are created or this will error.
         d = dict(name=sNewName,
-                 bank_reconcile=True,
                  code=str(iCode))
+        if hasattr(oTemplate, 'bank_reconcile'):
+            d['bank_reconcile'] = True
 
         iNewAccount, = Account.create([d], config.context)
         oNewAccount= Account(iNewAccount)
@@ -396,7 +403,8 @@ def oCreateNewChartAccountforBank(context, sNumber, sTemplate, sFormat=""):
 
         oNewAccount.parent = oParent
         # this is required for bank_statement
-        oNewAccount.bank_reconcile = True
+        if hasattr(oNewAccount, 'bank_reconcile'):
+            oNewAccount.bank_reconcile = True
         #? is this right? are bank accounts always reconcile = True
         oNewAccount.reconcile = True
         if hasattr(oNewAccount, 'party_required'):

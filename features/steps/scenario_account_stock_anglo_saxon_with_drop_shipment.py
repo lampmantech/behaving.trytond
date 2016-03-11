@@ -153,8 +153,7 @@ def step_impl(context):
     sale.party = customer
     sale.sale_date = TODAY
     sale.payment_term = payment_term
-    sale_line = SaleLine()
-    sale.lines.append(sale_line)
+    sale_line = sale.lines.new()
     sale_line.product = product
     sale_line.quantity = 50
     sale.save()
