@@ -413,7 +413,6 @@ def step_impl(context, uDate, uDescription, uCustomer):
 def step_impl(context, uDescription, uCustomer):
     """
     Given \
-    From T/ASAS/SASAS
     Post customer Invoice for the Sales Order with description "uDescription"
     to customer "uCustomer"
 

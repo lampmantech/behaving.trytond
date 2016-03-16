@@ -245,6 +245,7 @@ def step_impl(context, uTem, uRoot):
         create_chart.execute('create_properties')
 
         cash, = Account.find([
+                #? cash or other
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),
                 ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
@@ -271,6 +272,7 @@ def step_impl(context):
     company, = Company.find([('party.id', '=', party.id)])
 
     cash, = Account.find([
+            #? cash or other
             ('kind', '=', 'other'),
             ('company', '=', company.id),
             ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),

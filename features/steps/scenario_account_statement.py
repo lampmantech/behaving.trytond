@@ -111,6 +111,7 @@ def step_impl(context):
         ('company', '=', company.id),
         ])
     cash, = Account.find([
+        #? cash or other?
         ('kind', '=', 'other'),
         ('company', '=', company.id),
         ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
@@ -369,7 +370,6 @@ def step_impl(context):
         pass
     statement2.reload()
     
-    # FixMe: AttributeError: 'module' object has no attribute 'user'
     Model.get('res.user.warning')(user=config.user,
             name=str(statement2.lines[0].id), always=True).save()
     try:

@@ -55,6 +55,7 @@ def step_impl(context):
         ('company', '=', company.id),
         ])
     cash, = Account.find([
+        #? cash or other
         ('kind', '=', 'other'),
         ('company', '=', company.id),
         ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
@@ -163,6 +164,7 @@ def step_impl(context):
         ('company', '=', company.id),
         ])
     cash, = Account.find([
+        #? cash or other
         ('kind', '=', 'other'),
         ('company', '=', company.id),
         ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),

@@ -191,6 +191,7 @@ def step_impl(context, uBankSequenceName):
     # is this needed?
     Account = proteus.Model.get('account.account')
     cash, = Account.find([
+                # other
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),
                 ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
@@ -204,7 +205,7 @@ def step_impl(context, uBankSequenceName):
 def step_impl(context, uName, uType, uStatementAJName, uCur):
     """
     Given \
-    Create an account.bank.statement.journal named "{uName}"
+    Create a Bank Statement Journal named "{uName}"
     from the "cash" account.journal named "{uStatementAJName}"
     with currency "{uCur}"
     Idempotent.
@@ -277,13 +278,13 @@ def step_impl(context, uType, uName, uBankSequenceName):
     if not AccountJournal.find([('name', '=', uName),
                                 ('type', '=', uType)]):
             oDefaultCash, = Account.find([
-                # FixMe: is it kind other or kind cash?
+                # it is kind other
                 ('kind', '=', 'other'),
                 ('company', '=', company.id),
                 ('name', '=', sGetFeatureData(context, 'account.template,main_cash')),
             ])
             credit_account = debit_account = oDefaultCash
-
+            uCode = ''
             for row in context.table:
                 if row['name'] == 'credit_account':
                     credit_account, = Account.find([
@@ -305,11 +306,15 @@ def step_impl(context, uType, uName, uBankSequenceName):
                     debit_account.save()
                     # looks like this is necessary
                     debit_account.reload()
+                elif row['name'] == 'code':
+                    uCode = row['value']
             oAccountJournal = AccountJournal(name=uName,
                                              type=uType,
                                              credit_account=credit_account,
                                              debit_account=debit_account,
                                              sequence=oSequence)
+            if uCode:
+                oAccountJournal.code = uCode
             oAccountJournal.save()
 
     oAccountJournal, = AccountJournal.find([('name', '=', uName),

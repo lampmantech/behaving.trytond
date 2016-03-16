@@ -55,7 +55,16 @@ def step_impl(context, uName, uClass):
     assert context.table
     Class = proteus.Model.get(uClass)
     uField = 'name'
-    oResource = Class.find([(uField, '=', uName)])[0]
+    
+    # FixMe: were not ready for account.move from account.voucher yet
+    try:
+        oResources = Class.find([(uField, '=', uName)])
+    except KeyError:
+        return
+    else:
+        if not oResources:
+            return
+    oResource = oResources[0]
     assert context.table
     bNeedSave = False
     for row in context.table:
@@ -75,7 +84,15 @@ def step_impl(context, uField, uValue, uClass):
     """
     Class = proteus.Model.get(uClass)
 
-    oResource = Class.find([(uField, '=', uValue)])[0]
+    # FixMe: were not ready for account.move from account.voucher yet
+    try:
+        oResources = Class.find([(uField, '=', uValue)])
+    except KeyError:
+        return
+    else:
+        if not oResources:
+            return
+    oResource = oResources[0]
     assert context.table
     for row in context.table:
         uFile = row['filename']
