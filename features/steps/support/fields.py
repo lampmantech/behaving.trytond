@@ -81,10 +81,14 @@ def string_to_python (sField, uValue, Party=None):
                "PANIC: key %s; not in %r" % ('relation', dFields.keys(),)
     sRelation = dField['relation']
 
-    Klass = proteus.Model.get(sRelation)
-    #? FixMe: assume name for now
-    lElts = Klass.find([('name', '=', uValue)])
-
+    oClass = proteus.Model.get(sRelation)
+    lKeys = dir(oClass)
+    #? FixMe: rec_name?
+    for sKey in ['name', 'code']:
+        if sKey not in lKeys: continue
+        lElts = oClass.find([(sKey, '=', uValue)])
+        if lElts: break
+            
     if len(lElts) == 0 and sField in ['country', 'subdivision']:
         # Were having trouble with country.country as of 3.2
         # This code from trytond_party_vcarddav-3.2.0/party.py doesnt work

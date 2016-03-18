@@ -62,9 +62,10 @@ def step_impl(context, uDescription, uSupplier):
                     string_to_python(row['name'], row['value'], Purchase))
 
         purchase.save()
-    purchase, = Purchase.find([('description', '=', uDescription),
-                               ('company.id',  '=', company.id),
-                               ('party.id', '=', supplier.id)])
+        
+    assert Purchase.find([('description', '=', uDescription),
+                              ('company.id',  '=', company.id),
+                              ('party.id', '=', supplier.id)])
 
 
 @step('Purchase on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" ProductTemplates from supplier "{uSupplier}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |name|quantity|line_description| fields')

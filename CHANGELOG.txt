@@ -1,3 +1,8 @@
+commit 8fabb20d70d5da3cd51176982dcf1640497c976d
+Date:   Wed Mar 16 19:59:13 2016 +0200
+
+    account_statement improvements
+
 commit 99d90f4ba09c5b0c916e5eae2be903119618df15
 Date:   Sat Mar 12 00:14:55 2016 +0200
 

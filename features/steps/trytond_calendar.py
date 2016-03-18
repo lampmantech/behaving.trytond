@@ -85,8 +85,6 @@ def step_impl(context, uKind, uCalName, uUserName):
     Location = proteus.Model.get('calendar.location')
     Category = proteus.Model.get('calendar.category')
 
-    # NewCalendar=proteus.Model.get('calendar.calendar', ProteusConfig.TrytondConfig('meec32', 'accountant', 'postgresql', config_file='/n/data/TrytonOpenERP/etc/trytond-3.2.conf'))
-
     if True:
         uUserLogin=sGetFeatureData(context, 'user,'+uUserName+',login')
         uUserPassword=sGetFeatureData(context, 'user,'+uUserName+',password')

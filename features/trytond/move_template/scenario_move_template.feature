@@ -5,8 +5,8 @@ Feature:    Run the Trytond scenario_move_template doctests
   Adapted from the file 
   trytond_account-3.6.0/tests/scenario_move_template.rst
 
-  A move template allows to configure predefined moves. A Move Template is
-  defined by the following fields
+  A move template allows one to configure predefined moves. 
+  A Move Template is defined by the following fields
   
   * Name
   * Company
@@ -44,8 +44,7 @@ Feature:    Run the Trytond scenario_move_template doctests
 
   A wizard to create moved base on templates is available in the *Entries* menu.
   The templates are also available as actions when opening a journal.
-  
-  
+    
   Scenario: Setup the tests of the module named "move_template"
 
       Given Create database with pool.test set to True
