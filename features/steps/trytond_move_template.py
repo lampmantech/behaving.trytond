@@ -30,9 +30,9 @@ def step_impl(context, uName, uAcct):
 
     oCashJournal = Journal.find([('type', '=', 'cash')])[0]
     if not oCashJournal.debit_account or not oCashJournal.credit_account:
-            oAccount, = Account.find([
+        oAccount, = Account.find([
                 ('kind', '=', 'other'),
-                ('name', '=', uAcct),
+                ('code', '=', uAcct),
                 ('company', '=', oCompany.id),
                 ])
         oCashJournal.debit_account = oAccount
@@ -73,7 +73,7 @@ def vCreateMoveTemplate(context, uName, oJournal):
 
     # Create Template::
     if not MoveTemplate.find([('name', '=', uName),
-                              ('oCompany', '=', oCompany.id),]):
+                              ('company', '=', oCompany.id),]):
 
         template = MoveTemplate()
         # date company description
@@ -87,92 +87,33 @@ def vCreateMoveTemplate(context, uName, oJournal):
     
 @step('Add keywords to a MoveTemplate named "{uName}" with description "{uTDescription}" and |name|string|type|digits| following')
 def step_impl(context, uName, uTDescription):
-    """Add keywords to a MoveTemplate named "Test Move Template" with description "{party} - {description}" and|name|string|type|digits| following
+    """Add keywords to a MoveTemplate named "Test Move Template" with description "{party} - {description}" and |name|string|type|digits| following
     """
     vAssertContentTable(context, 4)
 
     MoveTemplate = proteus.Model.get('account.move.template')
     
     template, = MoveTemplate.find([('name', '=', uName)])
-    uTDescription = '{party} - {description}'
     template.description = uTDescription
+    lKeywords = []
     for row in context.table:
-        dElts = dict(name=row['name'], string=row['string'], type_=row['type'])
+        uKeywordName = row['name'].strip()
+        dElts = dict(name=uKeywordName,
+                         string=row['string'].strip(),
+                         type_=row['type'].strip())
         if dElts['type_'] == 'numeric' and row['digits']:
             dElts['digits'] = int(row['digits'])
         _ = template.keywords.new(**dElts)
+        lKeywords.append(uKeywordName)
+
+    # we are going to need this
+    if 'date' not in lKeywords:
+        dElts = dict(name='date',
+                     string='Date',
+                     type_='char')
+        _ = template.keywords.new(**dElts)
     template.save()
 
-@step('Add lines to a MoveTemplate named "{uName}" with Tax "{uTaxName}" and |amount|account|tax|party|operation| following')
-def step_impl(context, uName, uTaxName):
-    """Add lines to a MoveTemplate named "Test Move Template" with Tax "10% Sales Tax" and |amount|account|tax|party|operation| following
-    """
-    vAssertContentTable(context, 4)
-    
-    MoveTemplate = proteus.Model.get('account.move.template')
-    
-    Party = proteus.Model.get('party.party')
-    sCompanyName = sGetFeatureData(context, 'party,company_name')
-    party, = Party.find([('name', '=', sCompanyName)])
-    Company = proteus.Model.get('company.company')
-    oCompany, = Company.find([('party.id', '=', party.id)])
-
-    template, = MoveTemplate.find([('name', '=', uName)])
-
-    Account = proteus.Model.get('account.account')
-    payable, = Account.find([
-        ('kind', '=', 'payable'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_payable')),
-        ('company', '=', oCompany.id),
-        ])
-    expense, = Account.find([
-        ('kind', '=', 'expense'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
-        ('company', '=', oCompany.id),
-        ])
-    account_tax, = Account.find([
-        ('kind', '=', 'other'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),
-        ('company', '=', oCompany.id),
-        ])
-
-    if uTaxName = '0% Sales Tax':
-        oTax = None
-    else:
-        Tax = proteus.Model.get('account.tax')
-        oTax, = Tax.find([('name', '=', uTaxName)])
-        assert oTax.type == 'percentage'
-        oTaxRate = oTax.rate
-
-    for row in context.table:
-        line = template.lines.new()
-        line.operation = row['operation']
-        if row['account'] == 'payable':
-            line.account = payable
-        elif row['account'] == 'expense':
-            line.account = expense
-        elif row['account'] == 'invoice_account':
-            line.account = oTax.invoice_account
-        else:
-            oAccount, = Account.find([
-                # ('kind', '=', 'expense'),
-                ('name', '=', row['account']),
-                ('company', '=', oCompany.id),
-                ])
-            line.account = oAccount
-        line.party = row['party']
-        line.amount = row['amount']
-        
-        if oTax and row['tax']:
-            ttax = line.taxes.new()
-            ttax.amount = line.amount
-            if row['tax'] == 'base':
-                ttax.code = oTax.invoice_base_code
-            elif row['tax'] == 'tax':
-                ttax.code = oTax.invoice_tax_code
-            ttax.tax = oTax
-            
-    template.save()
 
 @step('Create a move from a MoveTemplate named "{uName}" on date "{uDate}" with |name|value| keywords following')
 def step_impl(context, uName, uDate):
@@ -191,15 +132,30 @@ def step_impl(context, uName, uDate):
     Company = proteus.Model.get('company.company')
     oCompany, = Company.find([('party.id', '=', party.id)])
 
-    template, = MoveTemplate.find([('name', '=', uName)])
-    # Create Move::
-    create_move = proteus.Wizard('account.move.template.create')
+    template, = MoveTemplate.find([('name', '=', uName),
+                                       ('company', '=', oCompany.id)])
     # Char('Date', help='Leave empty for today')
     if uDate == 'TODAY':
         template.date = ''
+        oDate = TODAY
     else:
-        template.date = uDate
+        template.date = 'date'
+        # FixMe: derive assumes yyyy-mm-dd
+        oDate = datetime.date(*map(int, uDate.split('-')))
+
+    oPeriod, = Period.find([('company.id', '=', oCompany.id),
+                                ('start_date', '<=', oDate),
+                                ('end_date', '>=', oDate),])
+
+    #  create_move has a:    move.period = self.template.period
+    #? the Period on the template is required to overwrite any previous one?
+    template.period = oPeriod
+    template.save()
+    
+    # Create Move::
+    create_move = proteus.Wizard('account.move.template.create')
     create_move.form.template = template
+    create_move.form.period = oPeriod
     create_move.execute('keywords')
 
     data = {}
@@ -213,22 +169,17 @@ def step_impl(context, uName, uDate):
             keywords[uKey] = oParty.id
         elif uKey == 'amount':
             keywords[uKey] = Decimal(row['value'])
-
-    # derive keywords['period'] from uDate for move
-    if uDate == 'TODAY':
-        oDate = TODAY
-    else:
-        # FixMe: derive assumes yyyy-mm-dd
-        oDate = datetime.date(*uDate.split('-'))
-
-    period_ids = Period.find([('code', '=', '%d-%d' % (oDate.year, oDate.month)),
-                              ('company', '=', oCompany.id)])
-    if len(period_ids) == 1:
-        keywords['period'] = period_ids[0]
-
-    context = create_move._context.copy()
-    context.update(create_move._config.context)
+        elif uKey == 'date':
+            # this is required whether its in the lines or not
+            pass
+        
+    keywords['date'] = oDate
+        
+    oMoveContext = create_move._context.copy()
+    oMoveContext.update(create_move._config.context)
+    # even with the template.period, this is crucial
+    oMoveContext['period'] = oPeriod
     # note:: using custom call because proteus doesnt support fake model
     _ = create_move._proxy.execute(create_move.session_id, data, 'create_',
-            context)
+            oMoveContext)
 

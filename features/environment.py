@@ -16,7 +16,7 @@ from .steps.support import behave_better
 behave_better.patch_all()
 
 sVERSION = '3.6'
-sDB_NAME = 'test36'
+sDB_NAME = 'lampmancy36'
 ETC_TRYTOND_CONF = '/n/data/TrytonOpenERP/etc/trytond-' +sVERSION +'.conf'
 sTRYTOND_USER = 'admin'
 sTRYTOND_PASSWD = 'foobar'

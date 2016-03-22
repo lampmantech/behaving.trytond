@@ -18,61 +18,6 @@ from trytond.exceptions import UserError, UserWarning
 
 TODAY = datetime.date.today()
 
-def done():
-# Create database::
-
-    config = proteus.config.set_trytond()
-    config.pool.test = True
-
-# Install account_statement and account_invoice::
-
-    Module = Model.get('ir.module.module')
-    modules = Module.find([
-            ('name', 'in', ('account_statement', 'account_invoice')),
-        ])
-    for module in modules:
-            module.click('install')
-    proteus.Wizard('ir.module.module.install_upgrade').execute('upgrade')
-
-# Create company::
-
-    _ = create_company()
-    company = get_company()
-
-# Create fiscal year::
-
-    fiscalyear = set_fiscalyear_invoice_sequences(
-            create_fiscalyear(company))
-    fiscalyear.click('create_period')
-
-# Create chart of accounts::
-
-    _ = create_chart(company)
-    accounts = get_accounts(company)
-    receivable = accounts['receivable']
-    payable = accounts['payable']
-    revenue = accounts['revenue']
-    expense = accounts['expense']
-    cash = accounts['cash']
-
-# Reload the context::
-
-    User = Model.get('res.user')
-    config._context = User.get_preferences(True, config.context)
-
-# Create parties::
-
-    Party = Model.get('party.party')
-    supplier = Party(name='Supplier')
-    supplier.save()
-    customer = Party(name='Customer')
-    customer.save()
-
-# Create payment term::
-
-    payment_term = create_payment_term()
-    payment_term.save()
-
     
 @step('T/SASt Scenario Account Statement')
 def step_impl(context):

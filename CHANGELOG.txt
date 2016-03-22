@@ -1,3 +1,8 @@
+commit 80c5fbee800eb8d5cbc7a3dcb636c6f9547603c9
+Date:   Fri Mar 18 04:58:17 2016 +0200
+
+    Added features/steps/trytond_move_template
+
 commit 8fabb20d70d5da3cd51176982dcf1640497c976d
 Date:   Wed Mar 16 19:59:13 2016 +0200
 

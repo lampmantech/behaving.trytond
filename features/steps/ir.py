@@ -114,3 +114,18 @@ def step_impl(context, uField, uValue, uClass):
         assert os.path.exists(uFile), "Does not exist: " +uFile
         o = stepfuns.oAttachFileContentToResource(oResource, uFile)
         assert o
+
+@step('Prefix all Strict Sequences of code "{uCode}" with the year')
+def step_impl(context, uCode):
+    """
+    Prefix all Strict Sequences of code "Invoice" with the year
+    """
+    SequenceStrict = proteus.Model.get('ir.sequence.strict')
+    lElts = SequenceStrict.find([('code', '=', uCode)])
+    #! assert lElts
+    for oElt in lElts:
+        if not oElt.prefix:
+            oElt.prefix = "${year}-"
+        if not oElt.padding:
+            oElt.padding = 2
+        oElt.save()

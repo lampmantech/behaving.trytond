@@ -8,14 +8,26 @@
   (let ((beg (if (and transient-mark-mode mark-active) (region-beginning)))
 	(end (if (and transient-mark-mode mark-active) (region-end))))
     (goto-char (point-min))
+    (replace-regexp "^=======+" "\"\"\"" nil beg end)
+    
+    (goto-char (point-min))
     (replace-regexp "^    >>> \\(.+\\)
-    True" "    assert \\1" nil beg end)
+    True" " assert \\1" nil beg end)
     (goto-char (point-min))
     (replace-regexp "^    >>> \\(.+\\)
     False" "    assert not \\1" nil beg end)
     (goto-char (point-min))
     (replace-regexp "^    >>> \\(.+\\)
     \\([0-9]+\\)" "    assert \\1 == \\2" nil beg end)
+
+    (goto-char (point-min))
+    (query-replace-regexp "^    >>> \\([^#
+]+\\)\\([^(
+\\\\]\\)
+    \\([^.>
+]\\)" "    assert \\1\\2 == \\3"
+    nil (if (and transient-mark-mode mark-active) (region-beginning)) (if (and transient-mark-mode mark-active) (region-end)) nil)
+    
     (goto-char (point-min))
     (replace-regexp "^    >>> " "    " nil beg end)
     (goto-char (point-min))

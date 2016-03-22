@@ -117,6 +117,7 @@ def step_impl(context, uDate, uDescription, uRef, uUser, uCur, uSupplier, uTerm,
         Currency = proteus.Model.get('currency.currency')
         oCurrency, = Currency.find([('code', '=', uCur)])
         purchase.currency = oCurrency
+        # FixMe: this isnt making it to the invoice?
         purchase.supplier_reference = uRef
         if uDate.lower() == 'today' or uDate.lower() == 'now':
             oDate = TODAY
@@ -190,6 +191,10 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
             assert invoice.origins == purchase.rec_name
             if not invoice.description:
                 invoice.description = purchase.description
+                invoice.save()
+            # FixMe: this isnt making it to the invoice?
+            if not invoice.reference:
+                invoice.reference = purchase.supplier_reference
                 invoice.save()
     elif uAct == 'process':
         purchase.click(uAct)

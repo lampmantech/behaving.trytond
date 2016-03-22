@@ -65,7 +65,7 @@ def step_impl(context):
      | account.template,main_revenue             | {main_revenue}             |
      | account.template,main_expense             | {main_expense}             |
      | account.template,main_cash                | {main_cash}                |
-     | account.template,main_tax                 | {main_tax}                 |
+     | account.template,main_input_tax                 | {main_input_tax}                 |
 '''
     uDefaults = uDefaults.format(
         company_name=COMPANY_NAME, # "B2CK"
@@ -82,7 +82,7 @@ def step_impl(context):
         main_revenue='Main Revenue',
         main_expense='Main Expense',
         main_cash='Main Cash',
-        main_tax='Main Tax',
+        main_input_tax='Main Tax',
         )
     context.execute_steps(uDefaults)
 

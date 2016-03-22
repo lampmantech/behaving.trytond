@@ -75,15 +75,16 @@ Feature:    Run the Trytond scenario_move_template doctests
           
       Given Create a MoveTemplate named "Test Move Template" on Journal coded "CASH"
         And Add keywords to a MoveTemplate named "Test Move Template" with description "{party} - {description}" and |name|string|type|digits| following
-            | name                  | string            | type    | digits |
-            | party                 | Party             | party   |        |
-            | description           | Description       | char    |        |
-            | amount                | Amount            | numeric | 2      |
-            | rate                  | Tax Rate          | numeric | 3      |
-
+            | name        | string      | type    | digits |
+            | party       | Party       | party   |        |
+            | description | Description | char    |        |
+            | amount      | Amount      | numeric |      2 |
+            | rate        | Tax Rate    | numeric |      3 |
+            | date        | Date        | char    |        | 
+  
   Scenario: Populate the Move Line Template
 
-      Given Add lines to a MoveTemplate named "Test Move Template" with Tax "10% Sales Tax" and |amount|account|tax|party|operation| following
+      Given T/AIMT Add lines to a MoveTemplate named "Test Move Template" with Tax "10% Sales Tax" and |amount|account|tax|party|operation| following
             | amount               | account         | tax  | party | operation |
             | amount               | payable         |      | party | credit    |
             | amount / 1.1         | expense         | base | party | debit     |

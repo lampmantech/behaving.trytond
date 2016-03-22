@@ -336,7 +336,7 @@ def step_impl(context, uTaxName):
     Account = proteus.Model.get('account.account')
     account_tax, = Account.find([
         ('kind', '=', 'other'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_input_tax')),
         ('company', '=', company.id),
         ])
 

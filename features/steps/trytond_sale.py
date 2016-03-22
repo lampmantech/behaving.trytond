@@ -139,6 +139,9 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
             if not invoice.description:
                 invoice.description = sale.description
                 invoice.save()
+            if not invoice.reference:
+                invoice.reference = sale.reference
+                invoice.save()
     elif uAct == 'process':
         Sale.process([sale.id], config.context)
         assert sale.state == u'processing'

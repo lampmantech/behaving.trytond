@@ -64,15 +64,19 @@ def step_impl(context, uCalName, uUserName):
     assert Calendar.find([('name', '=', uCalName)])
 
 @step('I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
+@step('I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with |date|name|location|description| following')
+@step('I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with |date|name|description|location| following')
 def step_impl(context, uKind, uCalName, uUserName):
     """
     Given \
     Create "{uKind}" events in the calendar named "{uCalName}"
-    owned by the user named "{uUserName}". {uKind} can be empty, but
-    if not, it is the category.
-    You must firstly create the user with the step 'Create a
-    user named'... in order to fields in the FeatureData, or use 'Set
-    the feature data with values' ...
+    owned by the user named "{uUserName}"
+    with |date|name|location|description| following
+
+    {uKind} can be empty, but if not, it is the category.
+    You must firstly create the user with the step 
+    'Create a user named'... in order to fields in the FeatureData, 
+    or use 'Set the feature data with values' ...
     It expects a |date|name|location|description| table.
     Idempotent.
 
@@ -192,6 +196,7 @@ def step_impl(context, uKind, uCalName, uUserName):
 iTHIS_YEAR = datetime.date.today().year
 # unfinished
 @step('I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields')
+@step('I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with |name|date| following')
 def step_impl(context, uKind, uCalName, uUserName):
     """
     Given \
@@ -253,8 +258,11 @@ def step_impl(context, uKind, uCalName, uUserName):
                     ('status', '=', 'confirmed'),
                     ('summary', '=', uSummary),
             ]):
-                lDate = map(int,uDate.split('-'))
-                if not lDate[0]:
+                lDate = map(int, uDate.split('-'))
+                if lDate[0]:
+                    bRecur = False
+                else:
+                    bRecur = True
                     lDate[0] = iTHIS_YEAR
                 oDate = datetime.datetime(*lDate)
                 # I think Calendar names are unique across all users
@@ -267,9 +275,13 @@ def step_impl(context, uKind, uCalName, uUserName):
                             status='confirmed',
                             dtstart=oDate)
                 if iCategory:
-                    dElt['categories']=[('add', [iCategory])]
+                    dElt['categories'] = [('add', [iCategory])]
                 iEvent = Event.create([dElt], dNewConfig)
                 oEvent = Event(iEvent)
+                if bRecur is True:
+                    #?oRRule = oEvent.rrules.new()
+                    # freq='yearly'
+                    pass
                 # oEvent._config = oNewConfig
                 oEvent.save()
 

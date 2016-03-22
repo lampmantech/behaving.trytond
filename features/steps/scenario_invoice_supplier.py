@@ -71,7 +71,7 @@ def step_impl(context, uDescription, uTaxName):
     # failing here expense.debit, expense.credit
     account_tax, = Account.find([
         ('kind', '=', 'other'),
-        ('name', '=', sGetFeatureData(context, 'account.template,main_tax')),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_input_tax')),
         ('company', '=', company.id),
         ])
     account_tax.reload()
