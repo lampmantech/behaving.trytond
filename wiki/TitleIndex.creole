@@ -22,8 +22,6 @@
 * [[Features-trytond-stock_supply-scenario_stock_internal_supply]]
 * [[Features-trytond-trytond_AccountantsCalendar]]
 * [[Features-trytond-trytond_AccountantsHolidays]]
-* [[Features-trytonspain-account_bank_statement-scenario_bank_statement]]
-* [[Features-trytonspain-account_financial_statement_report-scenario_financial_statement_report]]
 * [[FrontPage]]
 * [[Home]]
 * [[Installation]]

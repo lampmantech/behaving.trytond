@@ -1,3 +1,13 @@
+commit 58271f76fe982085df93d8d6f047d7d65439cda8
+Date:   Wed Mar 23 19:37:42 2016 +0200
+
+    Added features/steps/trytond_account_payment_clearing
+
+commit c4e3e8e433bf65b807416fd610bd0fedad16bceb
+Date:   Tue Mar 22 21:22:14 2016 +0200
+
+    Added scenario_account_asset - wip
+
 commit 80c5fbee800eb8d5cbc7a3dcb636c6f9547603c9
 Date:   Fri Mar 18 04:58:17 2016 +0200
 

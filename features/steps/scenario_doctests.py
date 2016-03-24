@@ -65,7 +65,9 @@ def step_impl(context):
      | account.template,main_revenue             | {main_revenue}             |
      | account.template,main_expense             | {main_expense}             |
      | account.template,main_cash                | {main_cash}                |
-     | account.template,main_input_tax                 | {main_input_tax}                 |
+     | account.template,main_input_tax           | {main_input_tax}           |
+     | account.template,main_asset               | {main_asset}               |
+     | account.template,main_depreciation        | {main_depreciation}        |
 '''
     uDefaults = uDefaults.format(
         company_name=COMPANY_NAME, # "B2CK"
@@ -83,6 +85,8 @@ def step_impl(context):
         main_expense='Main Expense',
         main_cash='Main Cash',
         main_input_tax='Main Tax',
+        main_asset='Assets',
+        main_depreciation='Depreciation',
         )
     context.execute_steps(uDefaults)
 

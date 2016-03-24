@@ -70,7 +70,7 @@ def done(context):
 def step_impl(context):
 
     config = context.oProteusConfig
-    
+
     Party = proteus.Model.get('party.party')
     Company = proteus.Model.get('company.company')
 
@@ -93,9 +93,14 @@ def step_impl(context):
         ('name', '=', sGetFeatureData(context, 'account.template,main_revenue')),
         ('company', '=', company.id),
         ])
+    asset_account = Account.find([
+#expense        ('kind', '=', 'other'),
+        ('name', '=', sGetFeatureData(context, 'account.template,main_asset')),
+        ('company', '=', company.id),
+        ])
     # Tangible assets depn
-    depreciation, = Account.find([
-                ('kind', '=', 'payable'),
+    depreciation_account, = Account.find([
+                ('kind', '=', 'other'),
                 ('company', '=', company.id),
                 ('name', '=', sGetFeatureData(context, 'account.template,main_depreciation')),
                 ])
@@ -104,7 +109,7 @@ def step_impl(context):
         ('name', '=', sGetFeatureData(context, 'account.template,main_expense')),
         ('company', '=', company.id),
         ])
-    
+
     ProductUom = Model.get('product.uom')
     unit, = ProductUom.find([('name', '=', 'Unit')])
     ProductTemplate = Model.get('product.template')
@@ -154,7 +159,7 @@ def step_impl(context):
     invoice_line.quantity = 1
     assert invoice_line.account == asset_account
     supplier_invoice.invoice_date = TODAY + relativedelta(day=1, month=1)
-    
+
     supplier_invoice.click('post')
     assert supplier_invoice.state == u'posted'
     invoice_line, = supplier_invoice.lines
@@ -162,20 +167,25 @@ def step_impl(context):
             (Decimal('1000'), Decimal('0'))
 
 #@step('Depreciate the asset')
-#def step_impl(context):
+#def step_impl(context)
 
     Asset = Model.get('account.asset')
     asset = Asset()
+    asset.depreciation_method = 'linear'
+    asset.frequency = 'monthly'
+    # comment
     asset.product = asset_product
     asset.supplier_invoice_line = invoice_line
     assert asset.value == Decimal('1000.00')
     assert asset.start_date == supplier_invoice.invoice_date
-    assert asset.end_date == (supplier_invoice.invoice_date +
+    assert asset.end_date == (supplier_invoice.invoice_date + \
             relativedelta(years=2, days=-1))
     assert asset.quantity == 1.0
-	assert asset.unit == unit
+    assert asset.unit == unit
+    
     asset.residual_value = Decimal('100')
-    assert asset.click('create_lines')
+    asset.click('create_lines')
+
     assert len(asset.lines) == 24
     assert [l.depreciation for l in asset.lines] == [Decimal('37.5')] * 24
     assert asset.lines[0].actual_value == Decimal('962.50')
@@ -190,8 +200,8 @@ def step_impl(context):
 #def step_impl(context):
 
     create_moves = Wizard('account.asset.create_moves')
-    create_moves.form.date = (supplier_invoice.invoice_date
-            + relativedelta(months=3))
+    create_moves.form.date = (supplier_invoice.invoice_date \
+                + relativedelta(months=3))
     create_moves.execute('create_moves')
     assert depreciation_account.debit == Decimal('0.00')
     assert depreciation_account.credit == Decimal('112.50')
@@ -205,35 +215,35 @@ def step_impl(context):
     update.form.value = Decimal('1100')
     update.execute('update_asset')
     assert update.form.amount == Decimal('100.00')
-    update.form.date = (supplier_invoice.invoice_date
+    update.form.date = (supplier_invoice.invoice_date \
             + relativedelta(months=2))
-    assert update.form.latest_move_date == (supplier_invoice.invoice_date
+    assert update.form.latest_move_date == (supplier_invoice.invoice_date \
                 + relativedelta(months=3, days=-1))
-    assert update.form.next_depreciation_date == (supplier_invoice.invoice_date
+    assert update.form.next_depreciation_date == (supplier_invoice.invoice_date \
                 + relativedelta(months=4, days=-1))
     try:
-        update.execute('create_move')  # doctest: +IGNORE_EXCEPTION_DETAIL
+        update.execute('create_move')
     except ValueError:
         pass
     else:
         raise RuntimeError('A ValueError should have been raised')
 
-    update.form.date = (supplier_invoice.invoice_date
+    update.form.date = (supplier_invoice.invoice_date \
             + relativedelta(months=3))
     update.execute('create_move')
     asset.reload()
     assert asset.value == Decimal('1100')
-    
+
     assert [l.depreciation for l in asset.lines[:3]] == \
       [Decimal('37.50'), Decimal('37.50'), Decimal('37.50')]
     assert [l.depreciation for l in asset.lines[3:-1]] == \
       [Decimal('42.26')] * 20
     assert asset.lines[-1].depreciation == Decimal('42.30')
-    
+
     depreciation_account.reload()
     assert depreciation_account.debit == Decimal('100.00')
     assert depreciation_account.credit == Decimal('112.50')
-    
+
     expense.reload()
     assert expense.debit == Decimal('112.50')
     assert expense.credit == Decimal('100.00')
@@ -245,11 +255,11 @@ def step_impl(context):
     create_moves.form.date = (supplier_invoice.invoice_date
             + relativedelta(months=6))
     create_moves.execute('create_moves')
-    
+
     depreciation_account.reload()
     assert depreciation_account.debit == Decimal('100.00')
     assert depreciation_account.credit == Decimal('239.28')
-    
+
     expense.reload()
     assert expense.debit == Decimal('239.28')
     assert expense.credit == Decimal('100.00')
@@ -267,18 +277,18 @@ def step_impl(context):
     invoice_line.unit_price = Decimal('600')
     assert invoice_line.account == revenue
     customer_invoice.click('post')
-    
+
     assert customer_invoice.state == u'posted'
-    
+
     asset.reload()
     assert asset.customer_invoice_line == customer_invoice.lines[0]
     assert revenue.debit == Decimal('860.72')
     assert revenue.credit == Decimal('600.00')
-    
+
     asset_account.reload()
     assert asset_account.debit == Decimal('1000.00')
     assert asset_account.credit == Decimal('1100.00')
-    
+
     depreciation_account.reload()
     assert depreciation_account.debit == Decimal('339.28')
     assert depreciation_account.credit == Decimal('239.28')
