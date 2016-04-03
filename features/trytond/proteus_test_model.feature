@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 
 @works32 @works34 @works36
-@idempotent
 Feature:    test_model.py from proteus-3.2.2/proteus/tests
 
   Scenario: proteus test_model.py

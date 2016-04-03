@@ -1,90 +1,50 @@
-From: https://github.com/lampmantech/trytond_scenari/raw/master/features/steps/trytond_account_invoice.py
 
-
-From: https://github.com/lampmantech/trytond_scenari/raw/master/features/steps/trytond_account_invoice.py
-
+== trytond_account_invoice.py ==
 
 
 **Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
 
 **Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
-   Given Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
-   "{uSupplier}" with following {{{|description|quantity|unit_price|account|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      {{{|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|}}} currency |
-   | Services Bought   | 5	   | 		|              | | | | | | |          |
-   | Test     	      | 1	   | 10.00	| Main Expense | | | | | | | USD      |
+Given \
+Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+"{uSupplier}" with following |description|quantity|unit_price|account| fields
+Note that this uses the heading description rather than name
+| description       | quantity   | unit_price | account      |tax_amount|base_amount|tax_code_id|base_code_id|tax_account| currency |
+| Services Bought   | 5	   | 		|              | | | | | | |          |
+| Test     	      | 1	   | 10.00	| Main Expense | | | | | | | USD      |
 
 **Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields**
-   Given Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
-   "{uSupplier}" with following {{{|description|quantity|unit_price|account|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      | currency |
-   | Services Bought   | 5	   | 		|              |          |
-   | Test     	      | 1	   | 10.00	| Main Expense | USD      |
+Given \
+Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+"{uSupplier}" with following |description|quantity|unit_price|account| fields
+Note that this uses the heading description rather than name
+| description       | quantity   | unit_price | account      | currency |
+| Services Bought   | 5	   | 		|              |          |
+| Test     	      | 1	   | 10.00	| Main Expense | USD      |
 
 **Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
 
 **Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
-   Given Create an Invoice with description "{uDescription}" to customer
-   "{uCustomer}" with following {{{|description|quantity|unit_price|account|currency|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      {{{|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|}}}currency |
-   | Services Bought   | 5	   | 		|              | | | | | | |          |
-   | Test     	      | 1	   | 10.00	| Main Revenue | | | | | | | USD      |
+Given \
+Create an Invoice with description "{uDescription}" to customer
+"{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
+Note that this uses the heading description rather than name
+| description       | quantity   | unit_price | account      |tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency |
+| Services Bought   | 5	   | 		|              | | | | | | |          |
+| Test     	      | 1	   | 10.00	| Main Revenue | | | | | | | USD      |
 
 **Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields**
-   Given Create an Invoice with description "{uDescription}" to customer
-   "{uCustomer}" with following {{{|description|quantity|unit_price|account|currency|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      | currency |
-   | Services Bought   | 5	   | 		|              |          |
-   | Test     	      | 1	   | 10.00	| Main Revenue | USD      |
+Given \
+Create an Invoice with description "{uDescription}" to customer
+"{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
+Note that this uses the heading description rather than name
+| description       | quantity   | unit_price | account      | currency |
+| Services Bought   | 5	   | 		|              |          |
+| Test     	      | 1	   | 10.00	| Main Revenue | USD      |
 
 **Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"**
-   Given     Action "post" on date "TODAY" the Invoice with description "Invoice #1"
-   as user named "Account" products from party "Supplier"
-----
-This file is automatically generated from the source code: do not edit.
+Given \
+Action "post" on date "TODAY" the Invoice with description "Invoice #1"
+as user named "Account" products from party "Supplier"
 
-**Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
-
-**Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
-   Given Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
-   "{uSupplier}" with following {{{|description|quantity|unit_price|account|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      {{{|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|}}} currency |
-   | Services Bought   | 5	   | 		|              | | | | | | |          |
-   | Test     	      | 1	   | 10.00	| Main Expense | | | | | | | USD      |
-
-**Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields**
-   Given Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
-   "{uSupplier}" with following {{{|description|quantity|unit_price|account|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      | currency |
-   | Services Bought   | 5	   | 		|              |          |
-   | Test     	      | 1	   | 10.00	| Main Expense | USD      |
-
-**Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
-
-**Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
-   Given Create an Invoice with description "{uDescription}" to customer
-   "{uCustomer}" with following {{{|description|quantity|unit_price|account|currency|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      {{{|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|}}}currency |
-   | Services Bought   | 5	   | 		|              | | | | | | |          |
-   | Test     	      | 1	   | 10.00	| Main Revenue | | | | | | | USD      |
-
-**Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields**
-   Given Create an Invoice with description "{uDescription}" to customer
-   "{uCustomer}" with following {{{|description|quantity|unit_price|account|currency|}}} fields
-   Note that this uses the heading description rather than name
-   | description       | quantity   | unit_price | account      | currency |
-   | Services Bought   | 5	   | 		|              |          |
-   | Test     	      | 1	   | 10.00	| Main Revenue | USD      |
-
-**Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"**
-   Given     Action "post" on date "TODAY" the Invoice with description "Invoice #1"
-   as user named "Account" products from party "Supplier"
-----
 This file is automatically generated from the source code: do not edit.
