@@ -2,12 +2,14 @@
 == trytond_product.py ==
 
 
-**Create a ProductCategory named "{uName}"**
+**STEP: Create a ProductCategory named "{uName}"**
+
 Given \
 Create a saved instance of "product.category" named "{uName}"
 Idempotent.
 
-**Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields**
+**STEP: Create a ProductTemplate named "{uName}" with stock accounts from features from a ProductCategory named "{uCatName}" with |name|value| fields**
+
 Given \
 Create a ProductTemplate named "{uName}"
 from a ProductCategory named "{uCatName}" with |name|value| fields
@@ -27,12 +29,14 @@ from a ProductCategory named "{uCatName}" with |name|value| fields
 This requires that anglo_saxon
 Idempotent.
 
-**Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}"**
+**STEP: Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}"**
+
 Given \
 Create a ProductTemplate named "{uTemplateName}"
 with a supplier_tax named "{uTaxName}"
 
-**Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields**
+**STEP: Create a ProductTemplate named "{uTemplateName}" with supplier_tax named "{uTaxName}" with |name|value| fields**
+
 Given \
 Create a ProductTemplate named "{uTemplateName}"
 with supplier_tax named "{uTaxName}"
@@ -52,7 +56,8 @@ We'll put a hack to work on systems without a CoTs:
 just call the tax "NO Sales Tax".
 Idempotent.
 
-**Create a product with description "{uDescription}" from template "{uTemplateName}"**
+**STEP: Create a product with description "{uDescription}" from template "{uTemplateName}"**
+
 Given \
 Create a product with description "{uDescription}" from template "{uTemplateName}"
 Idempotent.

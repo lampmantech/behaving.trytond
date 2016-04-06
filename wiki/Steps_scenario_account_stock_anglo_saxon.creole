@@ -8,13 +8,15 @@ This is a straight cut-and-paste from
 trytond_account-2.8.1/tests/scenario_account_reconciliation.rst
 Unfinished.
 
-**Set the fiscal years to use anglo-saxon accounting**
+**STEP: Set the fiscal years to use anglo-saxon accounting**
+
 Given \
 Set the fiscal years to use anglo-saxon accounting.
 Create the company and fiscal years first, but do it before
 you create the chart of accounts (I think).
 
-**T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields**
+**STEP: T/ASAS/SASAS Create products of type "{uType}" from the ProductTemplate named "{uName}" with fields**
+
 Given \
 Create products of type "{uType}" from the ProductTemplate named \
 "{uName}" with fields
@@ -23,7 +25,8 @@ Create products of type "{uType}" from the ProductTemplate named \
 | product_average	| average	    | Product Average     |
 Idempotent.
 
-**T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities**
+**STEP: T/ASAS/SASAS Purchase products on the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities**
+
 Given \
 Purchase products on the P. O. with description "{uDescription}" \
 from supplier "{uSupplier}" with quantities
@@ -32,34 +35,42 @@ from supplier "{uSupplier}" with quantities
 | product_average	| 7.0	   | 6		|
 Idempotent.
 
-**T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+**STEP: T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+
 Given \
 T/ASAS/SASAS Quote and Confirm and Process a P. O. \
 with description "{uDescription}" from Supplier "{uSupplier}"
 Idempotent.
 
-**T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+**STEP: T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+
 Given \
 T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" \
 from Supplier "{uSupplier}" with quantities
 Idempotent.
 
-**T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
+**STEP: T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
+
 NOT idempotent
 
-**T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices**
+**STEP: T/ASAS/SASAS Open a purchase invoice to pay for what we received from the P. O. with description "{uDescription}" to supplier "{uSupplier}" with prices**
 
-**T/ASAS/SASAS After paying for what we received assert the account credits and debits**
+
+**STEP: T/ASAS/SASAS After paying for what we received assert the account credits and debits**
+
 NOT idempotent
 
-**T/ASAS/SASAS After shipping to customer assert the account credits and debits**
+**STEP: T/ASAS/SASAS After shipping to customer assert the account credits and debits**
+
 Given \
 T/ASAS/SASAS After shipping to customer assert the account credits and debits
 NOT idempotent.
 
-**T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
+**STEP: T/ASAS/SASAS After posting the invoice to customer assert the account credits and debits**
 
-**T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities**
+
+**STEP: T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with quantities**
+
 Given \
 Create an Invoice to supplier "uSupplier" with PaymentTerm "uPaymentTerm" \
 by an accountant with quantities
@@ -67,7 +78,8 @@ by an accountant with quantities
 | product_fixed   | 5.0      	| 4.00	     |
 Idempotent.
 
-**T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities**
+**STEP: T/ASAS/SASAS Create an Invoice to supplier "{uSupplier}" with PaymentTerm "{uPaymentTerm}" by an accountant with negative quantities**
+
 Unfinished
 >>> invoice = Invoice()
 >>> invoice.party = customer

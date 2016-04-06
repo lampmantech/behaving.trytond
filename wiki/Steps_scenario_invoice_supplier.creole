@@ -8,9 +8,11 @@ This is a straight cut-and-paste from
 trytond_account_invoice-3.0.0/tests/scenario_invoice_supplier.rst
 It should be improved to be more like a Behave BDD.
 
-**TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
+**STEP: TS/AIS Post the invoice with description "{uDescription}" and assert the taxes named "{uTaxName}" are right**
 
-**TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
+
+**STEP: TS/AIS Create a credit note for the invoice with description "{uDescription}" and assert the amounts**
+
 Given \
 Create a credit note for the invoice with description "{uDescription}"
 and assert the amounts for the credit note equal the invoice amounts.

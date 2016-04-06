@@ -2,15 +2,19 @@
 == trytond_calendar.py ==
 
 
-**Create a calendar named "{uCalName}" owned by the user "{uUserName}"**
+**STEP: Create a calendar named "{uCalName}" owned by the user "{uUserName}"**
+
 WIP.
 Idempotent.
 
-**I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
+**STEP: I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
 
-**I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with |date|name|location|description| following**
 
-**I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with |date|name|description|location| following**
+**STEP: I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with |date|name|location|description| following**
+
+
+**STEP: I need a set of "{uKind}" events in a calendar named "{uCalName}" owned by the user named "{uUserName}" with |date|name|description|location| following**
+
 Given \
 Create "{uKind}" events in the calendar named "{uCalName}"
 owned by the user named "{uUserName}"
@@ -22,9 +26,11 @@ or use 'Set the feature data with values' ...
 It expects a |date|name|location|description| table.
 Idempotent.
 
-**I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
+**STEP: I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with fields**
 
-**I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with |name|date| following**
+
+**STEP: I need a set of "{uKind}" annual events in the calendar named "{uCalName}" owned by the user named "{uUserName}" with |name|date| following**
+
 Given \
 Create "{uKind}" annual events in the calendar named "{uCalName}"
 owned by the user named "{uUserName}". {uKind} can be empty, but

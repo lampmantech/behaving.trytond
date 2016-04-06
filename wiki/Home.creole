@@ -33,13 +33,15 @@ trytond_scenari uses proteus.
 === Documentation ===
 
 For the moment, the documentation is in the docstrings to the steps. 
-We've writen a simple shell script that can harvest these for the
+We've writen a simple script that can harvest these for the
 wiki so that the documentation can be automatically generated;
-see the [[TitleIndex]] for the pages that start with Feature or Steps.
+see the [[Features]] or [[Scripts]] pages, or the [[TitleIndex]] .
 
 * [[Installation]]
 * [[Configuration]]
 * [[Testing]]
+* [[Features]]
+* [[Steps]]
 * [[TitleIndex]]
 
 

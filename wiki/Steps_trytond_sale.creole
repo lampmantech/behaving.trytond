@@ -2,7 +2,8 @@
 == trytond_sale.py ==
 
 
-**Sale on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields**
+**STEP: Sale on date "{uDate}" with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" products to customer "{uCustomer}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |product|quantity|description| fields**
+
 Given \
 Sale on date "TODAY" with description "Description"
 with their reference "uRef"
@@ -15,19 +16,23 @@ with |product|quantity|description| fields
 | product | comment  | Comment     |
 | product | 3.0      |             |
 
-**Sale "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
+**STEP: Sale "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
+
 Given \
 Sale "quote" on date "TODAY" the S.O. with description "P. O #1"
 as user named "Sale" products from customer "Customer"
 
-**Invoice "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
+**STEP: Invoice "{uAct}" on date "{uDate}" the S. O. with description "{uDescription}" as user named "{uUser}" products from customer "{uCustomer}"**
+
 Given \
 Invoice "post" on date "TODAY" the S. O. with description "S. O #1"
 as user named "Account" products from customer "Customer"
 
-**Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields**
+**STEP: Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields**
 
-**Create a sales order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields**
+
+**STEP: Create a sales order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields**
+
 Given \
 Create a sales order with description "{uDescription}" in Currency coded "%(sCur)s" to customer "{uCustomer}" on Date "{uDate}" with fields
 | name              | value    |
@@ -36,7 +41,8 @@ Create a sales order with description "{uDescription}" in Currency coded "%(sCur
 | reference         | None     |
 Idempotent.
 
-**Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity|unit_price| fields**
+**STEP: Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity|unit_price| fields**
+
 Sell Products on the S. O. with description "uDescription" \
 to customer "uCustomer" with quantities
 | description     | quantity | unit_price |
@@ -44,7 +50,8 @@ to customer "uCustomer" with quantities
 | Product Average | 3.0      | 10.00      |
 Idempotent.
 
-**Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity| fields**
+**STEP: Sell Products on the S. O. with description "{uDescription}" to customer "{uCustomer}" with |description|quantity| fields**
+
 Given \
 Sell products on the S. O. with description "uDescription"
 to customer "uCustomer" with quantities
@@ -53,17 +60,21 @@ to customer "uCustomer" with quantities
 | Product Average | 3.0      |
 Idempotent.
 
-**Validate shipments on "{uDate}" for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+**STEP: Validate shipments on "{uDate}" for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
 
-**Ship the products on "{uDate}" of the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**STEP: Ship the products on "{uDate}" of the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
 Ship the products on "{uDate}" of the S. O. with description "{uDescription}" \
 to customer "{uCustomer}"
 From: T/ASAS/SASAS
 NOT idempotent
 
-**Invoice act "post" for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+**STEP: Invoice act "post" for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
 
-**Post customer Invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
+**STEP: Post customer Invoice for the S. O. with description "{uDescription}" to customer "{uCustomer}"**
+
 Given \
 Post customer Invoice for the Sales Order with description "uDescription"
 to customer "uCustomer"

@@ -2,19 +2,23 @@
 == trytond_stock.py ==
 
 
-**Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"**
+**STEP: Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"**
+
 Given \
 Create a stock admin user named "{uName}" with login "{uLogin}" in group "{uGroup}"
 
-**Create a new stock.location named "{uName}" of type warehouse**
+**STEP: Create a new stock.location named "{uName}" of type warehouse**
+
 Given \
 Create a new stock.location named "{uName}" of type warehouse"
 
-**Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"**
+**STEP: Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"**
+
 Given \
 Create a new stock.location named "{uName}" of type "{uType}" of parent with code "{uParent}"
 
-**Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" ProductTemplates with |product|quantity|expected_quantity| fields**
+**STEP: Add to inventory as user named "{uUser}" with storage at the location coded "{uCode}" ProductTemplates with |product|quantity|expected_quantity| fields**
+
 Given \
 Create an Inventory as user named "{uUser}"
 with storage at the location with code "{uCode}"
@@ -23,12 +27,14 @@ quantity and expected_quantity as floats.
 | name | quantity | expected_quantity |
 | product | 100.0    | 0.0               |
 
-**Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"**
+**STEP: Create an Inventory as user named "{uUser}" with storage at the location coded "{uCode}"**
+
 Given \
 Create an Inventory as user named "{uUser}"
 with storage at the location with code "{uCode}"
 
-**Stock Move of Product with description "{uProductDescription}" between locations with |name|value| fields**
+**STEP: Stock Move of Product with description "{uProductDescription}" between locations with |name|value| fields**
+
 Stock Move of Product with description "uProductDescription" \
 between locations with |name|value| fields
 | name              | value |
@@ -41,9 +47,11 @@ between locations with |name|value| fields
 | unit_price 	| 100   |
 | currency 		| USD   |
 
-**Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+**STEP: Stock Move of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
 
-**Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+
+**STEP: Stock Move of product of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+
 Stock Move of product of ProductTemplate named "uProductTemplate" \
 between locations with |name|value| fields
 | name              | value |
@@ -57,7 +65,8 @@ between locations with |name|value| fields
 | currency 		| USD |
 Locations are location codes, not names.
 
-**Stock Internal Shipment of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+**STEP: Stock Internal Shipment of ProductTemplate named "{uProductTemplate}" between locations with |name|value| fields**
+
 Given \
 Stock Internal Shipment of product of ProductTemplate named "uProductTemplate" \
 between locations with |name|value| fields
@@ -70,7 +79,8 @@ between locations with |name|value| fields
 | effective_date 	| TODAY |
 Locations are location codes, not names.
 
-**Stock Internal Shipment of Product with description "{uProductDescription}" between locations with |name|value| fields**
+**STEP: Stock Internal Shipment of Product with description "{uProductDescription}" between locations with |name|value| fields**
+
 Given \
 Stock Internal Shipment of product of Product \
 with description  "uProductDescription" \
@@ -84,7 +94,8 @@ between locations with |name|value| fields
 | effective_date 	| TODAY |
 Locations are location codes, not names.
 
-**Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description|unit_price| fields**
+**STEP: Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description|unit_price| fields**
+
 Given \
 Purchase on date "TODAY" stock with description "Description"
 as user named "Purchase" Products from supplier "Supplier"
@@ -97,7 +108,8 @@ with |description|quantity|line_description| fields
 | product | comment  | Comment     |       |
 | product | 3.0      |             | 10.00 |
 
-**Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields**
+**STEP: Purchase on date "{uDate}" stock with description "{uDescription}" with their reference "{uRef}" as user named "{uUser}" in Currency coded "{uCur}" Products from supplier "{uSupplier}" to warehouse "{uWh}" with PaymentTerm "{uTerm}" and InvoiceMethod "{uMethod}" with |description|quantity|line_description| fields**
+
 Given \
 Purchase on date "TODAY" stock with description "Description"
 as user named "Purchase" in Currency coded "uCur"

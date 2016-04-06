@@ -4,28 +4,35 @@
 This is the elementary test of Trytons basic modules.
 If this test fails, trytond is not properly installed.
 
-**we have proteus installed**
+**STEP: we have proteus installed**
 
-**Ensure that the "{mod}" module is loaded**
+
+**STEP: Ensure that the "{mod}" module is loaded**
+
 Load the "{mod}" module if it is not already loaded.
 Idempotent.
 
-**the "{mod}" module is in the list of loaded modules**
+**STEP: the "{mod}" module is in the list of loaded modules**
 
-**we print the list of loaded modules**
+
+**STEP: we print the list of loaded modules**
+
 Print the list of loaded modules on behave's stdout.
 
-**Ensure that the WebDAV modules are loaded**
+**STEP: Ensure that the WebDAV modules are loaded**
+
 Given \
 Ensure that the WebDAV modules are loaded
 So that we can access the calendars and contacts via WebDAV
 
-**we have the following table of "{mod}" instances**
+**STEP: we have the following table of "{mod}" instances**
+
 Creates the instances of the Model 'uMod' with the names from the table.
 It expects a |name| table.
 Idempotent.
 
-**there are some instances of "{uMod}"**
+**THEN: there are some instances of "{uMod}"**
+
 Asserts that there are some instances of the Model 'uMod'.
 Idempotent.
 
