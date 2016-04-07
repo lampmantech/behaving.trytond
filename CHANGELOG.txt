@@ -1,3 +1,13 @@
+commit 70f0166cc2fdcb8ce0f4f24132405ef3465a257d
+Date:   Thu Apr 7 17:36:17 2016 +0300
+
+     moved python source to src/behaving/trytond/steps/support
+
+commit aa657542f02a4107c952b8b4b8b9b885a22490d7
+Date:   Thu Apr 7 17:28:50 2016 +0300
+
+    Updated documentation for new layout
+
 commit b38aded85ba4d6859b9605be2be1ff18755aee6e
 Date:   Thu Apr 7 06:28:05 2016 +0300
 

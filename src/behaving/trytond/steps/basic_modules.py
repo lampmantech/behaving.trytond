@@ -12,7 +12,7 @@ from .support import tools
 from .support.stepfuns import vAssertContentTable
 
 @step('we have proteus installed')
-def step_impl(context):
+def we_have_proteus_installed(context):
     assert context.oProteusConfig
 
 @step('Ensure that the "{mod}" module is loaded')
@@ -67,7 +67,7 @@ def step_impl(context, mod):
 
 
 @then('there are some instances of "{uMod}"')
-def step_impl(context, uMod):
+def there_are_some_instances_of(context, uMod):
     """
     Asserts that there are some instances of the Model 'uMod'.
     Idempotent.

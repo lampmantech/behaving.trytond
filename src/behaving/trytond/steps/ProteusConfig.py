@@ -121,7 +121,7 @@ def set_trytond(database_name=None,
     os.environ['TRYTOND_CONFIG'] = sTrytonConfigFile
     # this is required - should this info be in the tryton config file?
     assert 'PGPASSWORD' in os.environ and os.environ['PGPASSWORD'], \
-		"Set PGPASSWORD in th OS environment to be the postgres password"
+		"Set PGPASSWORD in the OS environment to be the postgres password"
     postgres_password = os.environ['PGPASSWORD'] # 'postgresTryton'
     assert 'PGUSER' in os.environ and os.environ['PGUSER'], \
 		"Set PGPASSWORD in the OS environment to be the postgres user"

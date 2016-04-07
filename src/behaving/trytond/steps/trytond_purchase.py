@@ -193,7 +193,8 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
                 invoice.description = purchase.description
                 invoice.save()
             # FixMe: this isnt making it to the invoice?
-            if not invoice.reference:
+            if not invoice.reference and invoice.state in [u'draft']:
+                # it wont let you change thw reference if posted
                 invoice.reference = purchase.supplier_reference
                 invoice.save()
     elif uAct == 'process':
