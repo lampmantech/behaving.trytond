@@ -1,3 +1,8 @@
+commit df6e5194dc4dbb2c83a3f3e268870a85d7736b32
+Date:   Thu Apr 7 17:47:43 2016 +0300
+
+    Added setup.py
+
 commit 70f0166cc2fdcb8ce0f4f24132405ef3465a257d
 Date:   Thu Apr 7 17:36:17 2016 +0300
 

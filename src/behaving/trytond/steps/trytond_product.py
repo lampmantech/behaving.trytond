@@ -91,7 +91,7 @@ def step_impl(context, uName, uCatName):
             stock_supplier, = stepfuns.gGetFeaturesStockAccs(context, company)
 
         cogs, = Account.find([
-# what kind is cogs and why is it not in the default accounts?
+# what kind is cogs?
 #?            ('kind', '=', 'other'),
             ('name', '=', sGetFeatureData(context, 'account.template,main_cogs')),
             ('company', '=', company.id),

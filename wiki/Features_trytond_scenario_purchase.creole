@@ -6,6 +6,7 @@
     adapted from 
     in 
     Works, but still UNFINISHED.
+
     See this note in trytond_product-3.6.0/product.py:
 
 ===   Scenario: Setup the tests of the purchase module ===
@@ -114,7 +115,7 @@
             with their reference "Ref2" as user named "Purchase" \
             in Currency coded "USD" ProductTemplates from supplier "Supplier" \
             with PaymentTerm "Direct" and InvoiceMethod "shipment" \
-            with |name|quantity|description| fields
+            with |name|quantity|line_description| fields
             | name | quantity | line_description        |
             | product | 2.0      |              |
             | product | comment  | Comment      |

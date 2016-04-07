@@ -1,8 +1,6 @@
 
 === Testing ===
 
-To see what this version is,
-look at the first date in the file CHANGELOG.txt.
 
 As a rule, all tests within a directory should not interfere with each
 other, it is expected that there is interference between directories.
@@ -12,8 +10,8 @@ You can call behave with {{{behave/*.feature}}} or
 
 ==== Tags ====
 
-This should work
-with Tryton 3.4 with no problems: look at each feature for the tags
+The current release should work with Tryton 3.6 with a couple of tagged
+failures:look at each feature for the tags
 {{{works32}}} {{{works34}}} {{{works36}}}, and {{{broken36}}}.
 The latter means it was working, but has now broken in Tryton 3.6.
 Usually these are minor problems, but we just haven't had the time to fix it.
