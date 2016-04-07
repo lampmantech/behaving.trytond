@@ -2,25 +2,25 @@
 trytond_scenari
 http://github.com/lampmantech/trytond_scenari
 
-This module provides scenario testing for trytond using behave BDD
-(Behaviour Driven Development), and for loading trytond database
-information and code using BDD. The module is a work-in-progress.
+This package provides scenario testing for trytond using behave and behaving
+BDD (Behaviour Driven Development), and for loading trytond database
+data and code using BDD. The module is a work-in-progress.
 
 Behaviour Driven Development allows us to refactor the scenarios
 in Tryton's doctests, to provide easy-to-use templates for end-users
 to carry out the major tasks of Tryton. By migrating doctest scenarios to
-trytond_scenari, the testing moves from the developer into the hands
+behave scenari, the testing moves from the developer into the hands
 of the end-user. At the same time, duplication of code is eliminated.
 
 Tests are contained is textual feature files written in a
 domain specific natural language with a Gherkin syntax, in the files:
-{{{features/*.feature}}}
+{{{src/behaving/tests/features/*/*.feature}}}
 
-The steps of the language draw on the definitions in:
-{{{features/steps/*.py}}}
+The steps of the domain language draw on the Python definitions in:
+{{{src/behaving/tests/features/steps/*.py}}}
 
-For modularity, there is a local python module of undecorated python code:
-{{{features/steps/support/}}}
+For modularity, there is a local python module of undecorated Python code:
+{{{src/behaving/tests/features/steps/support/}}}
 
 trytond_scenari is inspired by OpenERPScenario:
 https:///github.com/camptocamp/oerpscenario/
@@ -29,12 +29,18 @@ which uses behave: http://pythonhosted.org/behave
 for BDD testing of OpenERP (v6.x and 7.0).
 trytond_scenari uses proteus.
 
+It has been structured to use the {{{behaving}}} namespace from
+https://github.com/ggozad/behaving/ and requires that package as a prerequisite.
+This allows us to draw from other {{{behaving}}} namespace packages, to use
+{{{behaving.web}}} for example to test {{{sao}}}.
+
+Active development is on Tryton 3.6; see
+* [[Testing|https://github.com/lampmantech/trytond_scenari/wiki/Testing]]
 
 === Documentation ===
 
-For the moment, the documentation is in the docstrings to the steps. 
-We've writen a simple script that can harvest these for the
-wiki so that the documentation can be automatically generated;
+We've written a simple script that can harvest the docstrings to the steps
+for the wiki so that the documentation can be automatically generated;
 see the [[Features]] or [[Scripts]] pages, or the [[TitleIndex]] .
 
 * [[Installation]]
@@ -43,7 +49,6 @@ see the [[Features]] or [[Scripts]] pages, or the [[TitleIndex]] .
 * [[Features]]
 * [[Steps]]
 * [[TitleIndex]]
-
 
 === Project ===
 

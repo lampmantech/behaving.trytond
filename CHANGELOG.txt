@@ -1,3 +1,23 @@
+commit b38aded85ba4d6859b9605be2be1ff18755aee6e
+Date:   Thu Apr 7 06:28:05 2016 +0300
+
+    Restructured file for the behaving namespace
+
+commit 20ea6723e4186b93ca9ecbb7ee3aff31ffd071cf
+Date:   Wed Apr 6 21:19:22 2016 +0300
+
+    Prepare for renaming of package to behaving.trytond
+
+commit b6864cdc3b27c13212ddf9c68ba9105b0fc10c13
+Date:   Wed Apr 6 21:09:53 2016 +0300
+
+    Renamed wiki pages
+
+commit e0919bfa47e52914d4c791302c8bb47e4b6cf5fb
+Date:   Sun Apr 3 06:57:46 2016 +0300
+
+    Improved to doc formatting
+
 commit d3e3d33f6fb55ca2338708160fd9b73f565ef0a7
 Date:   Sun Apr 3 06:36:40 2016 +0300
 
