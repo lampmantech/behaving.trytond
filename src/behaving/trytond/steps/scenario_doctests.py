@@ -122,11 +122,11 @@ def step_impl(context, uName):
     from trytond.tests.test_tryton import install_module
     install_module(uName)
 
-@step('Create the company with default COMPANY_NAME and Currency code "{uCode}"')
+@step('Create the Company with default COMPANY_NAME and Currency code "{uCode}"')
 def step_impl(context, uCode):
     """
     Given \
-    Create the company with default COMPANY_NAME and Currency code "{uCode}"
+    Create the Company with default COMPANY_NAME and Currency code "{uCode}"
     """
     uPartyName = sGetFeatureData(context, 'party,company_name')
     context.execute_steps(u'''
@@ -301,6 +301,7 @@ def step_impl(context, uKlass, uName):
 
 @step('Set the slots of the instance named "{uName}" of model "{uKlass}" to the values')
 @step('Set the instance named "{uName}" of model "{uKlass}" with fields')
+@step('Set the instance named "{uName}" of model "{uKlass}" with |name|value| fields')
 def step_impl(context, uName, uKlass):
     """
     Given \
@@ -311,8 +312,8 @@ def step_impl(context, uName, uKlass):
     vSetNamedInstanceFields(context, uName, uKlass)
 
 @step('Set the slots of the instance described "{uName}" of model "{uKlass}" to the values')
-@step('Set the instance described "{uName}" of model "{uKlass}" with |name|value| fields')
 @step('Set the instance described "{uName}" of model "{uKlass}" with fields')
+@step('Set the instance described "{uName}" of model "{uKlass}" with |name|value| fields')
 def step_impl(context, uName, uKlass):
     """
     Given \

@@ -16,14 +16,14 @@ def step_impl(context):
     """
     pass
 
-@when('we implement a test')
+@step('we implement a test')
 def step_impl(context):
     """
     A trivial assertion.
     """
     assert True is not False
 
-@then('behave will test it for us!')
+@step('behave will test it for us!')
 def step_impl(context):
     """
     The trivial assertion did not fail.

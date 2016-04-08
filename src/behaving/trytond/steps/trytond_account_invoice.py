@@ -18,14 +18,14 @@ TODAY = datetime.date.today()
 
 
 
-# Create an invoice on date "2014-07-01" with description "Jackson and Grimes 2014 Bill Adjustments" and a PaymentTerm named "Term 30 days" to supplier "Jackson and Grimes" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields'
+# Create an invoice on Date "2014-07-01" with description "Jackson and Grimes 2014 Bill Adjustments" and a PaymentTerm named "Term 30 days" to supplier "Jackson and Grimes" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields'
 
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+@step('Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+@step('Create an Invoice on Date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
     """
     Given \
-Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+Create an Invoice on Date "{uDate}" with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
 Note that this uses the heading description rather than name
   | description       | quantity   | unit_price | account      |tax_amount|base_amount|tax_code_id|base_code_id|tax_account| currency |
@@ -37,11 +37,11 @@ Note that this uses the heading description rather than name
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
 
 
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
+@step('Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uSupplier):
     """
     Given \
-Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+Create an Invoice on Date "{uDate}" with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
 Note that this uses the heading description rather than name
   | description       | quantity   | unit_price | account      | currency |
@@ -52,8 +52,8 @@ Note that this uses the heading description rather than name
     assert context.table
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uSupplier, sType)
 
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+@step('Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
+@step('Create an Invoice on Date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
     """
     Given \
@@ -69,11 +69,11 @@ Note that this uses the heading description rather than name
     oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uCustomer, sType)
 
 
-@step('Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
+@step('Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields')
 def step_impl(context, uDate, uDescription, uPaymentTerm, uCustomer):
     """
     Given \
-Create an Invoice with description "{uDescription}" to customer
+Create an Invoice on Date "{uDate}" with description "{uDescription}" to customer
 "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
 Note that this uses the heading description rather than name
   | description       | quantity   | unit_price | account      | currency |
@@ -208,7 +208,7 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
 
             if u'tax_account' in context.table.headings and row['tax_account']:
                 # tax_amount|base_amount|tax_code_id|base_code_id|tax_account
-                oInvoiceTax = InvoiceTax()
+                oInvoiceTax = invoice.taxes.new()
                 invoice.taxes.append(oInvoiceTax)
                 if uQuantity:
                     oInvoiceTax.description = 'VAT'
@@ -229,18 +229,18 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
                 oInvoiceTax.tax_code, = TaxCode.find([
                         ('code', '=', row['tax_code_id']),
                         ('company.id', '=', company.id)])
-                #? oInvoiceTax.save()
+
         invoice.save()
 
     assert Invoice.find([('party.id',  '=', oParty.id),
                              ('company.id',  '=', company.id),
                              ('description', '=', uDescription)])
 
-@step('Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"')
+@step('Action "{uAct}" on Date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"')
 def step_impl(context, uAct, uDate, uDescription, uUser, uSupplier):
     """
     Given \
-    Action "post" on date "TODAY" the Invoice with description "Invoice #1"
+    Action "post" on Date "TODAY" the Invoice with description "Invoice #1"
     as user named "Account" products from party "Supplier"
 
     """

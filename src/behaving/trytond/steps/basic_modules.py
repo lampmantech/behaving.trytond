@@ -66,7 +66,7 @@ def step_impl(context, mod):
         assert party.id > 0
 
 
-@then('there are some instances of "{uMod}"')
+@step('there are some instances of "{uMod}"')
 def there_are_some_instances_of(context, uMod):
     """
     Asserts that there are some instances of the Model 'uMod'.

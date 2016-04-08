@@ -2,33 +2,33 @@
 == trytond_account_invoice.py ==
 
 
-**STEP: Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
+**STEP: Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
 
 
-**STEP: Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
+**STEP: Create an Invoice on Date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
 
 Given \
-Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+Create an Invoice on Date "{uDate}" with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
 Note that this uses the heading description rather than name
 | description       | quantity   | unit_price | account      |tax_amount|base_amount|tax_code_id|base_code_id|tax_account| currency |
 | Services Bought   | 5	   | 		|              | | | | | | |          |
 | Test     	      | 1	   | 10.00	| Main Expense | | | | | | | USD      |
 
-**STEP: Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields**
+**STEP: Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to supplier "{uSupplier}" with following |description|quantity|unit_price|account|currency| fields**
 
 Given \
-Create an Invoice on date "{uDate}" with description "{uDescription}" to supplier
+Create an Invoice on Date "{uDate}" with description "{uDescription}" to supplier
 "{uSupplier}" with following |description|quantity|unit_price|account| fields
 Note that this uses the heading description rather than name
 | description       | quantity   | unit_price | account      | currency |
 | Services Bought   | 5	   | 		|              |          |
 | Test     	      | 1	   | 10.00	| Main Expense | USD      |
 
-**STEP: Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
+**STEP: Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
 
 
-**STEP: Create an Invoice on date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
+**STEP: Create an Invoice on Date "{uDate}" with description "{uDescription}" and with VAT and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|tax_amount|base_amount|tax_code_id|base_code_id|tax_account|currency| fields**
 
 Given \
 Create an Invoice with description "{uDescription}" to customer
@@ -38,20 +38,20 @@ Note that this uses the heading description rather than name
 | Services Bought   | 5	   | 		|              | | | | | | |          |
 | Test     	      | 1	   | 10.00	| Main Revenue | | | | | | | USD      |
 
-**STEP: Create an Invoice on date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields**
+**STEP: Create an Invoice on Date "{uDate}" with description "{uDescription}" and a PaymentTerm named "{uPaymentTerm}" to customer "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields**
 
 Given \
-Create an Invoice with description "{uDescription}" to customer
+Create an Invoice on Date "{uDate}" with description "{uDescription}" to customer
 "{uCustomer}" with following |description|quantity|unit_price|account|currency| fields
 Note that this uses the heading description rather than name
 | description       | quantity   | unit_price | account      | currency |
 | Services Bought   | 5	   | 		|              |          |
 | Test     	      | 1	   | 10.00	| Main Revenue | USD      |
 
-**STEP: Action "{uAct}" on date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"**
+**STEP: Action "{uAct}" on Date "{uDate}" the Invoice with description "{uDescription}" as user named "{uUser}" products from party "{uSupplier}"**
 
 Given \
-Action "post" on date "TODAY" the Invoice with description "Invoice #1"
+Action "post" on Date "TODAY" the Invoice with description "Invoice #1"
 as user named "Account" products from party "Supplier"
 
 This file is automatically generated from the source code: do not edit.

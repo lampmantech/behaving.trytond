@@ -10,8 +10,9 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
-TODAY = datetime.date.today()
+from .support.fields import string_to_python, sGetFeatureData, vSetFeatureData
 
+TODAY = datetime.date.today()
 
 @step('T/AP Create a PaymentJournal named "{uName}" of type "{uType}"')
 def step_impl(context, uName, uType):

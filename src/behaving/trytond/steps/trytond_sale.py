@@ -203,12 +203,12 @@ def step_impl(context, uAct, uDate, uDescription, uUser, uCustomer):
 
 
 # Customer, Sell 5 products
-@step('Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields')
 @step('Create a sales order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on date "{uDate}" with |name|value| fields')
+@step('Create a Sale order with description "{uDescription}" in Currency coded "{uCur}" to customer "{uCustomer}" on Date "{uDate}" with |name|value| fields')
 def step_impl(context, uDescription, uCur, uCustomer, uDate):
     """
     Given \
-    Create a sales order with description "{uDescription}" in Currency coded "%(sCur)s" to customer "{uCustomer}" on Date "{uDate}" with fields
+    Create a Sale order with description "{uDescription}" in Currency coded "%(sCur)s" to customer "{uCustomer}" on Date "{uDate}" with fields
 	  | name              | value    |
 	  | invoice_method    | shipment |
 	  | payment_term      | Direct   |

@@ -1,5 +1,6 @@
 **Index**
 
+* [[Home]]
 * [[Features]]
 * [[Steps]]
 * [[TitleIndex]]

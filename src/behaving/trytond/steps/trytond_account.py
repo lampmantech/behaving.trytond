@@ -1,5 +1,13 @@
 # -*- mode: python; py-indent-offset: 4; coding: utf-8-unix; encoding: utf-8 -*-
 """
+FixMe?: migrate this to use:
+
+from trytond.modules.company.tests.tools import create_company, \
+    get_company
+from trytond.modules.account.tests.tools import create_fiscalyear, \
+    create_chart, get_accounts
+from.trytond.modules.account_invoice.tests.tools import \
+    set_fiscalyear_invoice_sequences, create_payment_term    
 
 
 """
@@ -90,7 +98,8 @@ def step_impl(context, uYear):
     """
     config = context.oProteusConfig
 
-    if uYear == u'TODAY': uYear = str(TODAY.year)
+    if uYear == u'TODAY':
+        uYear = str(TODAY.year)
 
     FiscalYear = proteus.Model.get('account.fiscalyear')
     Party = proteus.Model.get('party.party')

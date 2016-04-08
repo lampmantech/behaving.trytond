@@ -173,12 +173,12 @@ def step_impl(context, uDescription, uSupplier):
 
 # FixMe: eliminate duplication
 # 12 products, Supplier
-@step('T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"')
+@step('T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from supplier "{uSupplier}"')
 def step_impl(context, uDescription, uSupplier):
     """
     Given \
     T/ASAS/SASAS Quote and Confirm and Process a P. O. \
-    with description "{uDescription}" from Supplier "{uSupplier}"
+    with description "{uDescription}" from supplier "{uSupplier}"
 
     Idempotent.
     """
@@ -204,12 +204,12 @@ def step_impl(context, uDescription, uSupplier):
         # These create the moves on the purchase order
 
 # 12 products, Supplier
-@step('T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities')
+@step('T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities')
 def step_impl(context, uDescription, uSupplier):
     """
     Given \
     T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" \
-    from Supplier "{uSupplier}" with quantities
+    from supplier "{uSupplier}" with quantities
 
     Idempotent.
     """

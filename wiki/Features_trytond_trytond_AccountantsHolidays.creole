@@ -6,7 +6,7 @@ This isn't working really because we still don't have recurrence rules.
 
 ===   Scenario: Set the default feature data for the Accountants calendar ===
 
-      **Given** Set the feature data with values \\
+\\      **Given** Set the feature data with values
             | name                                  | value                    	|
             | user,Accountant,name                  | Accountant		    	|
             | user,Accountant,login                 | accountant               	|
@@ -15,9 +15,9 @@ This isn't working really because we still don't have recurrence rules.
 
 ===   Scenario: Create the holidays ===
 
-      **Given** I need a set of "Holiday" annual events \\
-      	    in the calendar named "AccountantsCal" \
-	    owned by the user named "Accountant" with fields:
+\\      **Given** I need a set of {{{"Holiday"}}} annual events \\
+      	    in the calendar named {{{"AccountantsCal"}}} \\
+	    owned by the user named {{{"Accountant"}}} with fields:
             | name		   	  | date       	|
             | New Years                  | 2000-01-01 	|
             | Epiphany                   | 2000-01-06 	|

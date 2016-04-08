@@ -1,3 +1,8 @@
+commit cb172a19684d4a7044b385ecfb5f434ddc8cbbe8
+Date:   Thu Apr 7 23:58:45 2016 +0300
+
+    Updated documentaion
+
 commit df6e5194dc4dbb2c83a3f3e268870a85d7736b32
 Date:   Thu Apr 7 17:47:43 2016 +0300
 

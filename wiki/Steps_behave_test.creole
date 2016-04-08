@@ -10,11 +10,11 @@ If this test fails, behave is not properly installed.
 
 If behave is not installed we couldnt get here!
 
-**WHEN: we implement a test**
+**STEP: we implement a test**
 
 A trivial assertion.
 
-**THEN: behave will test it for us!**
+**STEP: behave will test it for us!**
 
 The trivial assertion did not fail.
 

@@ -31,7 +31,7 @@ Creates the instances of the Model 'uMod' with the names from the table.
 It expects a |name| table.
 Idempotent.
 
-**THEN: there are some instances of "{uMod}"**
+**STEP: there are some instances of "{uMod}"**
 
 Asserts that there are some instances of the Model 'uMod'.
 Idempotent.

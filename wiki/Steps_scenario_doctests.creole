@@ -40,10 +40,10 @@ Sets pool.test set to True
 Installs a module using trytond.tests.test_tryton.install_module
 in case thats different to installing a module.
 
-**STEP: Create the company with default COMPANY_NAME and Currency code "{uCode}"**
+**STEP: Create the Company with default COMPANY_NAME and Currency code "{uCode}"**
 
 Given \
-Create the company with default COMPANY_NAME and Currency code "{uCode}"
+Create the Company with default COMPANY_NAME and Currency code "{uCode}"
 
 **STEP: Create the Company associated with the party named "{uParty}" and using the currency "{uCode}"**
 
@@ -85,6 +85,9 @@ Idempotent.
 
 **STEP: Set the instance named "{uName}" of model "{uKlass}" with fields**
 
+
+**STEP: Set the instance named "{uName}" of model "{uKlass}" with |name|value| fields**
+
 Given \
 Guven an instance named "uName" of a Model, like Model.get('party.party')
 set the attributes to the values.   It expects a |name|value| table.
@@ -93,10 +96,10 @@ Idempotent.
 **STEP: Set the slots of the instance described "{uName}" of model "{uKlass}" to the values**
 
 
-**STEP: Set the instance described "{uName}" of model "{uKlass}" with |name|value| fields**
-
-
 **STEP: Set the instance described "{uName}" of model "{uKlass}" with fields**
+
+
+**STEP: Set the instance described "{uName}" of model "{uKlass}" with |name|value| fields**
 
 Given \
 Guven an instance described "uName" of a Model, like Model.get('account.invoice')

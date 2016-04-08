@@ -35,18 +35,18 @@ from supplier "{uSupplier}" with quantities
 | product_average	| 7.0	   | 6		|
 Idempotent.
 
-**STEP: T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from Supplier "{uSupplier}"**
+**STEP: T/ASAS/SASAS Quote and Confirm and Process a P. O. with description "{uDescription}" from supplier "{uSupplier}"**
 
 Given \
 T/ASAS/SASAS Quote and Confirm and Process a P. O. \
-with description "{uDescription}" from Supplier "{uSupplier}"
+with description "{uDescription}" from supplier "{uSupplier}"
 Idempotent.
 
-**STEP: T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from Supplier "{uSupplier}" with quantities**
+**STEP: T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" from supplier "{uSupplier}" with quantities**
 
 Given \
 T/ASAS/SASAS Receive 9 products from the P. O. with description "{uDescription}" \
-from Supplier "{uSupplier}" with quantities
+from supplier "{uSupplier}" with quantities
 Idempotent.
 
 **STEP: T/ASAS/SASAS After receiving 9 products assert the account credits and debits**
