@@ -1,5 +1,5 @@
 
-http://github.com/lampmantech/trytond_scenari
+http://github.com/lampmantech/behaving.trytond
 
 This package provides scenario testing for trytond using behave and behaving
 BDD (Behaviour Driven Development), and for loading trytond database
@@ -21,12 +21,12 @@ The steps of the domain language draw on the Python definitions in:
 For modularity, there is a local python module of undecorated Python code:
 {{{src/behaving/tests/features/steps/support/}}}
 
-trytond_scenari is inspired by OpenERPScenario:
+behaving.trytond is inspired by OpenERPScenario:
 https:///github.com/camptocamp/oerpscenario/
 (formerly http:///launchpad.net/~camptocamp/oerpscenario/)
 which uses behave: http://pythonhosted.org/behave
 for BDD testing of OpenERP (v6.x and 7.0).
-trytond_scenari uses proteus.
+behaving.trytond uses proteus.
 
 It has been structured to use the {{{behaving}}} namespace from
 https://github.com/ggozad/behaving/ and requires that package as a prerequisite.
@@ -34,17 +34,17 @@ This allows us to draw from other {{{behaving}}} namespace packages, to use
 {{{behaving.web}}} for example to test {{{sao}}}.
 
 Active development is on Tryton 3.6; see
-* [[Testing|https://github.com/lampmantech/trytond_scenari/wiki/Testing]]
+* [[Testing|https://github.com/lampmantech/behaving.trytond/wiki/Testing]]
 
 === Documentation ===
 
 The Documentation is in the Wiki:
-* [[Home|https://github.com/lampmantech/trytond_scenari/wiki/Home]]
+* [[Home|https://github.com/lampmantech/behaving.trytond/wiki/Home]]
 
 The feature files, and the summaries of the available steps, are in the Wiki:
-* [[Features|https://github.com/lampmantech/trytond_scenari/wiki/Features]]
-* [[Steps|https://github.com/lampmantech/trytond_scenari/wiki/Steps]]
-* [[TitleIndex|https://github.com/lampmantech/trytond_scenari/wiki/TitleIndex]]
+* [[Features|https://github.com/lampmantech/behaving.trytond/wiki/Features]]
+* [[Steps|https://github.com/lampmantech/behaving.trytond/wiki/Steps]]
+* [[TitleIndex|https://github.com/lampmantech/behaving.trytond/wiki/TitleIndex]]
 
 === Project ===
 
@@ -55,4 +55,4 @@ Please format wiki pages as Creole.
 For info on Creole, see http://wikicreole.org/
 
 Please file any bugs in the
-[[issues tracker|https://github.com/lampmantech/trytond_scenari/issues]].
+[[issues tracker|https://github.com/lampmantech/behaving.trytond/issues]].

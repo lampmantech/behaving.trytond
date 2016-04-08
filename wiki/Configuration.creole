@@ -33,7 +33,7 @@ export PGHOST=127.0.0.1
 As a rule, these tests to not tear down what they have done at the end,
 so that can be adapted to load database information and code into
 production systems, as well as testing. If you are running the tests
-in trytond_scenari, you may have drop the database created in a previous
+in behaving.trytond, you may have drop the database created in a previous
 run.  This also means that the order of execution of feature files may
 be important, if one step builds on a previous one, or interferes with it.
 

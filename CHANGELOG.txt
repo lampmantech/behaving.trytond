@@ -1,3 +1,8 @@
+commit c30c08e312683bfb37d1b65e6729cd2b25bca85c
+Date:   Sat Apr 9 00:02:05 2016 +0300
+
+    Updated doc
+
 commit cb172a19684d4a7044b385ecfb5f434ddc8cbbe8
 Date:   Thu Apr 7 23:58:45 2016 +0300
 
