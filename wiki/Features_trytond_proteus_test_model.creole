@@ -1,8 +1,8 @@
 
-@works32 @works34 @works36
+//@works32// //@works34// //@works36//
 == Feature:    test_model.py from proteus-3.2.2/proteus/tests ==
 
-===   Scenario: proteus test_model.py ===
+=== Scenario: proteus test_model.py ===
 
 \\      **Given** Ensure that the {{{"party"}}} module is loaded
 \\        **And** proteus/test_model test_class_cache

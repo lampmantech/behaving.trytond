@@ -1,10 +1,10 @@
 
 
-@works32 @works34 @works36
+//@works32// //@works34// //@works36//
 == Feature:    Run the Trytond scenario doctests (e.g. from ==
    trytond_account-2.8.1/tests/scenario_account_reconciliation.rst )
 
-===   Scenario: Run the company creation boilerplate ===
+=== Scenario: Run the company creation boilerplate ===
 
 \\      **Given** Ensure that the {{{"account"}}} module is loaded
 \\        **And** Set the default feature data

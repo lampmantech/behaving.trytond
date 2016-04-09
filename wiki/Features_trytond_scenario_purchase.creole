@@ -1,7 +1,7 @@
 
 
 
-@works32 @works34 @broken36
+//@works32// //@works34// //@broken36//
 == Feature:    Run the Trytond scenario_purchase doctests ==
     adapted from 
     [[https://github.com/lampmantech/trytond_scenari/master/raw/src/behaving/tests/features/trytond/purchase/scenario_purchase.rst|scenario_purchase.rst]]
@@ -10,7 +10,7 @@
 
     See this note in trytond_product-3.6.0/product.py:
 
-===   Scenario: Setup the tests of the purchase module ===
+=== Scenario: Setup the tests of the purchase module ===
 
 \\      **Given** Create database with pool.test set to True
 \\        **And** Ensure that the {{{"account_invoice_stock"}}} module is loaded
@@ -27,7 +27,7 @@
             | account.template,stock_production     | Stock Production          |
             | account.template,stock_supplier       | Stock Supplier            |
 
-===   Scenario: Create the company to test the module ===
+=== Scenario: Create the company to test the module ===
 
 \\      **Given** Create the company with default COMPANY_NAME and Currency code {{{"USD"}}}
 \\        **And** Reload the default User preferences into the context
@@ -39,7 +39,7 @@
 \\        **And** Create a default Minimal Account Chart
 \\        **And** Set the default credit and debit accounts on the cash Journal
 
-===   Scenario: Create the products that we will purchase ===
+=== Scenario: Create the products that we will purchase ===
     """
     We'll put a hack to work on systems without a CoTs:
     just call the tax {{{"NO Sales Tax"}}}.
@@ -73,7 +73,7 @@
             | account_revenue   | Main Revenue  |
 \\        **And** Create a PaymentTerm named {{{"Direct"}}} with {{{"0"}}} days remainder
 
-===   Scenario: Create the stock and inventory ===
+=== Scenario: Create the stock and inventory ===
 
 \\      **Given** Create an Inventory as user named {{{"Stock"}}} \\
             with storage at the location coded {{{"STO"}}}
@@ -83,7 +83,7 @@
             | name | quantity | expected_quantity       |
             | product | 100.0    | 0.0                  |
 
-===   Scenario: Create the first purchase order ===
+=== Scenario: Create the first purchase order ===
 
 \\      **Given** Purchase on date {{{"TODAY"}}} with description {{{"P. O. #1"}}} \\
             with their reference {{{"Ref1"}}} as user named {{{"Purchase"}}} \\
@@ -110,7 +110,7 @@
 \\        **And** T/PUR Check no new invoices in the P. O. \\
             with description {{{"P. O. #1"}}} for products from supplier {{{"Supplier"}}}
 
-===   Scenario: Create the second purchase order ===
+=== Scenario: Create the second purchase order ===
 
 \\      **Given** Purchase on date {{{"TODAY"}}} with description {{{"P. O. #2"}}} \\
             with their reference {{{"Ref2"}}} as user named {{{"Purchase"}}} \\
@@ -132,7 +132,7 @@
 \\        **And** Validate shipments on {{{"TODAY"}}} for P. O. with description {{{"P. O. #2"}}} \\
             as user named {{{"Stock"}}} for products from supplier {{{"Supplier"}}}
 
-===   Scenario: Unfinished - the rest still needs breaking out ===
+=== Scenario: Unfinished - the rest still needs breaking out ===
 
 \\      **Given** T/PUR Purchase Scenario
 

@@ -1,12 +1,12 @@
 
-@works32 @works34 @broken36
+//@works32// //@works34// //@broken36//
 == Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests ==
     adapted from {{{trytond_account_stock_anglo_saxon-3.2.1/tests/}}}
     [[https://github.com/lampmantech/trytond_scenari/master/raw/src/behaving/tests/features/trytond/sale_supply_drop_shipment/scenario_account_stock_anglo_saxon_with_drop_shipment.rst|scenario_account_stock_anglo_saxon_with_drop_shipment.rst]]
 
     Works, but still UNFINISHED.
 
-===   Scenario: Setup the tests of the module named "account_stock_anglo_saxon" ===
+=== Scenario: Setup the tests of the module named "account_stock_anglo_saxon" ===
 
 \\      **Given** Create database with pool.test set to True
 \\        **And** Ensure that the {{{"account_stock_anglo_saxon"}}} module is loaded
@@ -24,7 +24,7 @@
             | account.template,stock_supplier       | Stock Supplier       	|
 \\       **Then** the {{{"account_stock_anglo_saxon"}}} module is in the list of loaded modules
 
-===   Scenario: Create the company to test scenario_account_stock_anglo_saxon_with_drop_shipment ===
+=== Scenario: Create the company to test scenario_account_stock_anglo_saxon_with_drop_shipment ===
 \\      **Given** Create parties
 \\        **And** Create the company with default COMPANY_NAME and Currency code {{{"USD"}}}
 \\        **And** Reload the default User preferences into the context
@@ -36,7 +36,7 @@
 \\        **And** Create a default Minimal Account Chart
 \\        **And** Set the default credit and debit accounts on the cash Journal
 
-===   Scenario: Create the products that we will purchase ===
+=== Scenario: Create the products that we will purchase ===
 
 \\      **Given** Create a saved instance of {{{"product.category"}}} named {{{"Category"}}}
 \\        **And** Create a ProductTemplate named {{{"Product Template"}}} with stock accounts from features from a ProductCategory named {{{"Category"}}} with |name|value| fields
@@ -57,7 +57,7 @@
 \\        **And** Create a product with description {{{"T/ASASDS Product Description"}}} from template {{{"Product Template"}}}
 \\        **And** Create a PaymentTerm named {{{"Direct"}}} with {{{"0"}}} days remainder
 
-===   Scenario: Unfinished - the rest still needs breaking out ===
+=== Scenario: Unfinished - the rest still needs breaking out ===
 
 \\      **Given** T/ASASDS Account Stock Anglo-Saxon with Drop Shipment Scenario
 

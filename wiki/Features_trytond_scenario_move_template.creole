@@ -1,5 +1,5 @@
 
-@works36    
+//@works36//
 == Feature:    Run the Trytond scenario_move_template doctests ==
   Adapted from the file {{{trytond_account-3.6.0/tests/}}}
   [[https://github.com/lampmantech/trytond_scenari/master/raw/src/behaving/tests/features/trytond/move_template/scenario_move_template.rst|scenario_move_template.rst]]
@@ -44,14 +44,14 @@
   A wizard to create moved base on templates is available in the *Entries* menu.
   The templates are also available as actions when opening a journal.
 
-===   Scenario: Setup the tests of the module named "move_template" ===
+=== Scenario: Setup the tests of the module named "move_template" ===
 
 \\      **Given** Create database with pool.test set to True
 \\        **And** Ensure that the {{{"account_invoice"}}} module is loaded
 \\        **And** Set the default feature data
 \\       **Then** the {{{"account_invoice"}}} module is in the list of loaded modules
 
-===   Scenario: Setup the test company for the feature, with a sales tax ===
+=== Scenario: Setup the test company for the feature, with a sales tax ===
 
 \\      **Given** Create the company with default COMPANY_NAME and Currency code {{{"USD"}}}
 \\        **And** Reload the default User preferences into the context
@@ -70,7 +70,7 @@
             | credit_note_base_code | credit note base  |
             | credit_note_tax_code  | credit note tax   |
 
-===   Scenario: Make a move template and then define the Move Template Keywords ===
+=== Scenario: Make a move template and then define the Move Template Keywords ===
 
 \\      **Given** Create a MoveTemplate named {{{"Test Move Template"}}} on Journal coded {{{"CASH"}}}
 \\        **And** Add keywords to a MoveTemplate named {{{"Test Move Template"}}} with description {{{"{party} - {description}"}}} and |name|string|type|digits| following
@@ -81,7 +81,7 @@
             | rate        | Tax Rate    | numeric |      3 |
             | date        | Date        | char    |        | 
 
-===   Scenario: Populate the Move Line Template ===
+=== Scenario: Populate the Move Line Template ===
 
 \\      **Given** T/AIMT Add lines to a MoveTemplate named {{{"Test Move Template"}}} with Tax {{{"10% Sales Tax"}}} and |amount|account|tax|party|operation| following
             | amount               | account         | tax  | party | operation |
@@ -89,7 +89,7 @@
             | amount / 1.1         | expense         | base | party | debit     |
             | amount * (1 - 1/1.1) | invoice_account | tax  | party | debit     |
 
-===   Scenario:  Run the template instance ===
+=== Scenario:  Run the template instance ===
 
 \\      **Given** Create a move from a MoveTemplate named {{{"Test Move Template"}}} on date {{{"TODAY"}}} with |name|value| keywords following
             | name                 | value                    |

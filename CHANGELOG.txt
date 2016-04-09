@@ -1,3 +1,8 @@
+commit b47c4f0f444b7a23f9d6f26b7fb21408e28ee6fd
+Date:   Sat Apr 9 00:30:20 2016 +0300
+
+    Renamed project to behaving.trytond
+
 commit c30c08e312683bfb37d1b65e6729cd2b25bca85c
 Date:   Sat Apr 9 00:02:05 2016 +0300
 

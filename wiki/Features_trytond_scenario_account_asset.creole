@@ -1,5 +1,5 @@
 
-@wip
+//@wip//
 == Feature:    Run the Trytond scenario_move_template doctests ==
   Adapted from the file 
   {{{trytond_account_asset-3.6.2/tests/}}}
@@ -42,14 +42,14 @@
 
   An Asset Line defines for a date the value to depreciate.
 
-===   Scenario: Setup the tests of the module named "account_asset" ===
+=== Scenario: Setup the tests of the module named "account_asset" ===
 
 \\      **Given** Create database with pool.test set to True
 \\        **And** Ensure that the {{{"account_asset"}}} module is loaded
 \\        **And** Set the default feature data
 \\       **Then** the {{{"account_asset"}}} module is in the list of loaded modules
 
-===   Scenario: Setup the test company for the feature ===
+=== Scenario: Setup the test company for the feature ===
 
 \\      **Given** Create the company with default COMPANY_NAME and Currency code {{{"USD"}}}
 \\        **And** Reload the default User preferences into the context

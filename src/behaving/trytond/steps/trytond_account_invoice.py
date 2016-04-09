@@ -209,7 +209,7 @@ def oCreateAnInvoice(context, uDate, uDescription, uPaymentTerm, uParty, sType):
             if u'tax_account' in context.table.headings and row['tax_account']:
                 # tax_amount|base_amount|tax_code_id|base_code_id|tax_account
                 oInvoiceTax = invoice.taxes.new()
-                invoice.taxes.append(oInvoiceTax)
+                # invoice.taxes.append(oInvoiceTax)
                 if uQuantity:
                     oInvoiceTax.description = 'VAT'
                 else:

@@ -1,10 +1,10 @@
 
 
 
-@wip
+//@wip//
 == Feature:    Stock Shipment Out Scenario ==
 
-===   Scenario: test stock_supply ===
+=== Scenario: test stock_supply ===
 
 \\      **Given** Create database with pool.test set to True
 \\        **And** Ensure that the {{{"account"}}} module is loaded
@@ -20,7 +20,7 @@
             | account.template,stock_production     | Stock Production     	|
             | account.template,stock_supplier       | Stock Supplier       	|
 
-===   Scenario: Create the company to test the module ===
+=== Scenario: Create the company to test the module ===
 
 \\      **Given** Create the company with default COMPANY_NAME and Currency code {{{"USD"}}}
 \\        **And** Reload the default User preferences into the context
@@ -39,7 +39,7 @@
 \\        **And** Create a product with description {{{"Product Description"}}} \\
 	    from template {{{"T/SSIS Product Template"}}}
 
-===   Scenario: Unfinished ===
+=== Scenario: Unfinished ===
 
 \\      **Given** T/SSOS Stock Shipment Out Scenario
 

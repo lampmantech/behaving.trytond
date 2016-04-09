@@ -1,11 +1,11 @@
 
-@wip
+//@wip//
 == Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests with the ==
     {{{"product_cost_fifo"}}} module loaded and with a cost_price_method of "fifo.
     This FAILS on the asserts, as it should for, now because it is a copy
     changed to use FIFO, but the accounting results have not yet been updated.
 
-===   Scenario: Run the tests of the module named "product_cost_fifo" ===
+=== Scenario: Run the tests of the module named "product_cost_fifo" ===
 
 \\      **Given** Create database with pool.test set to True
 \\        **And** Ensure that the {{{"account_stock_anglo_saxon"}}} module is loaded
@@ -23,7 +23,7 @@
             | account.template,stock_supplier       | Stock Supplier       	|
 \\       **Then** the {{{"account_stock_anglo_saxon"}}} module is in the list of loaded modules
 
-===   Scenario: Create the company to test the module named "product_cost_fifo" ===
+=== Scenario: Create the company to test the module named "product_cost_fifo" ===
 
 \\      **Given** Create the company with default COMPANY_NAME and Currency code {{{"EUR"}}}
 \\        **And** Reload the default User preferences into the context
@@ -34,7 +34,7 @@
 \\        **And** Create a party named {{{"Customer"}}} with an account_payable attribute
 
 
-===   Scenario: Buy the products from the supplier, testing the module named "product_cost_fifo" ===
+=== Scenario: Buy the products from the supplier, testing the module named "product_cost_fifo" ===
 
 \\      **Given** Create a user named {{{"Accountant"}}} with the fields
             | name	| value		  	|
@@ -88,7 +88,7 @@
             | Product Average | 4.00     	 	|
 \\        **And** T/ASAS/SASAS After paying for what we received assert the account credits and debits
 
-===   Scenario: Sell the products to the customer, testing the module named "product_cost_fifo" ===
+=== Scenario: Sell the products to the customer, testing the module named "product_cost_fifo" ===
 
 \\      **Given** Create a sales order with description {{{"Sell 5 products"}}} \\
       	    in Currency coded {{{"EUR"}}} to customer {{{"Customer"}}} \\

@@ -1,8 +1,8 @@
 
-@works32 @works34 @works36
+//@works32// //@works34// //@works36//
 == Feature:    Create an Accountant user and give him a calendar ==
 
-===   Scenario: Create an Accountant user for various things ===
+=== Scenario: Create an Accountant user for various things ===
 
 \\      **Given** Ensure that the {{{"calendar"}}} module is loaded
 \\        **And** Ensure that the {{{"party_vcarddav"}}} module is loaded
@@ -12,7 +12,7 @@
             | password	| accountant				|
             | email	| accountant@example.com		|
 
-===   Scenario: Set the Accountant feature data ===
+=== Scenario: Set the Accountant feature data ===
 
 \\      **Given** Set the feature data with values
             | name                                  | value                    	|
@@ -21,7 +21,7 @@
             | user,Accountant,password              | accountant               	|
             | user,Accountant,email                 | accountant@example.com   	|
 
-===   Scenario: Create the calendar ===
+=== Scenario: Create the calendar ===
 
 \\      **Given** Create a calendar named {{{"AccountantsCal"}}} owned by the user {{{"Accountant"}}}
 
