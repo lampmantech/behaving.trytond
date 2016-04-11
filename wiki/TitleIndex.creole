@@ -27,6 +27,7 @@
 * [[Home]]
 * [[Installation]]
 * [[Organization]]
+* [[StepNamingConventions]]
 * [[Steps]]
 * [[Steps_ProteusConfig]]
 * [[Steps_basic_modules]]

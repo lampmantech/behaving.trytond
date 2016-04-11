@@ -1,3 +1,8 @@
+commit 5c0e43d9357e0dec521a8fd8851b89d71cab2771
+Date:   Sat Apr 9 18:15:44 2016 +0300
+
+    Fixed some github.com breakage
+
 commit b47c4f0f444b7a23f9d6f26b7fb21408e28ee6fd
 Date:   Sat Apr 9 00:30:20 2016 +0300
 
