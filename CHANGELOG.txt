@@ -1,3 +1,8 @@
+commit 14700aa9a8880d18a9ae6a2677fa8c160f5e2f96
+Date:   Mon Apr 11 23:48:39 2016 +0300
+
+    Added wiki/StepNamingConventions.creole
+
 commit 5c0e43d9357e0dec521a8fd8851b89d71cab2771
 Date:   Sat Apr 9 18:15:44 2016 +0300
 
