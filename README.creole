@@ -16,17 +16,19 @@ domain specific natural language with a Gherkin syntax, in the files:
 {{{src/behaving/tests/features/*/*.feature}}}
 
 The steps of the domain language draw on the Python definitions in:
-{{{src/behaving/tests/features/steps/*.py}}}
+{{{src/behaving/trytond/steps/*.py}}}. These steps then are activated
+in the {{{*.feature}}} file by the Python {{{import}}} statements in
+{{{src/behaving/tests/features/steps/__init__.py}}}
 
 For modularity, there is a local python module of undecorated Python code:
 {{{src/behaving/tests/features/steps/support/}}}
 
-behaving.trytond is inspired by OpenERPScenario:
+{{{behaving.trytond}}} is inspired by OpenERPScenario:
 https:///github.com/camptocamp/oerpscenario/
 (formerly http:///launchpad.net/~camptocamp/oerpscenario/)
 which uses behave: http://pythonhosted.org/behave
 for BDD testing of OpenERP (v6.x and 7.0).
-behaving.trytond uses proteus.
+behaving.trytond uses proteus for JSONRPC to the {{{trytond}}}.
 
 It has been structured to use the {{{behaving}}} namespace from
 https://github.com/ggozad/behaving/ and requires that package as a prerequisite.
