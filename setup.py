@@ -12,10 +12,11 @@ that it will not work on Windows.
  
 """
 import sys
+import os
 import glob
 from setuptools import setup, find_packages
 
-version = '0.0.8.dev1'
+version = '0.1.0'
 
 dParams = dict(name='behaving.trytond',
                version=version,
@@ -33,11 +34,11 @@ dParams = dict(name='behaving.trytond',
 #                   "Topic :: Utilities",
 #                   "Operating System :: Microsoft :: Windows",
                    "Operating System :: POSIX",
-                   "Operating System :: POSIX :: AIX",
-                   "Operating System :: POSIX :: Linux",
                    "Programming Language :: Python",
                    "Programming Language :: Python :: 2",
-                   "Programming Language :: Python :: 2.7",
+                   "Programming Language :: Python :: 2 :: Only",
+                   "Topic :: Software Development :: Quality Assurance",
+                   "Topic :: Software Development :: Testing",
                    ],
                keywords="BDD Behavior-Driven-Development testing tryton behave",
                author='Lampman Tech',
@@ -56,8 +57,45 @@ dParams = dict(name='behaving.trytond',
                                 glob.glob('docs/html/*.html'))],
            )
 
+BEHAVE_ARGS="--no-capture --no-capture-stderr --no-skipped --verbose"
+def iMain():
+    if sys.argv[-1] == 'publish':
+        os.system(sys.executable +" setup.py sdist --formats=gztar upload --show-response")
+#        os.system("python setup.py bdist_wheel upload")
+        print "You probably want to also tag the version now:"
+        print "  git tag -a %s -m 'version %s'" % (version, version, )
+        print "  git push --tags"
+        return 0
+    if sys.argv[-1] == 'test':
+        try:
+            modules = map(__import__, dParams['tests_require'])
+        except ImportError as e:
+            err_msg = e.message.replace("No module named ", "")
+            msg = "%s is not installed. Install your test requirments." % err_msg
+            raise ImportError(msg)
+        from behave.__main__ import main as behave_main
+        # We run the behave tests from the src directory
+        # so that behaving in on our sys.path, to run from source.
+        sStartDir = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(sStartDir, 'src'))
+        
+        largs = BEHAVE_ARGS.split()
+        largs.extend(['behaving/tests/features/behave_test.feature'])
+        iRetval = behave_main(largs)
+        return iRetval
+    
+    if '--help' in sys.argv:
+        print """
+Extra commands:
+
+  setup.py publish    will sdist upload the distribution to pypi
+  setup.py test       will run a very basic test of the software
+"""
+    
+    setup(**dParams)
+    return 0
+
 if __name__ == '__main__':
     if sys.version_info[:2] < (2, 6):
         sys.exit('behaving.trytond requires Python 2.6 or higher.')
-
-    setup(**dParams)
+    sys.exit(iMain())

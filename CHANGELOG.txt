@@ -1,3 +1,8 @@
+commit 88c0fda4a77a3ac8d2d95811b65c16a40d7abb10
+Date:   Wed Apr 13 18:04:40 2016 +0300
+
+    Corrected documentation
+
 commit 022cde4372c4517ccef56cac9a3b7562364faf1a
 Date:   Tue Apr 12 23:50:04 2016 +0300
 

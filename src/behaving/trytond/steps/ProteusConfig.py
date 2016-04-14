@@ -11,7 +11,6 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
 
     We restore the 3.2 behaviour of creating the database if it does not exist.
 
-
     """
 
     def __init__(self, database_uri=None, user='admin', language='en_US',
@@ -106,7 +105,6 @@ class TrytondConfig(OrigConfigModule.TrytondConfig):
             with transaction.set_user(self.user):
                 self._context = User.get_preferences(context_only=True)
             Cache.resets(database_name)
-
 
 def set_trytond(database_name=None,
                 user='admin', language='en_US', password='admin',
