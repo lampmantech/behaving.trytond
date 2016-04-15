@@ -122,7 +122,7 @@ def set_trytond(database_name=None,
 		"Set PGPASSWORD in the OS environment to be the postgres password"
     postgres_password = os.environ['PGPASSWORD'] # 'postgresTryton'
     assert 'PGUSER' in os.environ and os.environ['PGUSER'], \
-		"Set PGPASSWORD in the OS environment to be the postgres user"
+		"Set PGUSER in the OS environment to be the postgres user"
     postgres_user  = os.environ['PGUSER']        # 'tryton'
     if 'PGHOST' in os.environ and os.environ['PGHOST']:
         postgres_host = os.environ['PGHOST']

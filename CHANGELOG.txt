@@ -1,3 +1,8 @@
+commit add4e384846fd57db82f7c4a530d0194c5204b4a
+Date:   Thu Apr 14 17:21:46 2016 +0300
+
+    Added packaging to setup.py
+
 commit 88c0fda4a77a3ac8d2d95811b65c16a40d7abb10
 Date:   Wed Apr 13 18:04:40 2016 +0300
 

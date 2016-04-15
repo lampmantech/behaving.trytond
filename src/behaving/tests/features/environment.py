@@ -1,49 +1,55 @@
 # -*- encoding: utf-8 -*-
+"""
+This is the {{{environment.py}}} file  that is execed by behave before the
+steps are run, to define the hooks for before and after features and steps.
+
+There is a lot in here, that is used to parameterize the steps code
+from {{{behaving.trytond}}} so that it is easier to use the behaving feature
+files for more than just testing. We gather all of this parameterization
+into a file {{{environment.cfg}}} that should sit beside the features
+{{{environment.py}}} file. It lets you parameterize things like usernames,
+passwords, and names of accounts in the accounting charts. 
+
+So by simply editing the {{{environment.cfg}}} in the {{{tests/features/}}}
+directory, you can adapt the features to entirely different charts of accounts
+or use cases. In this way, the feature files can be used for loading
+Tyrton with real-world test cases into real charts of accounts, not just tests.
+
+You **must** edit the {{{environment.cfg}}} file before these tests will run,
+as you have to set the Trytond {{{user/password/super_pwd}}} as well as
+set the path to the {{{trytond.ini}}} file. Things will not work otherwise.
+
+The test scenarios assume that they are run with the Postgres test database
+freshly dropped, and will create it. Because the scenarios will be creating
+a fresh Postgres test database, it will need the Postgress user and password
+to create the database as. This is **not** set in the {{{environment.cfg}}}
+for security reasons; set {{{PGPASSWORD}}} in the OS environment of caller
+of {{{behave}}} to be the postgres password, and set {{{PGUSER}}} 
+to be the postgres user.
+
+Some of what is here may be old workarounds that are no longer needed.
+
+"""
 
 import sys, os
 import ConfigParser
 
-from datetime import datetime
-from optparse import OptionParser
+from trytond import __version__ as sTrytondVersion
 
-import proteus
-from proteus import Model, Wizard
-from .steps.support import tools
-from steps import ProteusConfig
+from behaving.trytond import environment as tenv
+from behaving.trytond.steps.support import tools, behave_better
+from behaving.trytond.steps import ProteusConfig
 
-from .steps.support import behave_better
 # Some monkey patches to enhance Behave
+# These should be reexamined to see if they are still needed.
 behave_better.patch_all()
-
-sVERSION = '3.6'
-sDB_NAME = 'lampmancy36'
-ETC_TRYTOND_CONF = '/n/data/TrytonOpenERP/etc/trytond-' +sVERSION +'.conf'
-sTRYTOND_USER = 'admin'
-sTRYTOND_PASSWD = 'foobar'
-
-def vCreateConfigFile(oEnvironmentCfg, sFile):
-
-    oEnvironmentCfg.add_section('trytond')
-    oEnvironmentCfg.set('trytond', 'password', sTRYTOND_PASSWD)
-    oEnvironmentCfg.set('trytond', 'user', sTRYTOND_USER)
-    oEnvironmentCfg.set('trytond', 'database_name', sDB_NAME)
-    oEnvironmentCfg.set('trytond', 'database_type', 'postgresql')
-    oEnvironmentCfg.set('trytond', 'config_file', ETC_TRYTOND_CONF)
-
-    oEnvironmentCfg.add_section('scenari')
-    oEnvironmentCfg.set('scenari', 'verbosity', '0')
-    oEnvironmentCfg.set('scenari', 'tracer', '')
-
-    # Writing our configuration file to 'example.cfg'
-    with open(sFile, 'wb') as oFd:
-        oEnvironmentCfg.write(oFd)
 
 def oReadConfigFile():
     oEnvironmentCfg = ConfigParser.RawConfigParser()
 
     sFile = os.path.splitext(__file__)[0]+'.cfg'
-    if not os.path.exists(sFile):
-        vCreateConfigFile(oEnvironmentCfg, sFile)
+    assert os.path.exists(sFile), \
+        "ERROR: environment.cfg file not found: " + sFile
     oEnvironmentCfg.read(sFile)
     return oEnvironmentCfg
 
@@ -51,6 +57,7 @@ def oReadConfigFile():
 def before_all(context):
     """These run before and after the whole shooting match.
     """
+    tenv.before_all(context)
     oEnvironmentCfg = oReadConfigFile()
 
     sAdminUser = oEnvironmentCfg.get('trytond', 'user')
@@ -63,10 +70,10 @@ def before_all(context):
 #?    assert sDatabaseType in ['postgresql'], "Unsupported database type: " + sDatabaseType
     sTrytonConfigFile = oEnvironmentCfg.get('trytond', 'config_file')
     assert os.path.exists(sTrytonConfigFile), \
-        "Required file not found: " + sTrytonConfigFile
+        "ERROR: Tryton ini file not found: " + sTrytonConfigFile
 
     context.oEnvironmentCfg = oEnvironmentCfg
-    if sVERSION == '3.2':
+    if sTrytondVersion.startswith('3.2'):
         context.oProteusConfig = ProteusConfig.set_trytond(
             database_name=sDatabaseName,
             user=sAdminUser,
@@ -94,12 +101,14 @@ def before_all(context):
 
         assert sTracer in lTracers, "Unsupported tracer: %s" % (sTracer,)
     # use this dictionary as a last resort to pass data around
+    # we could put it in contex.userdata but for now we'll keep it separate
     if not hasattr(context, 'dData'):
         context.dData = dict()
 
 def after_all(context):
     """These run after the whole shooting match.
     """
+    tenv.after_all(context)
     # This is REQUIRED if we dont want to leave a hanging
     # database connexion to postgres. It will show up
     # with netstat even after the behave process is done.
@@ -169,6 +178,7 @@ def after_step(context, laststep):
 def before_scenario(context, scenario):
     """These run before each scenario is run.
     """
+    tenv.before_scenario(context, scenario)
     # use this dictionary as a last resort to pass data around
     if not 'scenario' in context.dData or context.dData['scenario'] is None:
         context.dData['scenario'] = dict()
@@ -176,17 +186,20 @@ def before_scenario(context, scenario):
 def after_scenario(context, scenario):
     """These run after each scenario is run.
     """
+    tenv.after_scenario(context, scenario)
     context.dData['scenario'] = None
 
 def before_feature(context, feature):
     """These run before each feature file is exercised.
     """
+    tenv.before_feature(context, feature)
     if not 'feature' in context.dData or context.dData['feature'] is None:
         context.dData['feature'] = dict()
 
 def after_feature(context, feature):
     """These run after each feature file is exercised.
     """
+    tenv.after_feature(context, feature)
     context.dData['feature'] = None
 
 def before_tag(context, tag):

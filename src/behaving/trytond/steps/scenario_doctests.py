@@ -430,8 +430,8 @@ def step_impl(context, uName):
                 continue
             setattr(user, row['name'],
                     string_to_python(row['name'], row['value'], User))
-            sKey='user,'+uName+","+row['name']
-            context.dData['feature'][sKey]=row['value']
+            sKey = 'user,'+uName+","+row['name']
+            context.dData['feature'][sKey] = row['value']
         user.save()
 
         assert User.find([('name', '=', uName)])

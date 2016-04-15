@@ -1,19 +1,6 @@
 
 == Installation ==
 
-=== Running From the Source ===
-
-Once you have behaving, proteus, and trytond installed, there is no
-installation required for {{{behaving.trytond}}}: simply change
-to the {{{src}}} directory and run behave. So far, it has only
-been tested on postgres backends using proteus.
-
-The most trivial test, which does not even use trytond, is:
-{{{
-  behave --stop behaving/tests/features/behave_test.feature
-}}}
-
-
 === Installing the Namespace Module ===
 
 The normal usage is to install {{{behaving.trytond}}} as a Python
@@ -24,16 +11,68 @@ To install it, run the usual:
   python setup.py install
 }}}
 
-Then change to the {{{src/behaving/tests}}} directory and run the trivial
+So far, it has only been tested on postgres backends using proteus.
+
+=== Configuration ===
+
+Once the Python module has been installed, you still have to edit
+the configuration to set the parameters for the tests to talk to
+your Trytond server. This is managed by the {{{environment.py}}} file
+in the {{{src/behaving/tests/features/}}} directory, that is execed
+by {{{behave}}} before the steps are run. We use that code to parameterize
+the steps code from {{{behaving.trytond}}} so that it is easier to use
+the behaving feature files for more than just testing.
+
+We gather all of this parameterization into a file {{{environment.cfg}}}
+that should sit beside the features {{{environment.py}}} file.
+It lets you parameterize things like usernames, passwords, and
+names of accounts in the accounting charts. As distributed, there is an
+{{{environment.cfg.en}}} file that serves as a template in English;
+copy {{{environment.cfg.en}}} to {{{environment.cfg}}} and edit it.
+
+By simply editing the {{{environment.cfg}}} in the {{{tests/features/}}}
+directory, you can adapt the features to entirely different charts of accounts
+or use cases. In this way, the feature files can be used for loading
+Tryton with real-world test cases into real charts of accounts, not just tests.
+
+You **must** edit the {{{environment.cfg}}} file before these tests will run,
+as you have to set the Trytond {{{user/password/super_pwd}}} as well as
+set the path to the {{{trytond.ini}}} file, and the name of the Postgres
+database. Things will not work otherwise.
+
+The test scenarios assume that they are run with the Postgres test database
+freshly dropped, and will create it. Because the scenarios will be creating
+a fresh Postgres test database, it will need the Postgress user and password
+to create the database as. This is **not** set in the {{{environment.cfg}}}
+for security reasons; set {{{PGPASSWORD}}} in the OS environment of caller
+of {{{behave}}} to be the Postgres password, and set {{{PGUSER}}} 
+to be the Postgres user.
+
+=== Running the Tests ===
+
+Once you have installed the {{{behaving.trytond}}} module and edited
+the {{{environment.cfg}}}, simply change to the {{{src}}} directory
+and run {{{behave}}}. 
+
+The most trivial test, which does not even use trytond, is:
 {{{
-  behave --stop features/behave_test.feature
+  env PGUSER=trytond PGPASSWORD=mysecret \
+  behave --stop behaving/tests/features/behave_test.feature
 }}}
 
-You cannot just run all of the features recursively: {{{behave --stop features}}}
+You cannot just run all of the features recursively:
+{{{
+  behave --stop features
+}}}
 As a rule, all tests within a directory should not interfere with each
 other, but each directory has to be run with the test database freshly dropped.
-It is expected that there is interference in the features between directories;
+It is planned that there is interference in the features between directories;
 see [[Testing]].
+
+=== Making your own Features and Steos Tests ===
+
+Because the main code for the steps is in an importable Python module,
+you can write your own features and steps anywhere in your own tree.
 
 Look at the structure of the {{{src/behaving/tests}}} directory
 and you can use the {{{features/*.*}}} and {{{features/steps/__init__.py}}}
@@ -41,7 +80,7 @@ files as a template to run your own set of features and steps from
 your own directories.
 
 The steps {{{features/steps/}}} module is where you import the steps code from
-from the steps module of the behaving.trytond package: 
+from the {{{steps}}} module of the {{{behaving.trytond}}} Python package: 
 {{{
     from behaving.trytond.steps import *
 }}}
@@ -50,4 +89,8 @@ You can also import steps from other behaving namespace packages. For example,
 to use {{{behaving.web}}}  in your steps, you would add another line like:
 {{{
     from behaving.web.steps import *
+}}}
+and then call to the environment functions in your  {{{environment.py}}} file
+{{{
+from behaving.web import environment as wenv
 }}}
