@@ -1,3 +1,8 @@
+commit f54d4c5df28cb57bd73f5777d4e12bbd9f968b13
+Date:   Fri Apr 15 16:43:29 2016 +0300
+
+    Documented Installation and configuration
+
 commit add4e384846fd57db82f7c4a530d0194c5204b4a
 Date:   Thu Apr 14 17:21:46 2016 +0300
 
