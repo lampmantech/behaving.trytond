@@ -1,3 +1,8 @@
+commit 41ffa8ab5df4222b4902f3ff1d1e0b731b4010e2
+Date:   Sat Apr 16 18:20:32 2016 +0300
+
+    made configobj a dependency
+
 commit f54d4c5df28cb57bd73f5777d4e12bbd9f968b13
 Date:   Fri Apr 15 16:43:29 2016 +0300
 
