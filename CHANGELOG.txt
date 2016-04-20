@@ -1,3 +1,8 @@
+commit e1b18cc2a1b4469ee05d22e5ff491f45083d6695
+Date:   Mon Apr 18 18:23:39 2016 +0300
+
+    Updated documentation
+
 commit 41ffa8ab5df4222b4902f3ff1d1e0b731b4010e2
 Date:   Sat Apr 16 18:20:32 2016 +0300
 

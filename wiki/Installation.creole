@@ -18,7 +18,7 @@ So far, it has only been tested on postgres backends using proteus.
 Once the Python module has been installed, you still have to edit
 the configuration to set the parameters for the tests to talk to
 your Trytond server. This is managed by the {{{environment.py}}} file
-in the {{{src/behaving/tests/features/}}} directory, that is execed
+in the {{{tests/features/}}} directory, that is execed
 by {{{behave}}} before the steps are run. We use that code to parameterize
 the steps code from {{{behaving.trytond}}} so that it is easier to use
 the behaving feature files for more than just testing.
@@ -51,13 +51,14 @@ to be the Postgres user.
 === Running the Tests ===
 
 Once you have installed the {{{behaving.trytond}}} module and edited
-the {{{environment.cfg}}}, simply change to the {{{src}}} directory
+the {{{environment.cfg}}}, simply change to the {{{tests}}} directory
 and run {{{behave}}}. 
 
 The most trivial test, which does not even use trytond, is:
 {{{
+  cd tests/
   env PGUSER=trytond PGPASSWORD=mysecret \
-  behave --stop behaving/tests/features/behave_test.feature
+  behave --stop features/behave_test.feature
 }}}
 
 You cannot just run all of the features recursively:
@@ -74,7 +75,7 @@ see [[Testing]].
 Because the main code for the steps is in an importable Python module,
 you can write your own features and steps anywhere in your own tree.
 
-Look at the structure of the {{{src/behaving/tests}}} directory
+Look at the structure of the {{{tests}}} directory
 and you can use the {{{features/*.*}}} and {{{features/steps/__init__.py}}}
 files as a template to run your own set of features and steps from
 your own directories.

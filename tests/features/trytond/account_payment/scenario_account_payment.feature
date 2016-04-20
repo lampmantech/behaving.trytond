@@ -2,8 +2,9 @@
 
 @works32 @works34 @works36
 Feature:    Run the Trytond scenario_payment doctests
-    adapted from the file scenario_account_payment.rst
-    in trytond_account_payment-3.2.1/tests/
+    adapted from the file in {{{trytond_account_payment-3.2.1/tests/}}}
+    [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/account_payment/scenario_account_payment.rst|scenario_account_payment.rst]]
+
 
   Scenario: Setup the tests of the module named "account_payment"
 

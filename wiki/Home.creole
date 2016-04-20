@@ -15,12 +15,12 @@ of the end-user. At the same time, duplication of code is eliminated.
 
 Tests are contained is textual feature files written in a
 domain specific natural language with a Gherkin syntax, in the files:
-{{{src/behaving/tests/features/*/*.feature}}}
+{{{tests/features/*/*.feature}}}
 
 The steps of the domain language draw on the Python definitions in:
 {{{src/behaving/trytond/steps/*.py}}}. These steps then are activated
 in the {{{*.feature}}} file by the Python {{{import}}} statements in
-{{{src/behaving/tests/features/steps/__init__.py}}}
+{{{tests/features/steps/__init__.py}}}
 
 For modularity, there is a local python module of undecorated Python code:
 {{{src/behaving/trytond/steps/support/}}}

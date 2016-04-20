@@ -4,7 +4,7 @@
 
   Account Statement Scenario
   from trytond_account_statement-3.6.0/tests/
-  [[https://github.com/lampmantech/trytond_scenari/master/raw/src/behaving/tests/features/trytond/account_statement/scenario_account_statement.rst|scenario_account_statement.rst]]
+  [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/account_statement/scenario_account_statement.rst|scenario_account_statement.rst]]
 
   Works, but still not broken up yet.
 

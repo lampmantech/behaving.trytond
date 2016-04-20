@@ -6,8 +6,10 @@
 @works32 @works34 @broken36
 Feature:    Run the Trytond scenario_purchase doctests
     adapted from 
-    in 
+    [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/purchase/scenario_purchase.rst|scenario_purchase.rst]]
+
     Works, but still UNFINISHED.
+
     See this note in trytond_product-3.6.0/product.py:
 # This is a false positive as there is 1 product with the
 # template 1 and the same product with category 1. If you do not
@@ -125,7 +127,7 @@ Feature:    Run the Trytond scenario_purchase doctests
             with their reference "Ref2" as user named "Purchase" \
             in Currency coded "USD" ProductTemplates from supplier "Supplier" \
             with PaymentTerm "Direct" and InvoiceMethod "shipment" \
-            with |name|quantity|description| fields
+            with |name|quantity|line_description| fields
             | name | quantity | line_description        |
             | product | 2.0      |              |
             | product | comment  | Comment      |

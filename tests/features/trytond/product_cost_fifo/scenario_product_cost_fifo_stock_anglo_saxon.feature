@@ -66,7 +66,7 @@ Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests with the
             | product_fixed	| fifo   	    | Product Fixed       	|
             | product_average	| fifo		    | Product Average     	|
         And Create a Purchase Order with description "12 products" \
-	    from Supplier "Supplier" with fields
+	    from supplier "Supplier" with fields
             | name              | value    	|
             | invoice_method    | shipment 	|
             | payment_term      | Direct 	 	|
@@ -113,7 +113,7 @@ Feature:    Run the Trytond scenario_account_stock_anglo_saxon doctests with the
 	    with description "Sell 5 products" to customer "Customer"
         And T/ASAS/SASAS After posting the invoice to customer \
 	    assert the account credits and debits
-        And T/ASAS/SASAS Create an invoice to supplier "Supplier" \
+        And T/ASAS/SASAS Create an Invoice to supplier "Supplier" \
 	    with PaymentTerm "Direct" by an accountant with quantities
             | description     | quantity	| unit_price 	|
             | Product Fixed   | 5.0      	| 4.00	     	|

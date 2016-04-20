@@ -34,7 +34,8 @@ Some of what is here may be old workarounds that are no longer needed.
 import sys, os
 import ConfigParser
 
-from trytond import __version__ as sTrytondVersion
+# from trytond import __version__ as sTRYTOND_VERSION
+sTRYTOND_VERSION = '3.6'
 
 from behaving.trytond import environment as tenv
 from behaving.trytond.steps.support import tools, behave_better
@@ -73,7 +74,7 @@ def before_all(context):
         "ERROR: Tryton ini file not found: " + sTrytonConfigFile
 
     context.oEnvironmentCfg = oEnvironmentCfg
-    if sTrytondVersion.startswith('3.2'):
+    if sTRYTOND_VERSION.startswith('3.2'):
         context.oProteusConfig = ProteusConfig.set_trytond(
             database_name=sDatabaseName,
             user=sAdminUser,

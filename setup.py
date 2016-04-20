@@ -33,14 +33,13 @@ dParams = dict(name='behaving.trytond',
                    "Topic :: Software Development :: Testing",
                    "Topic :: Software Development :: Libraries",
                    "Topic :: Software Development :: Libraries :: Python Modules"
-#                   "Topic :: Utilities",
+                   "Topic :: Software Development :: Quality Assurance",
+                   "Topic :: Software Development :: Testing",
 #                   "Operating System :: Microsoft :: Windows",
                    "Operating System :: POSIX",
                    "Programming Language :: Python",
                    "Programming Language :: Python :: 2",
                    "Programming Language :: Python :: 2 :: Only",
-                   "Topic :: Software Development :: Quality Assurance",
-                   "Topic :: Software Development :: Testing",
                    ],
                keywords="BDD Behavior-Driven-Development testing tryton behave",
                author='Lampman Tech',
@@ -55,7 +54,7 @@ dParams = dict(name='behaving.trytond',
                # The code is being developed Unix-only for now - 'Windows', 
                platforms = ['Linux', 'Unix', 'MacOS X'],
                tests_require=['behave', 'proteus', 'trytond'],
-               data_files=[('share/doc/behaving.trytond/html',
+               data_files=[('doc/behaving.trytond/html',
                                 glob.glob('docs/html/*.html'))],
            )
 
@@ -76,7 +75,7 @@ def iMain():
             msg = "%s is not installed. Install your test requirments." % err_msg
             raise ImportError(msg)
         sStartDir = os.path.dirname(os.path.realpath(__file__))
-        sCfgFile = os.path.join(sStartDir, 'src/behaving/tests/features/environment.cfg')
+        sCfgFile = os.path.join(sStartDir, 'tests/features/environment.cfg')
         assert os.file.exists(sCfgFile), \
           "You must create and edit the configuration file before you can run the tests\n" \
           + "Look at the documentation in wiki/Installation.creole\n" \

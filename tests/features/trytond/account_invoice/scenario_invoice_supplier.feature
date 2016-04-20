@@ -2,8 +2,8 @@
 
 @works32 @works34 @works36
 Feature:    Run the Trytond scenario_invoice_supplier doctests
-    adapted from the file scenario_invoice_supplier.rst
-    in trytond_account_invoice-3.0.0/tests/
+    adapted from the file in {{{trytond_account_invoice-3.0.0/tests/}}}
+    [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/account_invoice/scenario_invoice_supplier.rst|scenario_invoice_supplier.rst]]
 
   Scenario: Setup the tests of the module named "account_invoice"
 

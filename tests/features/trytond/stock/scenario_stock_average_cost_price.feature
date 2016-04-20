@@ -1,11 +1,12 @@
 # -*- encoding: utf-8 -*-
 
-# These are straight cut-and-paste from Trytond doctests from
-# trytond_stock-3.2.3/tests/scenario_stock_average_cost_price.rst
-
-
 @works32 @works34 @works36
 Feature:    Stock Average Cost Price Scenario
+
+  These are straight cut-and-paste from Trytond doctests from
+  {{{trytond_stock-3.2.3/tests/}}}
+  [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/stock/scenario_stock_average_cost_price.rst|scenario_stock_average_cost_price.rst]]
+
 
   Scenario: test stock
     

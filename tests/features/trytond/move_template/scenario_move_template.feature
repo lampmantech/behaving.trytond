@@ -2,8 +2,8 @@
 
 @works36    
 Feature:    Run the Trytond scenario_move_template doctests
-  Adapted from the file 
-  trytond_account-3.6.0/tests/scenario_move_template.rst
+  Adapted from the file {{{trytond_account-3.6.0/tests/}}}
+  [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/move_template/scenario_move_template.rst|scenario_move_template.rst]]
 
   A move template allows one to configure predefined moves. 
   A Move Template is defined by the following fields

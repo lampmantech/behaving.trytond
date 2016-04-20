@@ -1,16 +1,21 @@
+# You must edit this file before these tests will run, as you have to
+# set the Trytond user/password/super_pwd as well as set the path to the
+# trytond.ini file.
+
+# Usually, it's just the values in this first section that must be set.
 [trytond]
 user = admin
 password = admin
 super_pwd = admin
 database_name = test36
 database_type = postgresql
-config_file = /n/data/TrytonOpenERP/etc/trytond-3.6.ini
+config_file = /etc/trytond-3.6.ini
 
 [scenari]
 verbosity = 0
 tracer = pdb
 
-# These are the default values in the Tryton code
+# These are the default values in the Tryton code, in English.
 [party]
 company_name = B2CK
 

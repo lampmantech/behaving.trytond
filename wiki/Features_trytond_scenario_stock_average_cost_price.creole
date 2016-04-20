@@ -4,7 +4,7 @@
 
   These are straight cut-and-paste from Trytond doctests from
   {{{trytond_stock-3.2.3/tests/}}}
-  [[https://github.com/lampmantech/trytond_scenari/master/raw/src/behaving/tests/features/trytond/stock/scenario_stock_average_cost_price.rst|scenario_stock_average_cost_price.rst]]
+  [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/stock/scenario_stock_average_cost_price.rst|scenario_stock_average_cost_price.rst]]
 
 
 === Scenario: test stock ===

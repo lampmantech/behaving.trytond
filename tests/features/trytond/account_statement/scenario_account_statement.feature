@@ -4,13 +4,15 @@
 Feature:    Run the Trytond scenario_account_statement doctests
 
   Account Statement Scenario
-  from trytond_account_statement-3.6.0/tests/scenario_account_statement.rst
+  from trytond_account_statement-3.6.0/tests/
+  [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/account_statement/scenario_account_statement.rst|scenario_account_statement.rst]]
+
   Works, but still not broken up yet.
 
   Scenario: Setup the tests of the module named "account_invoice"
 
       Given Create database with pool.test set to True
-        And Ensure that the "account_invoice" module is loaded
+        And Ensure that the "account_statement" module is loaded
         And Set the default feature data
        Then the "account_statement" module is in the list of loaded modules
 

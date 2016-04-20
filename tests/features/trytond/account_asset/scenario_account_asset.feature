@@ -3,7 +3,8 @@
 @wip
 Feature:    Run the Trytond scenario_move_template doctests
   Adapted from the file 
-  trytond_account_asset-3.6.2/tests/scenario_account_asset.rst
+  {{{trytond_account_asset-3.6.2/tests/}}}
+  [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/account_asset/scenario_account_asset.rst|scenario_account_asset.rst]]
   
   The account_asset module adds the depreciation of fixed assets.
   

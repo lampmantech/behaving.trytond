@@ -4,7 +4,7 @@
 //@works32// //@works34// //@broken36//
 == Feature:    Run the Trytond scenario_purchase doctests ==
     adapted from 
-    [[https://github.com/lampmantech/trytond_scenari/master/raw/src/behaving/tests/features/trytond/purchase/scenario_purchase.rst|scenario_purchase.rst]]
+    [[https://github.com/lampmantech/trytond_scenari/master/raw/tests/features/trytond/purchase/scenario_purchase.rst|scenario_purchase.rst]]
 
     Works, but still UNFINISHED.
 
