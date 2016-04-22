@@ -1,3 +1,8 @@
+commit e3fa2a3998cd198667e167bc0022839bf4a0b665
+Date:   Thu Apr 21 02:38:24 2016 +0300
+
+    Moved tests up to the root
+
 commit e1b18cc2a1b4469ee05d22e5ff491f45083d6695
 Date:   Mon Apr 18 18:23:39 2016 +0300
 

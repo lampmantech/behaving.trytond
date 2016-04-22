@@ -79,7 +79,7 @@ def iMain():
         assert os.file.exists(sCfgFile), \
           "You must create and edit the configuration file before you can run the tests\n" \
           + "Look at the documentation in wiki/Installation.creole\n" \
-          sCfgFile
+          + sCfgFile
           
         from behave.__main__ import main as behave_main
         # We run the behave tests from the src directory
